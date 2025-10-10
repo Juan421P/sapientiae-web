@@ -1,0 +1,14 @@
+{
+	"name": "sapientiae-web",
+	"type": "module",
+	"version": "1.0.0",
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build",
+		"preview": "vite preview"
+	},
+	"devDependencies": {
+		"vite": "^5.4.0",
+		"@tailwindcss/vite": "^4.1.11"
+	}
+}

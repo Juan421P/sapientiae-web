@@ -1,0 +1,141 @@
+@import 'tailwindcss';
+
+@layer base {
+
+    :root {
+        --body-from: 224, 231, 255;
+        /* indigo-100 */
+        --body-to: 219, 234, 254;
+        /* blue-100 */
+
+        --card-from: 238, 242, 255;
+        /* indigo-50 */
+        --card-to: 239, 246, 255;
+        /* blue-50 */
+
+        --text-from: 129, 140, 248;
+        /* indigo-400 */
+        --text-to: 96, 165, 250;
+        /* blue-400 */
+
+        --button-from: 129, 140, 248;
+        /* indigo-400 */
+        --button-to: 96, 165, 250;
+        /* blue-400 */
+        --button-text: 255, 255, 255;
+        /* white */
+
+        --placeholder-from: 165, 180, 252;
+        /* indigo-300 */
+        --placeholder-to: 147, 197, 253;
+        /* blue-300 */
+
+        --off-from: 199, 210, 254;
+        /* indigo-200 */
+        --off-to: 191, 219, 254;
+        /* blue-200 */
+    }
+
+    .dark {
+        --body-from: 38, 38, 38;
+        /* neutral-800 */
+        --body-to: 64, 64, 64;
+        /* neutral-700 */
+
+        --card-from: 31, 31, 31;
+        /* neutral-900 */
+        --card-to: 38, 38, 38;
+        /* neutral-800 */
+
+        --text-from: 229, 231, 235;
+        /* gray-200 */
+        --text-to: 209, 213, 219;
+        /* gray-300 */
+
+        /* Dark mode button gradient variables */
+        --button-from: 129, 140, 248;
+        /* indigo-400 */
+        --button-to: 96, 165, 250;
+        /* blue-400 */
+        --button-text: 255, 255, 255;
+        /* white */
+
+        --placeholder-from: 165, 180, 252;
+        /* indigo-300 */
+        --placeholder-to: 147, 197, 253;
+        /* blue-300 */
+
+        --off-from: 199, 210, 254;
+        /* indigo-200 */
+        --off-to: 191, 219, 254;
+        /* blue-200 */
+    }
+
+    input[type="password"]::-ms-reveal,
+    input[type="password"]::-ms-clear {
+        display: none;
+    }
+
+    input[type="password"]::password-toggle {
+        display: none;
+    }
+
+    body {
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    * {
+        user-select: none;
+    }
+
+    *:focus {
+        outline: none;
+    }
+
+}
+
+@layer utilities {
+
+    .text-2b {
+        color: #2B2B2B;
+    }
+
+    .text-d4 {
+        color: #D4D4D4;
+    }
+
+    .bg-2b {
+        background-color: #2B2B2B;
+    }
+
+    .bg-d4 {
+        background-color: #D4D4D4;
+    }
+
+    .bg-size-sm {
+        background-size: 300px;
+    }
+
+    .scrollbar-width-none {
+        scrollbar-width: none;
+    }
+
+    .scrollbar-width-none::-webkit-scrollbar {
+        display: none;
+    }
+
+}
+
+@layer components {
+
+    .btn-component {
+        @apply flex items-center justify-start gap-5 w-full px-5 py-4 rounded-xl text-[rgb(var(--button-from))] group-hover:text-[rgb(var(--button-text))] bg-gradient-to-r group-hover:from-[rgb(var(--button-from))] group-hover:to-[rgb(var(--button-to))] transition-all duration-300 cursor-pointer font-[512.5] hover:shadow-lg;
+    }
+
+    .secondary-btn-component {
+        @apply flex items-center justify-between gap-5 w-full px-5 py-4 rounded-xl text-[rgb(var(--button-text))] bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] transition-all hover:brightness-120 shadow-lg duration-300 cursor-pointer font-[512.5];
+    }
+
+}
+
+@import './animations.css';

@@ -1,0 +1,63 @@
+@keyframes left-spin-pulse {
+
+    0%,
+    100% {
+        transform: translateX(-50%) translateY(50%) scale(1) rotate(0deg);
+    }
+
+    50% {
+        transform: translateX(-50%) translateY(50%) scale(1.15) rotate(180deg);
+    }
+
+}
+
+.animate-left-spin-pulse {
+    animation: left-spin-pulse 30s ease-in-out infinite;
+}
+
+@keyframes right-spin-pulse {
+
+    0%,
+    100% {
+        transform: translateX(50%) translateY(-50%) scale(1) rotate(0deg);
+    }
+
+    50% {
+        transform: translateX(50%) translateY(-50%) scale(1.15) rotate(180deg);
+    }
+
+}
+
+.animate-right-spin-pulse {
+    animation: right-spin-pulse 20s ease-in-out infinite;
+}
+
+@keyframes toast-fade {
+
+    0% {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+
+    10% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    90% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+
+}
+
+.animate-toast-fade {
+    animation-name: toast-fade;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards;
+}
