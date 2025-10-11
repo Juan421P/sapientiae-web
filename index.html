@@ -1,24 +1,27 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Redireccionando...</title>
-  <script type="module">
-    import { AuthService } from './js/services/auth.service.js';
 
-    (async () => {
-      try {
-        const session = await AuthService.me();
-        if (session && session.user) {
-          window.location.href = '/html/general/main.html';
-        } else {
-          window.location.href = '/html/general/login.html';
-        }
-      } catch {
-        window.location.href = '/html/general/login.html';
-      }
-    })();
-  </script>
+<head>
+    <meta charset="UTF-8">
+    <title>Redireccionando...</title>
+    <script type="module">
+        import { AuthService } from './js/services/auth.service.js';
+
+        (async () => {
+            try {
+                const session = await AuthService.me();
+                if (session && session.user) {
+                    window.location.href = '/html/general/main.html';
+                } else {
+                    window.location.href = '/html/general/login.html';
+                }
+            } catch {
+                window.location.href = '/html/general/login.html';
+            }
+        })();
+    </script>
 </head>
+
 <body></body>
+
 </html>

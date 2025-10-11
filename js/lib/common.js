@@ -10,40 +10,11 @@ export function formatDate(isoString) {
 	return d.toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
 }
 
-export function stripScripts(htmlOrFragment) {
-	const tpl = document.createElement('template');
-	if (typeof htmlOrFragment === 'string') {
-		tpl.innerHTML = htmlOrFragment.trim();
-	} else {
-		tpl.content.append(htmlOrFragment.cloneNode(true));
-	}
-	tpl.content.querySelectorAll('script').forEach(s => s.remove());
-	return tpl;
-}
-
-export function extractTemplateContent(html) {
-	const tpl = stripScripts(html);
-
-	const nestedTemplate = tpl.content.querySelector('template');
-	if (nestedTemplate) {
-		return nestedTemplate.content;
-	}
-
-	const form = tpl.content.querySelector('form');
-	if (form) {
-		const fragment = new DocumentFragment();
-		fragment.appendChild(form.cloneNode(true));
-		return fragment;
-	}
-
-	return tpl.content;
-}
-
-export async function showImageModal(src) {
-	const { Modal } = await import('../../components/overlay/modal/modal.js');
-	const modal = new Modal({ templateId: 'tmpl-image-preview', size: 'lg', hideCloseButton: true });
-	modal.contentHost.querySelector('#modal-image-preview').src = src;
-}
+// export async function showImageModal(src) {
+// 	const { Modal } = await import('../../components/overlay/modal/modal.js');
+// 	const modal = new Modal({ templateId: 'tmpl-image-preview', size: 'lg', hideCloseButton: true });
+// 	modal.contentHost.querySelector('#modal-image-preview').src = src;
+// }
 
 export function countEntries(data, filters = []) {
 	return data.filter(entry => {

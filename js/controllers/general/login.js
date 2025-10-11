@@ -1,3 +1,4 @@
+import { AuthService } from './../../services/auth.service';
 import { Toast } from './../components/toast';
 const toast = new Toast();
 
@@ -25,7 +26,7 @@ function setupEmailField() {
             'Enter'
         ].includes(e.key) || e.ctrlKey || e.metaKey) return;
 
-        if (!/^[A-Za-z0-9#!@&.]$/.test(e.key)) {
+        if (!/^[A-Za-z0-9@.]$/.test(e.key)) {
             e.preventDefault();
         }
     });
@@ -73,22 +74,22 @@ async function setupForm() {
         e.preventDefault();
         try {
             const result = await AuthService.login(
-                (values['email-input'] || '').trim(),
-                (values['password-input'] || '').trim()
+                (emailInput.value.trim()),
+                (passwordInput.value || '').trim()
             );
-            if (result.success) {
-                window.location.hash = '';
+            if (result.status === 'success') {
+                sessionStorage.setItem('user', JSON.stringify((await AuthService.me()).user))
+                window.location.href = '/html/general/main.html';
             } else {
-                toast.show('Credenciales incorrectas');
+                toast.show('Credenciales incorrectas', 'warn');
             }
         } catch (error) {
             console.error(error);
-            toast.show('Error al iniciar sesión');
+            toast.show('Error al iniciar sesión', 'error');
         }
     })
 }
 
-toast.show('Inicio de sesión exitoso 🥺', 'success');
 setupPasswordField();
 setupEmailField();
 await setupForm();

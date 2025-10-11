@@ -75,10 +75,6 @@ export class Toast {
             progressBar.style.width = '0%';
         });
 
-        toast.querySelector('button').addEventListener('click', () => {
-            toast.remove();
-        });
-
         toast.addEventListener('animationend', (e) => {
             if (e.animationName === 'toast-fade') toast.remove();
         });

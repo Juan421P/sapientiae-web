@@ -1,6 +1,8 @@
+import { buildInitials } from './../../lib/common';
 import { AuthService } from './../../services/auth.service';
 
-const navbar = document.querySelector('#navbar');
+const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+const getLabelSpan = (element) => element.querySelector('span:not(.profile-initials)');
 
 function attachCollapses() {
     document.querySelectorAll('[data-toggle="collapse"]').forEach(btn => {
@@ -37,7 +39,7 @@ function attachCollapses() {
 
 async function filterByRole() {
     try {
-        const role = ((await AuthService.me()).user).roleID;
+        const role = user.roleID;
 
         const allowedMap = {
             'Administrador': ['system', 'planification'],
@@ -48,24 +50,31 @@ async function filterByRole() {
         };
 
         const allowedDirs = allowedMap[role] || [];
-
         const navbar = document.querySelector('nav');
 
-        navbar.querySelectorAll('a[href]').forEach(link => {
-            const href = link.getAttribute('href');
+        navbar.querySelectorAll('.nav-btn').forEach(item => {
+            let shouldShow = false;
 
-            const dir = href.split('/').slice(-2, -1)[0];
-
-            const isGlobal = ['main', 'news', 'not-found', 'profile'].some(file => href.includes(file));
-
-            if (!isGlobal && !allowedDirs.includes(dir)) {
-                link.closest('li')?.remove();
+            const link = item.querySelector('a[href]');
+            if (link) {
+                const dir = link.getAttribute('href').split('/').slice(-2, -1)[0];
+                shouldShow = ['main', 'news', 'not-found', 'profile'].includes(dir) || allowedDirs.includes(dir);
             }
-        });
 
-        navbar.querySelectorAll('ul').forEach(ul => {
-            if (!ul.querySelector('li')) {
-                ul.closest('.nav-btn')?.remove();
+            const btn = item.querySelector('button[data-toggle="collapse"]');
+            if (btn) {
+                const targetId = btn.dataset.target;
+                const target = targetId ? document.querySelector(targetId) : null;
+                if (target) {
+                    shouldShow = Array.from(target.querySelectorAll('a[href]')).some(nestedLink => {
+                        const dir = nestedLink.getAttribute('href').split('/').slice(-2, -1)[0];
+                        return allowedDirs.includes(dir);
+                    });
+                }
+            }
+
+            if (shouldShow) {
+                item.classList.remove('hidden');
             }
         });
 
@@ -76,7 +85,6 @@ async function filterByRole() {
 
 async function injectProfilePicture() {
     try {
-        const user = (await AuthService.me()).user;
         const initials = `${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}`.toUpperCase();
         const avatarHost = document.querySelector('#profile-avatar');
         if (!avatarHost) {
@@ -91,7 +99,7 @@ async function injectProfilePicture() {
 }
 
 function highlightActive() {
-    const hash = window.location.hash || '#main';
+    const path = window.location.pathname;
 
     document.querySelectorAll('#sidebar .nav-btn').forEach(entry => {
         entry.classList.remove('bg-gradient-to-r', 'from-[rgb(var(--button-from))]', 'to-[rgb(var(--button-to))]', 'shadow-lg');
@@ -102,8 +110,10 @@ function highlightActive() {
         entry.querySelector('ul')?.classList.remove('bg-gradient-to-tr', 'from-[rgb(var(--body-from))]', 'to-[rgb(var(--body-to))]');
     });
 
-    const activeLink = document.querySelector(`#sidebar a[href="${hash}"]`);
-    const entry = activeLink?.closest('.nav-btn');
+    const activeLink = Array.from(document.querySelectorAll('#sidebar a[href]')).find(a => a.getAttribute('href') === path);
+    if (!activeLink) return;
+
+    const entry = activeLink.closest('.nav-btn');
     if (!entry) return;
 
     entry.classList.add('bg-gradient-to-r', 'from-[rgb(var(--button-from))]', 'to-[rgb(var(--button-to))]', 'shadow-lg');
@@ -113,8 +123,8 @@ function highlightActive() {
     if (sp) {
         sp.classList.add('text-white');
         sp.classList.remove('text-[rgb(var(--button-from))]');
-        const isCollapsed = entry.querySelector('ul')?.classList.contains('hidden');
 
+        const isCollapsed = entry.querySelector('ul')?.classList.contains('hidden');
         sp.dataset.originalLabel ??= sp.textContent;
 
         if (activeLink && isCollapsed) {

@@ -47,8 +47,7 @@ export class Network {
         console.info('[Network] Network request:', {
             path: config.path,
             method: config.method || 'GET',
-            includeCredentials: config.includeCredentials,
-            credentials: config.includeCredentials ? 'include' : 'omit',
+            includeCredentials: config.includeCredentials || 'include',
             hasBody: !!config.body
         });
         const {
