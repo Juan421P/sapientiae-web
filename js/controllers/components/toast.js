@@ -1,10 +1,8 @@
 export class Toast {
-    constructor(containerId = 'toast-container') {
-        this.containerId = containerId;
-        this.container = this._ensureContainer();
-    }
+    
+    static containerId = 'toast-container';
 
-    _ensureContainer() {
+    static _ensureContainer() {
         let container = document.getElementById(this.containerId);
         if (!container) {
             container = document.createElement('div');
@@ -15,7 +13,9 @@ export class Toast {
         return container;
     }
 
-    show(message, type = 'info', duration = 7000) {
+    static show(message, type = 'info', duration = 7000) {
+        const container = this._ensureContainer();
+
         const typeColors = {
             info: 'from-indigo-400 to-blue-400',
             success: 'from-green-500 to-emerald-500',
@@ -42,8 +42,8 @@ export class Toast {
             </svg>`,
             error: `
             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 shrink-0 stroke-white" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4.929 4.929 19.07 19.071"/>
                 <circle cx="12" cy="12" r="10"/>
+                <path d="M15 9 9 15"/><path d="M9 9l6 6"/>
             </svg>`
         };
 
@@ -55,9 +55,7 @@ export class Toast {
         toast.innerHTML = `
         <div class="flex items-center gap-3 flex-1 pr-1.5">
             ${icons[type] || icons.info}
-            <span class="text-shadow select-none pl-2">
-                ${message}
-            </span>
+            <span class="text-shadow select-none pl-2">${message}</span>
         </div>
         `;
 
@@ -67,7 +65,7 @@ export class Toast {
         progressBar.style.transition = 'none';
         toast.appendChild(progressBar);
 
-        this.container.appendChild(toast);
+        container.appendChild(toast);
 
         requestAnimationFrame(() => {
             progressBar.offsetWidth;
@@ -75,8 +73,9 @@ export class Toast {
             progressBar.style.width = '0%';
         });
 
-        toast.addEventListener('animationend', (e) => {
+        toast.addEventListener('animationend', e => {
             if (e.animationName === 'toast-fade') toast.remove();
         });
     }
+    
 }

@@ -1,6 +1,5 @@
 import { AuthService } from './../../services/auth.service';
 import { Toast } from './../components/toast';
-const toast = new Toast();
 
 const form = document.querySelector('#login-form');
 const emailInput = document.querySelector('#email');
@@ -81,11 +80,11 @@ async function setupForm() {
                 sessionStorage.setItem('user', JSON.stringify((await AuthService.me()).user))
                 window.location.href = '/html/general/main.html';
             } else {
-                toast.show('Credenciales incorrectas', 'warn');
+                Toast.show('Credenciales incorrectas', 'warn');
             }
         } catch (error) {
             console.error(error);
-            toast.show('Error al iniciar sesión', 'error');
+            Toast.show('Error al iniciar sesión', 'error');
         }
     })
 }
