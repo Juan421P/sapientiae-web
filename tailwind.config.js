@@ -1,10 +1,8 @@
 export default {
   content: [
     "./index.html",
-    "./interfaces/**/*.html",
-    "./interfaces/**/*.js",
-    "./components/**/*.html",
-    "./components/**/*.js",
+    "./html/**/*.html",
+    "./js/**/*.js",
   ],
   theme: {
     extend: {

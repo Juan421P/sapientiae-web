@@ -1,0 +1,131 @@
+<!-- El pepe si fuera el login: El login -->
+
+<!DOCTYPE html>
+<html lang="es" class="scrollbar-width-none">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="./../../css/style.css">
+    <link rel="icon" href="./../../img/logo.ico">
+    <title>Inicio de sesión</title>
+</head>
+
+<body
+    class="relative flex justify-center min-h-screen md:justify-start bg-gradient-to-tr from-[rgb(var(--body-from))] to-[rgb(var(--body-to))]">
+    <div class="fixed bottom-10 left-0 w-[600px] h-[600px] z-[50] pointer-events-none animate-left-spin-pulse">
+        <div class="absolute inset-0 border-2 border-[rgb(var(--button-to))] opacity-20"></div>
+        <div class="absolute border-2 border-[rgb(var(--placeholder-to))] inset-1 opacity-5"></div>
+        <div class="absolute inset-0 rotate-45 border-2 border-[rgb(var(--button-from))] opacity-40"></div>
+        <div class="absolute rotate-45 border-2 border-[rgb(var(--placeholder-from))] inset-1 opacity-20"></div>
+    </div>
+    <div class="fixed top-0 right-0 w-[300px] h-[300px] z-[-20] pointer-events-none animate-right-spin-pulse">
+        <div class="absolute inset-0 border-2 border-[rgb(var(--button-to))] opacity-20"></div>
+        <div class="absolute border-2 border-[rgb(var(--placeholder-to))] inset-1 opacity-5"></div>
+        <div class="absolute inset-0 rotate-45 border-2 border-[rgb(var(--button-from))] opacity-40"></div>
+        <div class="absolute rotate-45 border-2 border-[rgb(var(--placeholder-from))] inset-1 opacity-20"></div>
+    </div>
+    <div id="main-view" class="flex-1 w-full">
+        <main class="flex items-center justify-center min-h-screen mb-1 overflow-y-auto scrollbar-width-none">
+            <div class="flex justify-center w-full md:justify-start md:ml-60">
+                <form id="login-form" class="z-50 flex flex-col w-full max-w-md gap-16 px-6 mx-auto md:mx-0 md:px-0">
+                    <section class="flex flex-col gap-2 px-10 md:px-0">
+                        <h1
+                            class="text-3xl font-bold text-left bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] bg-clip-text text-transparent drop-shadow-sm">
+                            Inicio de sesión
+                        </h1>
+                        <h3
+                            class="text-lg font-semibold text-left bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] bg-clip-text text-transparent drop-shadow-sm">
+                            ¡Bienvenido!
+                        </h3>
+                    </section>
+                    <section class="flex flex-col gap-6 px-10 md:px-0">
+                        <div class="relative w-full" data-input-wrapper>
+                            <input type="text" data-field id="email" placeholder="Correo electrónico"
+                                class="w-full px-4 py-3 rounded-xl shadow-md bg-gradient-to-r from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] text-[rgb(var(--text-from))] placeholder-[rgb(var(--placeholder-from))] placeholder:italic focus:outline-none focus:ring-[rgb(var(--text-from))]/40 focus:shadow-lg transition-all duration-300 focus:ring-0">
+                        </div>
+                        <div class="relative w-full" data-input-wrapper>
+                            <input type="password" data-field id="password" placeholder="Contraseña"
+                                class="w-full px-4 py-3 rounded-xl shadow-md bg-gradient-to-r from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] text-[rgb(var(--text-from))] placeholder-[rgb(var(--placeholder-from))] placeholder:italic focus:outline-none focus:ring-[rgb(var(--text-from))]/40 focus:shadow-lg transition-all duration-300 focus:ring-0">
+                            <button type="button" id="password-btn"
+                                class="absolute inset-y-0 flex items-center right-3">
+                                <svg id="eye-open" xmlns="http://www.w3.org/2000/svg"
+                                    class="text-[rgb(var(--placeholder-from))] hover:text-[rgb(var(--text-from))] w-5 h-5 stroke-current fill-none cursor-pointer transition-colors duration-300"
+                                    viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path
+                                        d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+                                    <circle cx="12" cy="12" r="3" />
+                                </svg>
+                                <svg id="eye-closed" xmlns="http://www.w3.org/2000/svg"
+                                    class="hidden text-[rgb(var(--placeholder-from))] hover:text-[rgb(var(--text-from))] w-5 h-5 stroke-current fill-none cursor-pointer transition-colors duration-300"
+                                    viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path
+                                        d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49" />
+                                    <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242" />
+                                    <path
+                                        d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143" />
+                                    <path d="m2 2 20 20" />
+                                </svg>
+                            </button>
+                        </div>
+                    </section>
+                    <section class="flex flex-col gap-4 px-0 md:px-10">
+                        <button id="submit-input" type="submit"
+                            class="p-6 w-full bg-gradient-to-tr from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] text-white text-shadow rounded-xl grid grid-cols-[auto_1fr] items-center shadow-md hover:brightness-110 hover:scale-[1.015] transition-all duration-300 cursor-pointer select-none">
+                            <span id="submit-icon" class="inline-flex items-center justify-center">
+                                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" class="svg-shadow"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" clip-rule="evenodd"
+                                        d="M20 6.66668C12.6362 6.66668 6.66671 12.6362 6.66671 20C6.66671 27.3638 12.6362 33.3333 20 33.3333C27.3638 33.3333 33.3334 27.3638 33.3334 20C33.3334 12.6362 27.3638 6.66668 20 6.66668ZM3.33337 20C3.33337 10.7953 10.7953 3.33334 20 3.33334C29.2048 3.33334 36.6667 10.7953 36.6667 20C36.6667 29.2048 29.2048 36.6667 20 36.6667C10.7953 36.6667 3.33337 29.2048 3.33337 20ZM18.8215 16.1785C18.1707 15.5276 18.1707 14.4724 18.8215 13.8215C19.4724 13.1706 20.5277 13.1706 21.1786 13.8215L26.1786 18.8215C26.8294 19.4724 26.8294 20.5276 26.1786 21.1785L21.1786 26.1785C20.5277 26.8294 19.4724 26.8294 18.8215 26.1785C18.1707 25.5276 18.1707 24.4724 18.8215 23.8215L20.9764 21.6667H15C14.0796 21.6667 13.3334 20.9205 13.3334 20C13.3334 19.0795 14.0796 18.3333 15 18.3333H20.9764L18.8215 16.1785Z"
+                                        fill="white" />
+                                </svg>
+                            </span>
+                            <span id="submit-text" class="block w-full font-medium text-center">
+                                Iniciar sesión
+                            </span>
+                        </button>
+                    </section>
+                </form>
+            </div>
+        </main>
+    </div>
+    <footer id="footer"
+        class="fixed bottom-0 left-0 w-full bg-gradient-to-tr from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] z-[999] opacity-0 pointer-events-none translate-y-full transition-all duration-700 ease-in-out grid grid-cols-1 md:grid-cols-12 rounded-t-2xl md:rounded-t-none cursor-pointer">
+        <div class="flex flex-row col-span-1 gap-4 p-4 md:col-span-4 lg:col-span-3">
+            <div class="flex items-center justify-center flex-shrink-0 col-span-1 p-6">
+                <svg width="64" height="80" viewBox="0 0 48 60" fill="none" xmlns="http://www.w3.org/2000/svg"
+                    class="text-d4 drop-shadow">
+                    <path
+                        d="M47.1,42.4a.9.9,0,1,0-.1-1.7H45.7l1-1a.9.9,0,0,0,0-1.2.8.8,0,0,0-1.1,0l-1,1a21.9,21.9,0,0,0-3.5-5.8l-.6-6.1a2.2,2.2,0,0,0-2.6-2l-6.1,1a17.1,17.1,0,0,0-4.4-1.3c.3-.2.5-.4.4-.7s-2-.2-2-.2c1.5-1.3,1.1-1.9,1.1-1.9s-2.8,1.2-2.8,1.2-.4-1.6-.4-1.6-2,2.2-2.2,3A20.8,20.8,0,0,0,13.7,28L7.6,27A2.2,2.2,0,0,0,5,29l-.9,9.2h0a16,16,0,0,0-1.8,6.7c0,.5.1,1,.1,1.4H.8a.9.9,0,0,0-.8.9.9.9,0,0,0,.8.8H2.6l-1.5.7a.7.7,0,0,0-.4,1,.8.8,0,0,0,1,.5l1.2-.6-.6,1.3A.9.9,0,0,0,2.7,52a.8.8,0,0,0,1.1-.4l.3-.7C7.5,56.3,15.1,60,24,60c12,0,21.7-6.8,21.7-15.1v-.6l.8.3a.7.7,0,0,0,1-.5.7.7,0,0,0-.4-1l-1.7-.6h1.7ZM28.4,44.1h-.6a2.7,2.7,0,0,1-1.4-.4,1.8,1.8,0,0,1-.5-.7l-.4.6a2.6,2.6,0,0,1-2.1.8h0a.3.3,0,0,1-.3-.3c0-.1.1-.2.3-.2a1.8,1.8,0,0,0,1.7-.7,1.4,1.4,0,0,0,.4-1v-.2h0c-1.6.1-2.9-.3-3-1s1.2-1.2,2.8-1.4,2.8.3,2.9,1S27.3,41.8,26,42v.3a3,3,0,0,0,.7,1.1,2.5,2.5,0,0,0,1.6.2l.3.2C28.6,43.9,28.6,44.1,28.4,44.1Z"
+                        transform="translate(0 0)" style="fill:#2b2b2b" />
+                    <path
+                        d="M40.3,18.4a5.3,5.3,0,0,1-2.2.4s6.3-3.6,2.2-6.4a1.2,1.2,0,0,0-1.8.8s-1.3,3.6-4.6,4.4a9.1,9.1,0,0,0,.1-3.3,10.1,10.1,0,0,0-4.1-6.5C20.6-4.7,4.7,1.6,4.7,1.6L12,10.9A9.5,9.5,0,0,0,10.3,18c.9,5.8,6.9,9.6,13.5,8.6A12.9,12.9,0,0,0,32,21.8c.4,1.6,1.6,5.3,3.9,3.5,0,0,2.4-1.5-1-3.7,0,0,6.5,3.1,6.7-2.6A.8.8,0,0,0,40.3,18.4ZM21,4.5c.4,0,.7.7.7,1.5s-.3,1.4-.7,1.4-.7-.6-.7-1.4S20.6,4.5,21,4.5ZM32.9,16.2c-1.6,3.8-6.1,3.7-6.1,3.7h-.1c-8,0-8.5-7.8-8.5-7.9l.2-.2c.2-.1.3.1.3.2s.5,7.4,8,7.4h.1c.2,0,4.1,0,5.6-3.2L25.7,9.5a.2.2,0,0,1,0-.3h.4L32.9,16Z"
+                        transform="translate(0 0)" style="fill:#2b2b2b" />
+                </svg>
+            </div>
+            <div class="flex flex-col justify-center col-span-3 gap-1">
+                <p class="text-sm font-bold text-white select-none text-shadow">Sistema de Registro</p>
+                <p class="text-sm font-bold text-white select-none text-shadow">Académico Universitario</p>
+                <p class="text-xl italic font-bold text-white select-none text-shadow">Sapientiae</p>
+            </div>
+        </div>
+        <div class="hidden col-span-1 md:block md:col-span-4 lg:col-span-6"></div>
+        <div
+            class="flex items-center justify-center col-span-1 pb-10 pl-10 pr-10 md:col-span-4 lg:col-span-3 md:pb-0 md:pl-0 md:pr-15 md:mt-0">
+            <div>
+                <p class="font-bold text-white select-none text-shadow">
+                    <!-- &copy; 2025 B. Alvarenga, D. Gómez, I. Nolazco, J. Pérez, J. Portillo. Todos los derechos reservados. -->
+                    &copy; 2025 La Morenita, Tortillería & Meat Market. Todos los derechos reservados.
+                </p>
+            </div>
+        </div>
+    </footer>
+</body>
+<script type="module" src="./../../js/controllers/general/login.js"></script>
+<script type="module" src="./../../js/controllers/elements/footer.js"></script>
+
+</html>

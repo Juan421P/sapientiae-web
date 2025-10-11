@@ -15,11 +15,15 @@ export class AuthService {
     }
 
     static async me() {
-        return await this.get('me', null, null, 'me');
+        return await Network.get({
+            path: `${this._ENDPOINT}/me`
+        });
     }
 
     static async logout() {
-        return await this.postRaw('logout');
+        return await Network.post({
+            path: `${this._ENDPOINT}/logout`
+        });
     }
 
 }
