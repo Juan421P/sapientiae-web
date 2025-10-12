@@ -136,6 +136,10 @@
         @apply flex items-center justify-between gap-5 w-full px-5 py-4 rounded-xl text-[rgb(var(--button-text))] bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] transition-all hover:brightness-120 shadow-lg duration-300 cursor-pointer font-[512.5];
     }
 
+    .nav-btn {
+        @apply z-[500]
+    }
+
 }
 
 @import './animations.css';

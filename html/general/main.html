@@ -17,7 +17,7 @@
 
 <body
     class="relative flex justify-center min-h-screen mb-50 md:justify-start bg-gradient-to-tr from-[rgb(var(--body-from))] to-[rgb(var(--body-to))]">
-    <div class="fixed bottom-10 left-0 w-[600px] h-[600px] z-[50] pointer-events-none animate-left-spin-pulse">
+    <div class="fixed bottom-10 left-0 w-[600px] h-[600px] pointer-events-none animate-left-spin-pulse">
         <div class="absolute inset-0 border-2 border-[rgb(var(--button-to))] opacity-20"></div>
         <div class="absolute border-2 border-[rgb(var(--placeholder-to))] inset-1 opacity-5"></div>
         <div class="absolute inset-0 rotate-45 border-2 border-[rgb(var(--button-from))] opacity-40"></div>
@@ -29,7 +29,7 @@
         <div class="absolute inset-0 rotate-45 border-2 border-[rgb(var(--button-from))] opacity-40"></div>
         <div class="absolute rotate-45 border-2 border-[rgb(var(--placeholder-from))] inset-1 opacity-20"></div>
     </div>
-    <div id="navbar">
+    <div id="navbar" class="fixed top-0 left-0 w-full z-[51]">
         <button id="burger-btn"
             class="fixed z-50 p-2 text-[rgb(var(--text-from))] dark:text-[rgb(var(--card-from))] bg-[rgb(var(--body-from))] dark:bg-[rgb(var(--button-from))] shadow-md top-4 left-4 rounded-xl md:hidden backdrop-blur drop-shadow">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"

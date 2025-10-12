@@ -2,17 +2,25 @@ export class ContextMenu {
 
     static menu = null;
     static isOpen = false;
+    static _lastX = 0;
+    static _lastY = 0;
 
     static _create() {
         if (this.menu) return;
 
         const template = document.createElement('template');
         template.innerHTML = `
-            <div id="context-menu" class="absolute z-50 hidden p-2 text-sm bg-white rounded-lg shadow-md select-none"></div>
+            <div id="context-menu" class="absolute z-50 hidden p-2 text-sm bg-white rounded-lg shadow-md select-none">
+            </div>
         `;
         document.body.appendChild(template.content.cloneNode(true));
 
         this.menu = document.getElementById('context-menu');
+
+        document.addEventListener('mousemove', (e) => {
+            this._lastX = e.clientX;
+            this._lastY = e.clientY;
+        });
 
         this._handleOutsideClick = (e) => {
             if (!this.menu.contains(e.target)) {
@@ -21,9 +29,12 @@ export class ContextMenu {
         };
     }
 
-    static show(x, y, actions = [], pos = 'br') {
+    static show(actions = [], pos = 'br') {
         this._create();
         this.close();
+
+        const x = this._lastX ?? window.innerWidth / 2;
+        const y = this._lastY ?? window.innerHeight / 2;
 
         this.menu.innerHTML = '';
 
@@ -85,5 +96,4 @@ export class ContextMenu {
         this.isOpen = false;
         document.removeEventListener('click', this._handleOutsideClick, true);
     }
-
 }
