@@ -12,7 +12,7 @@
         rel="stylesheet">
     <link rel="stylesheet" href="./../../css/style.css">
     <link rel="icon" href="./../../img/logo.ico">
-    <title>Inicio de sesión</title>
+    <title>Inicio</title>
 </head>
 
 <body
@@ -471,6 +471,34 @@
                                 </div>
                             </a>
                         </li>
+                        <!-- PRUEBAS -->
+                        <li>
+                            <a href="/html/general/testing.html"
+                                class="block transition-shadow duration-300 bg-transparent group rounded-xl hover:shadow-lg nav-btn">
+                                <div
+                                    class="flex items-center gap-5 px-5 py-4 transition-colors duration-300 inner rounded-xl group-hover:bg-gradient-to-r group-hover:from-[rgb(var(--button-from))] group-hover:to-[rgb(var(--button-to))]">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round"
+                                        class="flex-shrink-0 w-5 h-5 text-[rgb(var(--button-from))] transition-colors duration-300 group-hover:text-white drop-shadow stroke-current fill-none">
+                                        <path d="M12 20v-9" />
+                                        <path d="M14 7a4 4 0 0 1 4 4v3a6 6 0 0 1-12 0v-3a4 4 0 0 1 4-4z" />
+                                        <path d="M14.12 3.88 16 2" />
+                                        <path d="M21 21a4 4 0 0 0-3.81-4" />
+                                        <path d="M21 5a4 4 0 0 1-3.55 3.97" />
+                                        <path d="M22 13h-4" />
+                                        <path d="M3 21a4 4 0 0 1 3.81-4" />
+                                        <path d="M3 5a4 4 0 0 0 3.55 3.97" />
+                                        <path d="M6 13H2" />
+                                        <path d="m8 2 1.88 1.88" />
+                                        <path d="M9 7.13V6a3 3 0 1 1 6 0v1.13" />
+                                    </svg>
+                                    <span
+                                        class="flex-1 font-medium text-[rgb(var(--button-from))] transition-all duration-300 select-none group-hover:bg-gradient-to-r group-hover:font-medium drop-shadow group-hover:text-white">
+                                        Zona de pruebas
+                                    </span>
+                                </div>
+                            </a>
+                        </li>
                         <!-- CERRAR SESIÓN -->
                         <li>
                             <div class="block transition-shadow duration-300 bg-transparent group rounded-xl hover:shadow-lg nav-btn"
@@ -515,7 +543,7 @@
             </div>
         </template>
     </div>
-    <div id="main-view" class="flex-1 w-full">
+   <div id="main-view" class="flex-1 w-full">
         <main class="flex flex-col min-h-screen p-10 md:ml-80">
   <div class="w-full p-5 overflow-x-auto select-none">
     <div class="flex flex-wrap gap-3 mb-4" data-search>
@@ -604,7 +632,7 @@
     </footer>
 </body>
 <script type="module" src="./../../js/controllers/teacher-portal/courses.controller.js"></script>
-<script type="module" src="./../../js/controllers/elements/footer.js"></script>
-<script type="module" src="./../../js/controllers/elements/navbar.js"></script>
+<script type="module" src="./../../js/controllers/elements/footer.controller.js"></script>
+<script type="module" src="./../../js/controllers/elements/navbar.controller.js"></script>
 
 </html>
