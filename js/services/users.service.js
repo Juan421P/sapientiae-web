@@ -1,40 +1,39 @@
-// js/services/users.service.js
-import { Service } from './../lib/service.js';
-import { UsersContract } from './../contracts/users.contract.js';
+import { Network } from '../lib/network';
 
-export class UsersService extends Service {
+export class UsersService {
 
-  static baseEndpoint = '/Users';
-  static contract = new UsersContract();
+	static _ENDPOINT = '/Users';
 
-  // ——— estilo parecido a NotificationsService ———
-  static async list() {
-    // GET /Users  → scope de respuesta 'table' si tu contrato lo usa
-    return await this.get('getAllUsers', null, null, 'table');
-  }
+	static async get(){
+		return await Network.get({
+			path: `${this._ENDPOINT}/getAllUsers`
+		});
+	}
 
-  static async create(userData) {
-    // POST /Users → scope de request 'create', respuesta 'detail'
-    return await this.post('AddUser', userData, 'create', 'detail');
-  }
+	static async getByID(id){
+		return await Network.get({
+			path: `${this._ENDPOINT}/findUsersById/${id}`
+		});
+	}
 
-  static async update(userData) {
-    // PUT /Users/{id} → requiere userData.id
-    return await this.put('UpdateUser', userData, 'update', 'detail');
-  }
+	static async post(data){
+		return await Network.post({
+			path: `${this._ENDPOINT}/AddUser`,
+			body: data
+		});
+	}
 
-  static async delete(id) {
-    // DELETE /Users/{id}
-    return await super.delete('DeleteUser', id);
-  }
+	static async put(id){
+		return await Network.put({
+			path: `${this._ENDPOINT}/UpdateUser/${id}`,
+			body: data
+		});
+	}
 
-  // ——— extras útiles y alias para tu UI ———
-  static async getAll() {
-    return await this.list();
-  }
+	static async delete(id){
+		return await Network.delete({
+			path: `${this._ENDPOINT}/DeleteUser/${id}`
+		});
+	}
 
-  static async getById(id) {
-    // GET /Users/{id}
-    return await this.get('', { id }, null, 'detail');
-  }
 }
