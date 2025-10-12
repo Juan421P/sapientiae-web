@@ -12,7 +12,7 @@
         rel="stylesheet">
     <link rel="stylesheet" href="./../../css/style.css">
     <link rel="icon" href="./../../img/logo.ico">
-    <title>Inicio</title>
+    <title>Zona de pruebas</title>
 </head>
 
 <body
@@ -545,30 +545,23 @@
     </div>
     <div id="main-view" class="flex-1 w-full">
         <main class="flex flex-col min-h-screen p-10 md:ml-80">
-            <div class="w-full space-y-8">
-                <div
-                    class="bg-gradient-to-bl from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] shadow-md rounded-xl p-6 flex items-center gap-6">
-                    <div id="main-avatar"
-                        class="w-14 h-14 rounded-full bg-gradient-to-tr from-[rgb(var(--body-from))] to-[rgb(var(--body-to))] flex items-center justify-center drop-shadow flex-shrink-0">
+            <div class="w-full p-5 overflow-x-auto select-none">
+                <div class="flex flex-wrap gap-3 mb-4" data-search></div>
+                <div class="relative">
+                    <div
+                        class="p-0.5 rounded-xl bg-gradient-to-r from-[rgb(var(--placeholder-from))] to-[rgb(var(--placeholder-to))] shadow-lg">
+                        <div
+                            class="bg-gradient-to-br from-[rgb(var(--body-from))] to-[rgb(var(--body-to))] rounded-lg overflow-hidden">
+                            <table class="min-w-full text-sm bg-[rgb(var(--body-from))] text-left">
+                                <thead id="thead"
+                                    class="text-xs uppercase select-none bg-[rgb(var(--card-from))] bg-clip-text text-transparent drop-shadow">
+                                </thead>
+                                <tbody id="tbody" class="divide-y divide-[rgb(var(--placeholder-from))] text-left">
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    <div class="flex-shrink-1">
-                        <p id="main-welcome"
-                            class="text-lg font-semibold text-transparent select-none bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] bg-clip-text drop-shadow">
-                        </p>
-                        <p id="main-role"
-                            class="text-sm text-transparent select-none bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text drop-shadow">
-                        </p>
-                        <span id="main-date"
-                            class="block mt-1 text-xs text-transparent select-none bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text drop-shadow">
-                        </span>
-                    </div>
-                </div>
-                <div
-                    class="px-5 py-4 border border-[rgb(var(--off-from))] rounded-lg bg-gradient-to-tr from-[rgb(var(--body-from))] to-[rgb(var(--body-to))] drop-shadow">
-                    <span
-                        class="bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent select-none drop-shadow">
-                        Recuerda actualizar los datos de matrícula antes del <strong>8 de diciembre</strong>.
-                    </span>
+                    <div data-pagination class="flex items-center justify-end hidden gap-2 mt-4 text-xs"></div>
                 </div>
             </div>
         </main>
@@ -605,7 +598,7 @@
         </div>
     </footer>
 </body>
-<script type="module" src="./../../js/controllers/general/main.controller.js"></script>
+<script type="module" src="./../../js/controllers/general/testing.controller.js"></script>
 <script type="module" src="./../../js/controllers/elements/footer.controller.js"></script>
 <script type="module" src="./../../js/controllers/elements/navbar.controller.js"></script>
 
