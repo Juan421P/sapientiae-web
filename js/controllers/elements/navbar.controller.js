@@ -1,5 +1,5 @@
-import { buildInitials } from './../../lib/common';
-import { AuthService } from './../../services/auth.service';
+import { buildInitials } from '../../lib/common';
+import { AuthService } from '../../services/auth.service';
 
 const user = JSON.parse(sessionStorage.getItem('user') || '{}');
 const getLabelSpan = (element) => element.querySelector('span:not(.profile-initials)');
@@ -51,13 +51,18 @@ async function filterByRole() {
 
         const allowedDirs = allowedMap[role] || [];
         const navbar = document.querySelector('nav');
+        console.log('[filterByRole] Role:', role);
+        console.log('[filterByRole] Allowed dirs:', allowedDirs);
 
         navbar.querySelectorAll('.nav-btn').forEach(item => {
             let shouldShow = false;
 
-            const link = item.querySelector('a[href]');
+            const link = item.matches('a[href]') ? item : item.querySelector('a[href]');
+
             if (link) {
-                const dir = link.getAttribute('href').split('/').slice(-2, -1)[0];
+                const href = link.getAttribute('href');
+                const dir = href.split('/').slice(-2, -1)[0];
+
                 shouldShow = ['main', 'news', 'not-found', 'profile'].includes(dir) || allowedDirs.includes(dir);
             }
 
