@@ -25,23 +25,23 @@ export class Toast {
 
         const icons = {
             info: `
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 shrink-0 stroke-white" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 shrink-0 stroke-white drop-shadow" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"/>
                 <path d="M12 16v-4"/><path d="M12 8h.01"/>
             </svg>`,
             success: `
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 shrink-0 stroke-white" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 shrink-0 stroke-white drop-shadow" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"/>
                 <path d="m9 12 2 2 4-4"/>
             </svg>`,
             warn: `
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 shrink-0 stroke-white" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 shrink-0 stroke-white drop-shadow" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"/>
                 <line x1="12" x2="12" y1="8" y2="12"/>
                 <line x1="12" x2="12.01" y1="16" y2="16"/>
             </svg>`,
             error: `
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 shrink-0 stroke-white" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 shrink-0 stroke-white drop-shadow" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"/>
                 <path d="M15 9 9 15"/><path d="M9 9l6 6"/>
             </svg>`
@@ -55,7 +55,7 @@ export class Toast {
         toast.innerHTML = `
         <div class="flex items-center gap-3 flex-1 pr-1.5">
             ${icons[type] || icons.info}
-            <span class="text-shadow select-none pl-2">${message}</span>
+            <span class="drop-shadow-2xl select-none pl-2">${message}</span>
         </div>
         `;
 
