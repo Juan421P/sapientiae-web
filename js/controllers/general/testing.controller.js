@@ -65,7 +65,7 @@ function populateTable(users) {
                     label: 'Eliminar usuario',
                     icon: 'delete',
                     onClick: () => {
-                        
+                        Toast.show('Eliminar usuario', 'error');
                     },
                 },
             ]);
