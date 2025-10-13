@@ -88,6 +88,16 @@ async function setupForm() {
     })
 }
 
+async function checkAuth() {
+    const session = await AuthService.me();
+    if (session && session.user) {
+        sessionStorage.setItem('user', JSON.stringify((await AuthService.me()).user))
+        window.location.replace('/html/general/main.html');
+        return;
+    }
+}
+
+await checkAuth();
 setupPasswordField();
 setupEmailField();
 await setupForm();

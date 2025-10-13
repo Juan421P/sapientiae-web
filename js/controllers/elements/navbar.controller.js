@@ -153,13 +153,15 @@ async function attachLogoutHandler() {
             return;
         }
         const logoutModal = template.content.querySelector('#logout-modal').cloneNode(true);
+
         Modal.show(logoutModal);
+
         const confirm = logoutModal.querySelector('#logout-confirm');
         confirm.addEventListener('click', async () => {
             await AuthService.logout();
             sessionStorage.clear();
             localStorage.clear();
-            window.location.href = '/html/general/login.html';
+            window.location.replace('/html/general/login.html');
             Modal.hide();
         });
     });
