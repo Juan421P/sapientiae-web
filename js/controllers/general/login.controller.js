@@ -69,42 +69,48 @@ function setupPasswordField() {
 
 async function setupForm() {
     form.addEventListener('submit', async e => {
-        e.preventDefault();
-        try {
-            const result = await AuthService.login(
-                emailInput.value.trim(),
-                passwordInput.value.trim()
-            );
-           
-            if (result.status === 'success') {
-                await new Promise(resolve => setTimeout(resolve, 100));
-               
-                const user = await AuthService.me();
-                sessionStorage.setItem('user', JSON.stringify(user));
-               
-                window.location.href = '/html/general/main.html';
-            } else {
-                alert('Credenciales incorrectas');
-            }
-        } catch (error) {
-            console.error('[AuthGuard] Login failed:', error);
-            alert('Error al iniciar sesión');
-        }
-    });
+  e.preventDefault();
+  try {
+    // login (el Set-Cookie lo maneja el navegador)
+    const result = await AuthService.login(
+      emailInput.value.trim(),
+      (passwordInput.value || '').trim()
+    );
+
+    if (result.status === 'success') {
+      // ahora SÍ consulta /me (ya con cookie)
+      const session = await AuthService.me();
+      if (session && session.user) {
+        sessionStorage.setItem('user', JSON.stringify(session.user));
+        window.location.href = '/html/general/main.html';
+      } else {
+        Toast.show('No se pudo cargar el perfil.', 'warn');
+      }
+    } else {
+      Toast.show('Credenciales incorrectas', 'warn');
+    }
+  } catch (error) {
+    console.error(error);
+    // Si vino 401 aquí, son credenciales inválidas
+    Toast.show(error?.status === 401 ? 'Credenciales incorrectas' : 'Error al iniciar sesión', 'error');
+  }
+});
 }
 
 async function checkAuth() {
-    try {
-        const user = await AuthService.me();
-        if (user) {
-            sessionStorage.setItem('user', JSON.stringify(user));
-            window.location.replace('/html/general/main.html');
-        }
-    } catch (error) {
-        console.log('[Login] No active session');
+  try {
+    const session = await AuthService.me();          // puede lanzar 401
+    if (session && session.user) {
+      sessionStorage.setItem('user', JSON.stringify(session.user));
+      window.location.replace('/html/general/main.html');
     }
+  } catch (err) {
+    // 401 es normal si aún no has iniciado sesión: NO bloquear la página.
+    if (err?.status !== 401) console.error('checkAuth error:', err);
+  }
 }
 
+// No dejes que una excepción bloquee el resto
 await checkAuth();
 setupPasswordField();
 setupEmailField();
