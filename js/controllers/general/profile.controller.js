@@ -1,4 +1,7 @@
 import { THEMES } from './../../lib/themes.js';
+import { buildInitials } from './../../lib/common.js';
+
+const user = JSON.parse(sessionStorage.getItem('user') || '{}');
 
 function setInitialThemeMode() {
     const current = THEMES.getCurrent();
@@ -70,13 +73,12 @@ avatar?.addEventListener('click', () => {
     if (img?.src) showImageModal(img.src);
 });
 
-
-function renderAvatar(user, person) {
+function renderAvatar() {
     const host = document.querySelector('#profile-avatar-main');
     if (!host) return;
 
     host.innerHTML = '';
-    const initials = `${person.firstName?.[0] || ''}${person.lastName?.[0] || ''}`.toUpperCase();
+    const initials = `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}`.toUpperCase();
 
     if (user.image) {
         const img = document.createElement('img');
@@ -89,14 +91,14 @@ function renderAvatar(user, person) {
     }
 }
 
-function renderUserInfo(person, user, role) {
+function renderUserInfo() {
     const nameEl = document.querySelector('#profile-name');
     const roleEl = document.querySelector('#profile-role');
     const emailEl = document.querySelector('#profile-email');
 
-    if (nameEl) nameEl.textContent = `${person.firstName} ${person.lastName}`.trim();
-    if (roleEl) roleEl.textContent = role || 'Usuario';
-    if (emailEl) emailEl.textContent = person.contactEmail || user.email || '';
+    if (nameEl) nameEl.textContent = `${user.firstName} ${user.lastName}`.trim();
+    if (roleEl) roleEl.textContent = user.roleID || 'Usuario';
+    if (emailEl) emailEl.textContent = user.email || '';
 
     renderAvatar();
 }
