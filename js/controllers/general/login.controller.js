@@ -72,22 +72,40 @@ async function setupForm() {
         e.preventDefault();
         try {
             const result = await AuthService.login(
-                (emailInput.value.trim()),
-                (passwordInput.value || '').trim()
+                emailInput.value.trim(),
+                passwordInput.value.trim()
             );
+           
             if (result.status === 'success') {
-                sessionStorage.setItem('user', JSON.stringify((await AuthService.me()).user))
+                await new Promise(resolve => setTimeout(resolve, 100));
+               
+                const user = await AuthService.me();
+                sessionStorage.setItem('user', JSON.stringify(user));
+               
                 window.location.href = '/html/general/main.html';
             } else {
-                Toast.show('Credenciales incorrectas', 'warn');
+                alert('Credenciales incorrectas');
             }
         } catch (error) {
-            console.error(error);
-            Toast.show('Error al iniciar sesión', 'error');
+            console.error('[AuthGuard] Login failed:', error);
+            alert('Error al iniciar sesión');
         }
-    })
+    });
 }
 
+async function checkAuth() {
+    try {
+        const user = await AuthService.me();
+        if (user) {
+            sessionStorage.setItem('user', JSON.stringify(user));
+            window.location.replace('/html/general/main.html');
+        }
+    } catch (error) {
+        console.log('[Login] No active session');
+    }
+}
+
+await checkAuth();
 setupPasswordField();
 setupEmailField();
 await setupForm();

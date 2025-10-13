@@ -17,7 +17,7 @@
 
 <body
     class="relative flex justify-center min-h-screen mb-50 md:justify-start bg-gradient-to-tr from-[rgb(var(--body-from))] to-[rgb(var(--body-to))]">
-    <div class="fixed bottom-10 left-0 w-[600px] h-[600px] z-[50] pointer-events-none animate-left-spin-pulse">
+    <div class="fixed bottom-10 left-0 w-[600px] h-[600px] pointer-events-none animate-left-spin-pulse">
         <div class="absolute inset-0 border-2 border-[rgb(var(--button-to))] opacity-20"></div>
         <div class="absolute border-2 border-[rgb(var(--placeholder-to))] inset-1 opacity-5"></div>
         <div class="absolute inset-0 rotate-45 border-2 border-[rgb(var(--button-from))] opacity-40"></div>
@@ -29,7 +29,7 @@
         <div class="absolute inset-0 rotate-45 border-2 border-[rgb(var(--button-from))] opacity-40"></div>
         <div class="absolute rotate-45 border-2 border-[rgb(var(--placeholder-from))] inset-1 opacity-20"></div>
     </div>
-    <div id="navbar">
+    <div id="navbar" class="fixed top-0 left-0 w-full z-[51]">
         <button id="burger-btn"
             class="fixed z-50 p-2 text-[rgb(var(--text-from))] dark:text-[rgb(var(--card-from))] bg-[rgb(var(--body-from))] dark:bg-[rgb(var(--button-from))] shadow-md top-4 left-4 rounded-xl md:hidden backdrop-blur drop-shadow">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -40,7 +40,7 @@
         <div id="sidebar-wrapper"
             class="fixed inset-y-0 left-0 z-40 transition-transform duration-300 transform -translate-x-full w-80 md:translate-x-0 scrollbar-width-none">
             <aside id="sidebar"
-                class="flex flex-col w-full h-full gap-6 px-4 py-6 overflow-y-auto bg-[rgb(var(--body-from))]/70 backdrop-blur md:bg-transparent md:backdrop-blur-0 scrollbar-width-none">
+                class="flex flex-col w-full h-full gap-6 px-4 py-6 overflow-y-auto bg-[rgb(var(--body-from))]/70 backdrop-blur md:bg-transparent md:backdrop-blur-none scrollbar-width-none">
                 <header class="flex items-center justify-between px-2">
                     <div class="flex items-center justify-between flex-1 gap-2">
                         <svg width="64" height="80" viewBox="0 0 48 60" fill="none" xmlns="http://www.w3.org/2000/svg"
@@ -525,8 +525,8 @@
                 </nav>
             </aside>
         </div>
-        <template id="tmpl-logout-confirm">
-            <div class="flex flex-col gap-10 p-10 mx-auto">
+        <template id="logout-template">
+            <div class="flex flex-col gap-10 p-10 mx-auto" id="logout-modal">
                 <div class="text-left">
                     <span
                         class="min-w-full text-3xl font-bold bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent drop-shadow select-none text-left">
@@ -538,7 +538,15 @@
                     </p>
                 </div>
                 <div class="flex justify-end gap-4">
-                    <div id="logout-confirm" class="group"></div>
+                    <div id="logout-confirm" class="group">
+                        <button type="button" class="secondary-btn-component" id="logout-confirm">
+                            <div class="flex justify-center w-full">
+                                <span id="button-text" class="drop-shadow-sm">
+                                    Confirmar
+                                </span>
+                            </div>
+                        </button>
+                    </div>
                 </div>
             </div>
         </template>
@@ -605,6 +613,7 @@
         </div>
     </footer>
 </body>
+<script type="module" src="./../../js/controllers/auth/auth.controller.js"></script>
 <script type="module" src="./../../js/controllers/general/main.controller.js"></script>
 <script type="module" src="./../../js/controllers/elements/footer.controller.js"></script>
 <script type="module" src="./../../js/controllers/elements/navbar.controller.js"></script>

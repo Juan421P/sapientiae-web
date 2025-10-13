@@ -51,8 +51,6 @@ async function filterByRole() {
 
         const allowedDirs = allowedMap[role] || [];
         const navbar = document.querySelector('nav');
-        console.log('[filterByRole] Role:', role);
-        console.log('[filterByRole] Allowed dirs:', allowedDirs);
 
         navbar.querySelectorAll('.nav-btn').forEach(item => {
             let shouldShow = false;
@@ -142,7 +140,35 @@ function highlightActive() {
     entry.querySelector('ul')?.classList.add('bg-gradient-to-tr', 'from-[rgb(var(--body-from))]', 'to-[rgb(var(--body-to))]');
 }
 
+async function attachLogoutHandler() {
+    const btn = document.querySelector('#logout-btn');
+    if (!btn) {
+        console.warn('Logout button not found');
+        return;
+    }
+
+    btn.addEventListener('click', async () => {
+        const template = document.querySelector('#logout-template');
+        if(!template){
+            return;
+        }
+        const logoutModal = template.content.querySelector('#logout-modal').cloneNode(true);
+
+        Modal.show(logoutModal);
+
+        const confirm = logoutModal.querySelector('#logout-confirm');
+        confirm.addEventListener('click', async () => {
+            await AuthService.logout();
+            sessionStorage.clear();
+            localStorage.clear();
+            window.location.replace('/html/general/login.html');
+            Modal.hide();
+        });
+    });
+}
+
 await filterByRole();
 await injectProfilePicture();
 highlightActive();
 attachCollapses();
+await attachLogoutHandler();

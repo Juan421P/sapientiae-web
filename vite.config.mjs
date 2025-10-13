@@ -17,6 +17,7 @@ export default defineConfig({
 		tailwindcss(),
 		AutoImport({
 			imports:{
+				'@/components/context-menu.js': ['ContextMenu'],
 				'@/components/modal.js': ['Modal'],
 				'@/components/toast.js': ['Toast'],
 			},
