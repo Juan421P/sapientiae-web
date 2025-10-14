@@ -1,16 +1,17 @@
 export class ContextMenu {
-    
+
     static menu = null;
     static isOpen = false;
     static _lastX = 0;
     static _lastY = 0;
+    static _timeout = null;
 
     static _create() {
         if (this.menu) return;
 
         const template = document.createElement('template');
         template.innerHTML = `
-            <div id="context-menu" class="absolute z-50 hidden p-2 text-sm bg-white rounded-lg shadow-md select-none"></div>
+            <div id="context-menu" class="absolute z-[100000] hidden p-2 text-sm bg-white rounded-lg shadow-md select-none transition-opacity duration-300 opacity-0"></div>
         `;
         document.body.appendChild(template.content.cloneNode(true));
         this.menu = document.getElementById('context-menu');
@@ -18,6 +19,11 @@ export class ContextMenu {
         this._handleOutsideClick = (e) => {
             if (!this.menu.contains(e.target)) this.close();
         };
+    }
+
+    static _resetTimer() {
+        clearTimeout(this._timeout);
+        this._timeout = setTimeout(() => this.close(true), 2500);
     }
 
     static show(actions = []) {
@@ -62,10 +68,15 @@ export class ContextMenu {
                     action.onClick?.();
                 });
             }
+
+            btn.addEventListener('mouseenter', () => this._resetTimer());
+            btn.addEventListener('click', () => this._resetTimer());
+
             this.menu.appendChild(btn);
         });
 
         this.menu.classList.remove('hidden');
+        requestAnimationFrame(() => (this.menu.style.opacity = '1'));
 
         this.menu.style.top = `${y}px`;
         this.menu.style.left = `${x}px`;
@@ -78,13 +89,27 @@ export class ContextMenu {
 
         this.isOpen = true;
         document.addEventListener('click', this._handleOutsideClick, true);
+
+        this._resetTimer();
     }
 
-    static close() {
+    static close(withFade = false) {
         if (!this.menu) return;
-        this.menu.classList.add('hidden');
-        this.isOpen = false;
-        document.removeEventListener('click', this._handleOutsideClick, true);
-    }
 
+        clearTimeout(this._timeout);
+
+        if (withFade) {
+            this.menu.style.opacity = '0';
+            setTimeout(() => {
+                this.menu.classList.add('hidden');
+                this.isOpen = false;
+                document.removeEventListener('click', this._handleOutsideClick, true);
+            }, 300);
+        } else {
+            this.menu.classList.add('hidden');
+            this.menu.style.opacity = '0';
+            this.isOpen = false;
+            document.removeEventListener('click', this._handleOutsideClick, true);
+        }
+    }
 }

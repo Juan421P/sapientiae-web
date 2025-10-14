@@ -1,0 +1,48 @@
+<!-- El login -->
+
+<!DOCTYPE html>
+<html lang="es" class="scrollbar-width-none">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="./../../css/style.css">
+    <link rel="icon" href="./../../img/logo.ico">
+    <title>Zona de pruebas</title>
+</head>
+
+<body
+    class="relative flex justify-center min-h-screen mb-50 md:justify-start bg-gradient-to-tr from-[rgb(var(--body-from))] to-[rgb(var(--body-to))]">
+    <div class="fixed bottom-10 left-0 w-[600px] h-[600px] z-[50] pointer-events-none animate-left-spin-pulse">
+        <div class="absolute inset-0 border-2 border-[rgb(var(--button-to))] opacity-20"></div>
+        <div class="absolute border-2 border-[rgb(var(--placeholder-to))] inset-1 opacity-5"></div>
+        <div class="absolute inset-0 rotate-45 border-2 border-[rgb(var(--button-from))] opacity-40"></div>
+        <div class="absolute rotate-45 border-2 border-[rgb(var(--placeholder-from))] inset-1 opacity-20"></div>
+    </div>
+    <div class="fixed top-0 right-0 w-[300px] h-[300px] z-[-20] pointer-events-none animate-right-spin-pulse">
+        <div class="absolute inset-0 border-2 border-[rgb(var(--button-to))] opacity-20"></div>
+        <div class="absolute border-2 border-[rgb(var(--placeholder-to))] inset-1 opacity-5"></div>
+        <div class="absolute inset-0 rotate-45 border-2 border-[rgb(var(--button-from))] opacity-40"></div>
+        <div class="absolute rotate-45 border-2 border-[rgb(var(--placeholder-from))] inset-1 opacity-20"></div>
+    </div>
+    <div id="navbar" class="fixed top-0 left-0 w-full z-[52]">
+    </div>
+    <div id="main-view" class="flex-1 w-full z-51">
+        <main class="flex flex-col min-h-screen p-10 md:ml-80">
+            
+        </main>
+    </div>
+    <footer id="footer"
+        class="fixed bottom-0 left-0 w-full bg-gradient-to-tr from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] z-[999] opacity-0 pointer-events-none translate-y-full transition-all duration-700 ease-in-out grid grid-cols-1 md:grid-cols-12 rounded-t-2xl md:rounded-t-none cursor-pointer">
+    </footer>
+</body>
+<script type="module" src="./../../js//controllers/themes/themes.controller.js"></script>
+<script type="module" src="./../../js/controllers/student-portal/pensum.controller.js"></script>
+<script type="module" src="./../../js/controllers/elements/footer.controller.js"></script>
+<script type="module" src="./../../js/controllers/elements/navbar.controller.js"></script>
+
+</html>
