@@ -80,7 +80,7 @@ async function setupForm() {
                 const session = await AuthService.me();
                 if (session && session.user) {
                     sessionStorage.setItem('user', JSON.stringify(session.user));
-                    window.location.href = '/html/general/main.html';
+                    window.location.replace('/html/general/main.html');
                 } else {
                     Toast.show('No se pudo cargar el perfil.', 'warn');
                 }
