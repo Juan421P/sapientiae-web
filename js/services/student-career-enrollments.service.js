@@ -1,35 +1,33 @@
-import { Service } from './../lib/service.js';
-import { StudentCareerEnrollmentsContract } from './../contracts/student-career-enrollments.contract.js';
+import { Network } from '../lib/network';
 
-export class StudentCareerEnrollmentsService extends Service {
-  static baseEndpoint = '/StudentCareerEnrollments';
-  static contract = new StudentCareerEnrollmentsContract();
+export class StudentCareerEnrollmentsService {
 
-  // Estáticos (útiles para llamadas directas)
-  static async list() {
-    // GET /StudentCareerEnrollments/getAllEnrollments
-    return super.get('getAllEnrollments', null, null, 'table');
-  }
+	static _ENDPOINT = '/StudentCareerEnrollments';
 
-  static async create(payload) {
-    // POST /StudentCareerEnrollments/insertEnrollment
-    return super.post('insertEnrollment', payload, 'create', 'table');
-  }
+	static async get() {
+		return await Network.get({
+			path: `${this._ENDPOINT}/getAll`
+		});
+	}
 
-  static async update(id, payload) {
-    // PUT /StudentCareerEnrollments/updateEnrollment/{id}
-    const body = { ...(payload || {}), id };
-    return super.put('updateEnrollment', body, 'update', 'table');
-  }
+	static async post(data) {
+		return await Network.post({
+			path: `${this._ENDPOINT}/insert`,
+			body: data
+		});
+	}
 
-  static async remove(id) {
-    // DELETE /StudentCareerEnrollments/deleteEnrollment/{id}
-    return super.delete('deleteEnrollment', id);
-  }
+	static async put(id) {
+		return await Network.put({
+			path: `${this._ENDPOINT}/update/${id}`,
+			body: data
+		});
+	}
 
-  // Wrappers de instancia (para componentes)
-  async list()   { return this.constructor.getAll(); }
-  async create(data) { return this.constructor.create(data); }
-  async update(id, data) { return this.constructor.update(id, data); }
-  async delete(id) { return this.constructor.remove(id); }
+	static async delete(id) {
+		return await Network.delete({
+			path: `${this._ENDPOINT}/delete/${id}`
+		});
+	}
+
 }

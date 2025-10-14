@@ -637,6 +637,11 @@ function highlightActive() {
         sp?.classList.remove('text-white');
         sp?.classList.add('text-[rgb(var(--button-from))]');
         entry.querySelector('ul')?.classList.remove('bg-gradient-to-tr', 'from-[rgb(var(--body-from))]', 'to-[rgb(var(--body-to))]');
+
+        const inner = entry.querySelector('.inner');
+        if (inner) {
+            inner.classList.remove('bg-gradient-to-r', 'from-[rgb(var(--button-from))]', 'to-[rgb(var(--button-to))]');
+        }
     });
 
     const activeLink = Array.from(document.querySelectorAll('#sidebar a[href]')).find(a => a.getAttribute('href') === path);
@@ -661,6 +666,11 @@ function highlightActive() {
         } else {
             sp.textContent = sp.dataset.originalLabel;
         }
+    }
+
+    const inner = entry.querySelector('.inner');
+    if (inner) {
+        inner.classList.remove('bg-gradient-to-r', 'from-[rgb(var(--button-from))]', 'to-[rgb(var(--button-to))]');
     }
 
     entry.querySelector('ul')?.classList.add('bg-gradient-to-tr', 'from-[rgb(var(--body-from))]', 'to-[rgb(var(--body-to))]');

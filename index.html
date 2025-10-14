@@ -7,16 +7,17 @@
     <script type="module">
         import { AuthService } from './js/services/auth.service.js';
 
-        (async () => {
+        await (async () => {
             try {
                 const session = await AuthService.me();
                 if (session && session.user) {
-                    window.location.href = '/html/general/main.html';
+                    sessionStorage.setItem('user', JSON.stringify(session.user));
+                    window.location.replace('/html/general/main.html');
                 } else {
-                    window.location.href = '/html/general/login.html';
+                    window.location.replace('/html/general/login.html');
                 }
             } catch {
-                window.location.href = '/html/general/login.html';
+                window.location.replace('/html/general/login.html');
             }
         })();
     </script>

@@ -18,6 +18,7 @@ export default defineConfig({
 		AutoImport({
 			imports:{
 				'@/components/context-menu.js': ['ContextMenu'],
+				'@/js/lib/data-operations.js': ['DataOperations'],
 				'@/components/modal.js': ['Modal'],
 				'@/components/toast.js': ['Toast'],
 			},

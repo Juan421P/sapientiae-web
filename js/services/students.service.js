@@ -1,24 +1,33 @@
-import { Service } from "../lib/service.js";
-import { StudentContract } from "../contracts/students.contract.js";
+import { Network } from '../lib/network';
 
-export class StudentService extends Service{
-     
-    static baseEndpoint = '/Students';
-    static contract = new StudentContract();
+export class StudentsService {
 
-    static async list() {
-        return await this.get('getStudents', null, 'table');
+    static _ENDPOINT = '/Students';
+
+    static async get() {
+        return await Network.get({
+            path: `${this._ENDPOINT}/getStudents`
+        });
     }
 
-    static async create(data) {
-        return await this.post('newStudent', data, 'create');
+    static async post(data) {
+        return await Network.post({
+            path: `${this._ENDPOINT}/newStudent`,
+            body: data
+        });
     }
 
-    static async update(data) {
-        return await this.put('updateStudents', data, 'update');
+    static async put(id) {
+        return await Network.put({
+            path: `${this._ENDPOINT}/updateStudents/${id}`,
+            body: data
+        });
     }
 
     static async delete(id) {
-        return await this.delete('deleteStudents', id);
+        return await Network.delete({
+            path: `${this._ENDPOINT}/deleteStudents/${id}`
+        });
     }
+
 }

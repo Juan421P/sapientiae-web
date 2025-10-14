@@ -1,24 +1,33 @@
-import { Service } from './../lib/service.js';
-import { PensaContract } from "../contracts/pensa.contract";
+import { Network } from '../lib/network';
 
-export class PensaService extends Service {
-    
-    static baseEndpoint = '/Pensum';
-    static contract = new PensaContract();
+export class PensaService {
 
-    static async list() {
-        return await this.get('getPensumPagination', null, 'table');
+    static _ENDPOINT = '/Pensum';
+
+    static async get() {
+        return await Network.get({
+            path: `${this._ENDPOINT}/getPensa`
+        });
     }
 
-    static async create(data) {
-        return await this.post('newPensum', data, 'create');
+    static async post(data) {
+        return await Network.post({
+            path: `${this._ENDPOINT}/newPensum`,
+            body: data
+        });
     }
 
-    static async update(data) {
-        return await this.put('updatePensum', data, 'update');
+    static async put(id) {
+        return await Network.put({
+            path: `${this._ENDPOINT}/updatePensum/${id}`,
+            body: data
+        });
     }
 
     static async delete(id) {
-        return await this.delete('deletePensum', id);
+        return await Network.delete({
+            path: `${this._ENDPOINT}/deletePensum/${id}`
+        });
     }
+
 }
