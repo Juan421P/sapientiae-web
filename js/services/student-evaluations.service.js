@@ -1,55 +1,32 @@
-import { fetchJSON, postJSON, putJSON } from './../lib/network.js';
-import { studentEvaluationContract } from '../contracts/student-evaluations.contract.js';
+import { Network } from './../lib/network.js';
 
-const ENDPOINT = '/studentEvaluations';
+const BASE = '/api/StudentEvaluations';
 
-export const studentEvaluationService ={
-    contract: studentEvaluationContract,
-    
-    async list(){
-        const studentEvaluations = await fetchJSON(
-            `${ENDPOINT}/getStudentEvaluations`
-        )
-        const parsed = Array.isArray(studentEvaluations) ? studentEvaluations.map(n => studentEvaluations.parse(n, 'table')) : [];
-                document.dispatchEvent(new CustomEvent('studentEvaluations:list', {
-                    detail: parsed
-                }));
-                return parsed;
-    },
+export const StudentEvaluationsService = {
+  async getAll() {
+    // Espera 200 con lista o 204 sin contenido
+    return await Network.get({ path: `${BASE}/getStudentEvaluations` });
+  },
 
-    async create(data){
-         const studentEvaluations = await postJSON(
-                    `${ENDPOINT}/newStudentEvaluation`,
-                    studentEvaluations.parse(data, 'create')
-                );
-                const parsed = studentEvaluations.parse(studentEvaluations, 'table');
-                document.dispatchEvent(new CustomEvent('studentEvaluations:create', {
-                    detail: parsed
-                }));
-                return parsed;
-    },
+  async create(payload) {
+    // Ajusta el DTO al esperado por tu backend:
+    // title/description/date/topics/questionTypes → mapea en el controller si difieren
+    return await Network.post({
+      path: `${BASE}/insertStudentEvaluation`,
+      body: payload
+    });
+  },
 
-     async update(data) {
-            const studentEvaluations = await putJSON(
-                `${ENDPOINT}/${data.studentEvaluationID}`,
-                studentEvaluations.parse(data, 'update')
-            );
-            const parsed = studentEvaluations.parse(s, 'table');
-            document.dispatchEvent(new CustomEvent('studentEvaluations:update', { detail: parsed }));
-            return parsed;
-        },
+  async update(id, payload) {
+    return await Network.put({
+      path: `${BASE}/updateStudentEvaluation/${encodeURIComponent(id)}`,
+      body: payload
+    });
+  },
 
-        async delete(id) {
-        const success = await deleteJSON(
-            `${ENDPOINT}/deleteStudentEvaluation/${id}`
-        );
-        document.dispatchEvent(new CustomEvent('studentEvaluations:delete', {
-            detail: {
-                id,
-                success
-            }
-        }));
-        return success === true;
-    }
-    
-}
+  async remove(id) {
+    return await Network.delete({
+      path: `${BASE}/deleteStudentEvaluation/${encodeURIComponent(id)}`
+    });
+  }
+};

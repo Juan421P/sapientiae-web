@@ -1,36 +1,57 @@
-/*
 import { EvaluationPlansService } from '../../services/evaluation-plans.service.js';
-import { Modal } from '../../components/modal.js';
-import { Toast } from '../../components/toast.js';
+import { EvaluationPlanComponentsService } from '../../services/evaluation-plan-components.service.js';
+import { Modal } from './../../../components/modal.js';
+import { Toast } from './../../../components/toast.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 
+
 export async function init() {
-  await loadAndRender();
+  try {
+    // Eventos UI
+    $('#create-plan-btn')?.addEventListener('click', openCreateModal);
 
-  $('#create-plan-btn')?.addEventListener('click', openCreateModal);
+    // Cerrar menús contextuales simples al hacer click fuera
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.context-menu').forEach(m => m.classList.add('hidden'));
+    });
 
-  // cerrar menús contextuales si se hace click fuera
-  document.addEventListener('click', () => {
-    document.querySelectorAll('.context-menu').forEach(m => m.classList.add('hidden'));
-  });
+    await loadAndRender();
+  } catch (e) {
+    console.error('[EvaluationPlans] init error:', e);
+    Toast.show('No se pudieron cargar los planes.', 'error');
+  }
 }
+
+// Auto-init
+if (document.readyState !== 'loading') {
+  init().catch(console.error);
+} else {
+  document.addEventListener('DOMContentLoaded', () => init().catch(console.error));
+}
+
 
 async function loadAndRender() {
   const container = $('#plans-container');
-  container.innerHTML = `<div id="timeline-line" class="absolute left-4 w-1 bg-gradient-to-r from-[rgb(var(--off-from))] to-[rgb(var(--off-to))] rounded-full"></div>`;
+  container.innerHTML = `
+    <div id="timeline-line" class="absolute left-4 w-1 bg-gradient-to-r from-[rgb(var(--off-from))] to-[rgb(var(--off-to))] rounded-full"></div>
+  `;
 
-  let data;
+  let plans = [];
+  let comps = [];
   try {
-    data = await EvaluationPlansService.getAll(); // 200 = lista | 204 = vacío
+    // Credenciales: el Network ya manda credentials: 'include'
+    const [plansRes, compsRes] = await Promise.all([
+      EvaluationPlansService.getAll(),                // /api/EvaluationPlans/getEvaluationPlan
+      EvaluationPlanComponentsService.getAll()        // /api/EvaluationPlanComponents/getEvaluationPlanComponents
+    ]);
+    plans = Array.isArray(plansRes) ? plansRes : [];
+    comps  = Array.isArray(compsRes)  ? compsRes  : [];
   } catch (e) {
-    console.error('[EvaluationPlans] falló getAll:', e);
-    new Toast('No se pudieron cargar los planes.').show();
+    console.error('[EvaluationPlans] fetch failed:', e);
+    Toast.show('Error obteniendo datos del servidor.', 'error');
     return;
   }
-
-  // si la API devolvió 204 No Content, Network.get probablemente haya devuelto null/undefined
-  const plans = Array.isArray(data) ? data : [];
 
   if (!plans.length) {
     container.insertAdjacentHTML(
@@ -45,27 +66,40 @@ async function loadAndRender() {
     return;
   }
 
+  // --- Agrupar componentes por planId ---
+  const getCompPlanId = c =>
+    c.evaluationPlanID || c.evaluationPlanId || c.planId || c.planID || c.idPlan || null;
+
+  const getCompName = c =>
+    c.componentName || c.nombre || c.name || `Componente #${c.orderIndex ?? ''}`.trim();
+
+  const compsByPlan = new Map();
+  comps.forEach(c => {
+    const pid = getCompPlanId(c);
+    if (!pid) return;
+    if (!compsByPlan.has(pid)) compsByPlan.set(pid, []);
+    compsByPlan.get(pid).push(getCompName(c));
+  });
+
+  // --- Render cards ---
   plans.forEach(dto => {
-    // Mapeo tolerante: usa lo que venga; si falta, muestra algo razonable
     const plan = mapPlan(dto);
+    plan.evaluations = (compsByPlan.get(plan.id) || []).slice();
 
     const tpl = document.importNode($('#tmpl-plan-card').content, true);
-    $('.context-menu', tpl)?.classList.add('hidden');
 
+    // Rellenar
     $('#plan-title', tpl).textContent = plan.title;
     $('#plan-period', tpl).textContent = plan.period;
     $('#plan-description', tpl).textContent = plan.description || '—';
+    $('#plan-evaluations', tpl).innerHTML =
+      (plan.evaluations || []).map(e => `<li>${escapeHTML(e)}</li>`).join('');
 
-    const evalList = $('#plan-evaluations', tpl);
-    evalList.innerHTML = (plan.evaluations || []).map(e => `<li>${escapeHTML(e)}</li>`).join('');
-
-    // detalle
+    // Acciones
     $('.view-plan-btn', tpl).addEventListener('click', () => openPlanDetail(plan));
-
-    // editar (por ahora: solo precarga el form; cuando tengamos DTO exacto, hacemos PUT)
     $('.edit-plan-btn', tpl).addEventListener('click', () => openEditModal(plan));
 
-    // menú contextual minimal
+    // mini context-menu local
     const btn = $('.context-menu-btn', tpl);
     const menu = $('.context-menu', tpl);
     btn.addEventListener('click', ev => {
@@ -75,57 +109,41 @@ async function loadAndRender() {
     });
     $('.ctx-duplicate', menu).addEventListener('click', () => {
       menu.classList.add('hidden');
-      // demo local (solo UI). Cuando definas el endpoint de duplicar, se llama aquí.
-      new Toast('Función "Duplicar plan" (UI)').show();
+      Toast.show('Función "Duplicar plan" (UI)', 'info');
     });
     $('.ctx-add-eval', menu).addEventListener('click', () => {
       menu.classList.add('hidden');
-      new Toast('Función "Agregar evaluación" (UI)').show();
+      Toast.show('Función "Agregar evaluación" (UI)', 'info');
     });
 
+    // Añadir al DOM
     container.appendChild(tpl);
   });
 
   updateTimelineHeight();
 }
 
+
 function mapPlan(dto) {
-  // Intenta cubrir nombres comunes sin inventar estructura fija
+  const id =
+    dto.evaluationPlanID || dto.evaluationPlanId || dto.id || dto.uuid || dto.codigo || dto.code;
+
   const title =
-    dto.nombre ||
-    dto.name ||
-    dto.titulo ||
-    dto.title ||
-    dto.planName ||
-    'Plan de Evaluación';
+    dto.planName || dto.nombre || dto.name || dto.titulo || dto.title || 'Plan de Evaluación';
 
   const year =
-    dto.year || dto.anio || dto.anioLectivo || dto.academicYear || dto.yearLabel;
+    dto.year || dto.anio || dto.academicYear || dto.yearLabel;
 
   const cycle =
-    dto.cycle || dto.ciclo || dto.cycleName || dto.cycleLabel || dto.cycleType;
+    dto.cycle || dto.ciclo || dto.cycleLabel || dto.cycleType;
 
-  const period = [cycle, year].filter(Boolean).join(' - ') || (dto.period || dto.periodo || '—');
+  const period = [cycle, year].filter(Boolean).join(' - ')
+               || dto.period || dto.periodo || '—';
 
   const description =
-    dto.descripcion || dto.description || dto.detalle || dto.summary || '';
+    dto.description || dto.descripcion || dto.detalle || '';
 
-  const evaluations =
-    dto.evaluations ||
-    dto.componentes ||
-    dto.items ||
-    []; // si vienen objetos, conviértelos a texto
-  const evalStrings = Array.isArray(evaluations)
-    ? evaluations.map(e => (typeof e === 'string' ? e : (e?.nombre || e?.name || e?.titulo || 'Evaluación')))
-    : [];
-
-  return {
-    id: dto.id || dto.uuid || dto.codigo || dto.code,
-    title,
-    period,
-    description,
-    evaluations: evalStrings
-  };
+  return { id, title, period, description, evaluations: [] };
 }
 
 async function openPlanDetail(plan) {
@@ -133,57 +151,60 @@ async function openPlanDetail(plan) {
   $('#detail-title', tpl).textContent = plan.title;
   $('#detail-period', tpl).textContent = plan.period;
   $('#detail-description', tpl).textContent = plan.description || '—';
-  $('#detail-evaluations', tpl).innerHTML = (plan.evaluations || []).map(e => `<li>${escapeHTML(e)}</li>`).join('');
+  $('#detail-evaluations', tpl).innerHTML =
+    (plan.evaluations || []).map(e => `<li>${escapeHTML(e)}</li>`).join('');
 
-  const modal = new Modal({ size: 'md', content: tpl });
-  await modal.open();
+  // Mostrar modal
+  Modal.show(tpl.firstElementChild ? tpl.firstElementChild : tpl);
 }
 
 async function openCreateModal() {
-  const modal = new Modal({ templateId: 'tmpl-create-plan', size: 'sm' });
-  await modal.open();
+  const tpl = document.importNode($('#tmpl-create-plan').content, true);
+  const form = tpl.querySelector('#plan-form');
 
-  $('#cancel-plan-btn')?.addEventListener('click', () => modal.close());
-  $('#plan-form')?.addEventListener('submit', async e => {
+  // Botón cancelar
+  tpl.querySelector('#cancel-plan-btn')?.addEventListener('click', () => Modal.hide());
+
+  // Guardar (WIP: ajusta payload al DTO de tu backend si ya lo tienes)
+  form?.addEventListener('submit', async e => {
     e.preventDefault();
+    Toast.show('Define los campos del DTO para guardar (create).', 'warn');
 
-    // ⚠️ A la espera del DTO exacto. Por ahora, mostramos aviso.
-    new Toast('Define los campos del DTO para guardar (create).').show();
-
-    // Ejemplo de payload (ajústalo al DTO cuando lo tengas):
+    // Ejemplo (ajústalo luego a tu DTO real):
     // const payload = {
-    //   nombre: $('#form-title').value,
-    //   descripcion: $('#form-description').value,
-    //   periodo: $('#form-period').value
+    //   planName: tpl.querySelector('#form-title').value,
+    //   description: tpl.querySelector('#form-description').value,
+    //   period: tpl.querySelector('#form-period').value
     // };
     // await EvaluationPlansService.create(payload);
-
-    modal.close();
     // await loadAndRender();
+
+    Modal.hide();
   });
+
+  // Mostrar modal
+  Modal.show(tpl.firstElementChild ? tpl.firstElementChild : tpl);
 }
 
 async function openEditModal(plan) {
-  const modal = new Modal({ templateId: 'tmpl-create-plan', size: 'sm' });
-  await modal.open();
+  const tpl = document.importNode($('#tmpl-create-plan').content, true);
 
-  // precarga
-  $('#form-title').value = plan.title || '';
-  $('#form-period').value = plan.period || '';
-  $('#form-description').value = plan.description || '';
+  // Precarga
+  tpl.querySelector('#form-title').value = plan.title || '';
+  tpl.querySelector('#form-period').value = plan.period || '';
+  tpl.querySelector('#form-description').value = plan.description || '';
 
-  $('#cancel-plan-btn')?.addEventListener('click', () => modal.close());
-  $('#plan-form')?.addEventListener('submit', async e => {
+  tpl.querySelector('#cancel-plan-btn')?.addEventListener('click', () => Modal.hide());
+  tpl.querySelector('#plan-form')?.addEventListener('submit', async e => {
     e.preventDefault();
+    Toast.show('Define el DTO para actualizar (update).', 'warn');
 
-    new Toast('Define el DTO para actualizar (update).').show();
 
-    // const payload = { ... };
-    // await EvaluationPlansService.update(plan.id, payload);
 
-    modal.close();
-    // await loadAndRender();
+    Modal.hide();
   });
+
+  Modal.show(tpl.firstElementChild ? tpl.firstElementChild : tpl);
 }
 
 function updateTimelineHeight() {
@@ -213,4 +234,3 @@ function escapeHTML(s) {
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#39;');
 }
-*/
