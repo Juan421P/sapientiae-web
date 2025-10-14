@@ -1,8 +1,7 @@
 // Service para Localities
-
 class LocalitiesService {
     constructor() {
-        this.baseURL = 'http://localhost:8080/api/Locality';
+        this.baseURL = 'https://sapientiae-api-bd9a54b3d7a1.herokuapp.com/api/Locality';
     }
 
     async getLocalitiesPagination(page = 0, size = 10) {
@@ -11,7 +10,8 @@ class LocalitiesService {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                }
+                },
+                credentials: 'include'
             });
 
             if (!response.ok) {
@@ -31,7 +31,8 @@ class LocalitiesService {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                }
+                },
+                credentials: 'include'
             });
 
             if (!response.ok) {
@@ -52,6 +53,7 @@ class LocalitiesService {
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
                 body: JSON.stringify(localityData)
             });
 
@@ -74,6 +76,7 @@ class LocalitiesService {
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
                 body: JSON.stringify(localityData)
             });
 
@@ -95,7 +98,8 @@ class LocalitiesService {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
-                }
+                },
+                credentials: 'include'
             });
 
             if (!response.ok) {

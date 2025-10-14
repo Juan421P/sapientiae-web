@@ -211,38 +211,41 @@ class LocalitiesController {
     }
 
     async saveLocality() {
-        const address = document.getElementById('address').value.trim();
-        const phoneNumber = document.getElementById('phone-number').value.trim();
-        const isMainLocality = document.getElementById('is-main-locality').value === 'true';
+    const address = document.getElementById('address').value.trim();
+    const phoneNumber = document.getElementById('phone-number').value.trim();
+    const isMainLocality = document.getElementById('is-main-locality').value === 'true';
 
-        if (!address || !phoneNumber) {
-            this.showError('Todos los campos son obligatorios');
-            return;
-        }
-
-        const localityData = {
-            address,
-            phoneNumber,
-            isMainLocality,
-            universityID: "default-university-id"
-        };
-
-        try {
-            if (this.editingId) {
-                await this.service.updateLocality(this.editingId, localityData);
-                this.showSuccess('Localidad actualizada exitosamente');
-            } else {
-                await this.service.createLocality(localityData);
-                this.showSuccess('Localidad creada exitosamente');
-            }
-
-            this.closeModal();
-            this.loadLocalities();
-        } catch (error) {
-            console.error('Error al guardar localidad:', error);
-            this.showError('Error al guardar la localidad');
-        }
+    if (!address || !phoneNumber) {
+        this.showError('Todos los campos son obligatorios');
+        return;
     }
+
+    // Obtener universityID del usuario logueado
+    const user = JSON.parse(sessionStorage.getItem('user'));
+    
+    const localityData = {
+        address,
+        phoneNumber,
+        isMainLocality,
+        universityID: user?.userID || "3F464A1A464C6DF4E063DE54000A8EDM"  // ← USA userID
+    };
+
+    try {
+        if (this.editingId) {
+            await this.service.updateLocality(this.editingId, localityData);
+            this.showSuccess('Localidad actualizada exitosamente');
+        } else {
+            await this.service.createLocality(localityData);
+            this.showSuccess('Localidad creada exitosamente');
+        }
+
+        this.closeModal();
+        this.loadLocalities();
+    } catch (error) {
+        console.error('Error al guardar localidad:', error);
+        this.showError('Error al guardar la localidad');
+    }
+}
 
     async editLocality(id) {
         const locality = this.localities.find(l => l.localityID === id);
