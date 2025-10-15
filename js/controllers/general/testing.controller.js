@@ -164,5 +164,42 @@ function populateSelect(selectRoot, options = [], selectedValue = null) {
     }
 }
 
+function getSelectedValue(selectRoot) {
+    if (!selectRoot) return null;
+    const input = selectRoot.querySelector('[data-input]');
+    return input?.value || null;
+}
+
+function setSelectedValue(selectRoot, value) {
+    if (!selectRoot) return;
+    const input = selectRoot.querySelector('[data-input]');
+    const text = selectRoot.querySelector('[data-text]');
+    const options = [...selectRoot.querySelectorAll('[data-menu] li')];
+    const match = options.find(li => li.dataset.value === value);
+
+    if (match) {
+        text.textContent = match.textContent.trim();
+        text.classList.remove('italic', 'text-[rgb(var(--placeholder-from))]');
+        text.classList.add(
+            'bg-gradient-to-r',
+            'from-[rgb(var(--button-from))]',
+            'to-[rgb(var(--button-to))]',
+            'bg-clip-text',
+            'text-transparent'
+        );
+        input.value = value;
+    } else {
+        text.textContent = 'Seleccione';
+        text.classList.add('italic', 'text-[rgb(var(--placeholder-from))]');
+        text.classList.remove(
+            'bg-gradient-to-r',
+            'from-[rgb(var(--button-from))]',
+            'to-[rgb(var(--button-to))]',
+            'bg-clip-text',
+            'text-transparent'
+        );
+        input.value = '';
+    }
+}
 
 await loadUsers();
