@@ -1,24 +1,33 @@
-import { Service } from "./../lib/service.js";
-import { DegreeTypeContract } from "../contracts/degree-types.contract.js";
+import { Network } from '../lib/network';
 
-export class DegreeTypeService extends Service {
+export class DegreeTypesService {
 
-    static baseEndpoint = '/DegreeTypes';
-    static contract = new DegreeTypeContract();
+	static _ENDPOINT = '/DegreeTypes';
 
-    static async list() {
-        return await this.get('getAllDegreeTypes', null, 'table');
-    }
+	static async get(){
+		return await Network.get({
+			path: `${this._ENDPOINT}/getAllDegreeTypes`
+		});
+	}
 
-    static async create(degreeTypeData) {
-        return await this.post('AddDegreeType', degreeTypeData, 'create');
-    }
+	static async post(data){
+		return await Network.post({
+			path: `${this._ENDPOINT}/AddDegreeType`,
+			body: data
+		});
+	}
 
-    static async update(degreeTypeData) {
-        return await this.put('UpdateDegreeType', degreeTypeData, 'update');
-    }
+	static async put(id){
+		return await Network.put({
+			path: `${this._ENDPOINT}/UpdateDegreeType/${id}`,
+			body: data
+		});
+	}
 
-    static async delete(id) {
-        return await this.delete('DeleteDegreeType', id);
-    }
+	static async delete(id){
+		return await Network.delete({
+			path: `${this._ENDPOINT}/DeleteDegreeType/${id}`
+		});
+	}
+
 }

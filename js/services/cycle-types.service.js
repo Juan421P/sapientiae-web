@@ -1,54 +1,33 @@
-import { fetchJSON, postJSON, putJSON } from './../lib/network.js';
-import { CycleTypesContract } from './../contracts/cycle-types.contract.js';
+import { Network } from '../lib/network';
 
-const ENDPOINT = '/CycleTypes';
+export class CycleTypesService {
 
-export const CycleTypesService = {
-    contract: CycleTypesContract,
+	static _ENDPOINT = '/CycleTypes';
 
-    async list() {
-        const cycleTypes = await fetchJSON(
-            `${ENDPOINT}/getAllCycleTypes`
-        );
-        const parsed = Array.isArray(cycleTypes) ? cycleTypes.map(n => CycleTypesContract.parse(n, 'table')) : [];
-        document.dispatchEvent(new CustomEvent('CycleTypes:list', {
-            detail: parsed
-        }));
-        return parsed;
-    },
+	static async get(){
+		return await Network.get({
+			path: `${this._ENDPOINT}/getAllCycleTypes`
+		});
+	}
 
-    async create(data) {
-        const cycleTypes = await postJSON(
-            `${ENDPOINT}/AddCycleType`,
-            CycleTypesContract.parse(data, 'create')
-        );
-        const parsed = CycleTypesContract.parse(cycleTypes, 'table');
-        document.dispatchEvent(new CustomEvent('CycleTypes:create', {
-            detail: parsed
-        }));
-        return parsed;
-    },
+	static async post(data){
+		return await Network.post({
+			path: `${this._ENDPOINT}/AddCycleType`,
+			body: data
+		});
+	}
 
-    async update(data) {
-        const cycleTypes = await putJSON(
-            `${ENDPOINT}/UpdateCycleType/${data.id}`,
-            CycleTypesContract.parse(data, 'update')
-        );
-        const parsed = CycleTypesContract.parse(cycleTypes, 'table');
-        document.dispatchEvent(new CustomEvent('CycleTypes:update', { detail: parsed }));
-        return parsed;
-    },
+	static async put(id){
+		return await Network.put({
+			path: `${this._ENDPOINT}/UpdateCycleType/${id}`,
+			body: data
+		});
+	}
 
-    async delete(id) {
-        const success = await deleteJSON(
-            `${ENDPOINT}/DeleteCycleType/${id}`
-        );
-        document.dispatchEvent(new CustomEvent('CycleTypes:delete', {
-            detail: {
-                id,
-                success
-            }
-        }));
-        return success === true;
-    }
-};
+	static async delete(id){
+		return await Network.delete({
+			path: `${this._ENDPOINT}/DeleteCycleType/${id}`
+		});
+	}
+
+}
