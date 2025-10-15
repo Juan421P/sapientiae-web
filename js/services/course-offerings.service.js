@@ -1,37 +1,33 @@
-// services/course-offerings.service.js
-import { Service } from './../lib/service.js';
-import { CourseOfferingsContract } from './../contracts/course-offerings.contract.js';
+import { Network } from '../lib/network';
 
-export class CourseOfferingsService extends Service {
-  // SIN /api (lo agrega tu Network)
-  static baseEndpoint = '/CourseOfferings';
-  static contract = new CourseOfferingsContract();
+export class CourseOfferingService {
 
-  // ===== estáticos =====
-  // GET /CourseOfferings/getAllCourseOfferings
-  static async list() {
-    return super.get('getAllCourseOfferings', null, null, 'table');
-  }
+    static _ENDPOINT = '/CourseOfferings';
 
-  // POST /CourseOfferings/insertCourseOffering
-  static async create(payload) {
-    return super.post('insertCourseOffering', payload, 'create', 'table');
-  }
+    static async get(){
+        return await Network.get({
+            path: `${this._ENDPOINT}/getAllCourseOfferings`
+        });
+    }
 
-  // PUT /CourseOfferings/updateCourseOffering/{id}
-  static async update(id, payload) {
-    const body = { ...(payload || {}), id }; // Service._buildPath usa data?.id
-    return super.put('updateCourseOffering', body, 'update', 'table');
-  }
+    static async post(data){
+        return await Network.post({
+            path: `${this._ENDPOINT}/insertCourseOffering`,
+            body: data
+        });
+    }
 
-  // DELETE /CourseOfferings/deleteCourseOffering/{id}
-  static async remove(id) {
-    return super.delete('deleteCourseOffering', id);
-  }
+    static async put(id){
+        return await Network.put({
+            path: `${this._ENDPOINT}/updateCourseOffering/${id}`,
+            body: data
+        });
+    }
 
-  // ===== wrappers de instancia (útiles para componentes) =====
-  async list() { return this.constructor.getAll(); }
-  async create(data) { return this.constructor.create(data); }
-  async update(id, data) { return this.constructor.update(id, data); }
-  async delete(id) { return this.constructor.remove(id); }
+    static async delete(id){
+        return await Network.delete({
+            path: `${this._ENDPOINT}/deleteCourseOffering/${id}`
+        });
+    }
+
 }

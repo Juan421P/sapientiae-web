@@ -11,7 +11,7 @@ export class ContextMenu {
 
         const template = document.createElement('template');
         template.innerHTML = `
-            <div id="context-menu" class="absolute z-[100000] hidden p-2 text-sm bg-white rounded-lg shadow-md select-none transition-opacity duration-300 opacity-0"></div>
+            <div id="context-menu" class="absolute z-[100000] hidden p-2 text-sm bg-[rgb(var(--card-from))] rounded-lg shadow-md select-none transition-opacity duration-300 opacity-0"></div>
         `;
         document.body.appendChild(template.content.cloneNode(true));
         this.menu = document.getElementById('context-menu');

@@ -1,0 +1,103 @@
+<!-- El login -->
+
+<!DOCTYPE html>
+<html lang="es" class="scrollbar-width-none">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="./../../css/style.css">
+    <link rel="icon" href="./../../img/logo.ico">
+    <title>Inicio</title>
+</head>
+
+<body
+    class="relative flex justify-center min-h-screen mb-50 md:justify-start bg-gradient-to-tr from-[rgb(var(--body-from))] to-[rgb(var(--body-to))]">
+    <div class="fixed bottom-10 left-0 w-[600px] h-[600px] pointer-events-none animate-left-spin-pulse">
+        <div class="absolute inset-0 border-2 border-[rgb(var(--button-to))] opacity-20"></div>
+        <div class="absolute border-2 border-[rgb(var(--placeholder-to))] inset-1 opacity-5"></div>
+        <div class="absolute inset-0 rotate-45 border-2 border-[rgb(var(--button-from))] opacity-40"></div>
+        <div class="absolute rotate-45 border-2 border-[rgb(var(--placeholder-from))] inset-1 opacity-20"></div>
+    </div>
+    <div class="fixed top-0 right-0 w-[300px] h-[300px] z-[-20] pointer-events-none animate-right-spin-pulse">
+        <div class="absolute inset-0 border-2 border-[rgb(var(--button-to))] opacity-20"></div>
+        <div class="absolute border-2 border-[rgb(var(--placeholder-to))] inset-1 opacity-5"></div>
+        <div class="absolute inset-0 rotate-45 border-2 border-[rgb(var(--button-from))] opacity-40"></div>
+        <div class="absolute rotate-45 border-2 border-[rgb(var(--placeholder-from))] inset-1 opacity-20"></div>
+    </div>
+    <div id="navbar" class="fixed top-0 left-0 w-full z-[51]">
+    </div>
+    <div id="main-view" class="z-50 flex-1 w-full">
+        <main class="flex flex-col min-h-screen p-10 space-y-8 md:ml-80 pb-80 md:pb-20">
+            <div class="flex items-center justify-between">
+                <h1
+                    class="text-2xl font-bold bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent drop-shadow select-none">
+                    Instrumentos de evaluación
+                </h1>
+                <div
+                    class="block transition-shadow duration-300 bg-transparent group rounded-xl hover:bg-white hover:shadow-lg">
+                    <button type="button" class="btn-component" id="add-student">
+                        <div class="flex justify-center w-full gap-4">
+                            <svg id="button-icon" class="w-6 h-6 stroke-current fill-none drop-shadow-sm"
+                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10" />
+                                <path d="M8 12h8" />
+                                <path d="M12 8v8" />
+                            </svg>
+                            <span id="button-text" class="drop-shadow-sm">
+                                Agregar instrumento
+                            </span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+            <div class="sm:max-w-xs">
+                <input id="career-search" type="text" placeholder="Buscar"
+                    class="w-full bg-gradient-to-r from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] px-4 py-3 rounded-lg focus:outline-none text-[rgb(var(--button-from))] placeholder:text-[rgb(var(--placeholder-from))] placeholder:italic text-shadow shadow-md border-none select-none focus:ring-0" />
+            </div>
+            <section id="instruments-list" class="flex flex-wrap gap-6">
+                <template id="tmpl-instrument-card">
+                </template>
+            </section>
+
+        </main>
+    </div>
+    <footer id="footer" class="fixed bottom-0 left-0 w-full bg-gradient-to-tr from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] z-[999] opacity-0 pointer-events-none translate-y-full transition-all duration-700 ease-in-out grid grid-cols-1 md:grid-cols-12 rounded-t-2xl md:rounded-t-none cursor-pointer">
+    </footer>
+    <template id="tmpl-add-instrument">
+    <form id="instrument-form" class="flex flex-col max-w-md gap-10 px-6 py-10 mx-auto">
+        <h2
+            class="text-2xl font-bold text-center bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent drop-shadow select-none">
+            Nuevo instrumento
+        </h2>
+        <input id="instrument-name-input" type="text"
+            class="w-full bg-gradient-to-r from-[rgb(var(--body-from))] to-[rgb(var(--body-to))] px-6 py-4 rounded-lg text-indigo-500 placeholder:text-indigo-300 placeholder:italic shadow-md"
+            placeholder="Ej: Examen Final, Investigación" required>
+        <input id="instrument-type-input" type="text"
+            class="w-full bg-gradient-to-r from-[rgb(var(--body-from))] to-[rgb(var(--body-to))] px-6 py-4 rounded-lg text-indigo-500 placeholder:text-indigo-300 placeholder:italic shadow-md"
+            placeholder="Tipo o categoría (Ej: Práctica, Teórico)" required>
+        <div class="flex justify-end gap-3">
+            <button type="button" id="cancel-btn"
+                class="p-4 font-medium text-indigo-400 transition-all shadow-md bg-gradient-to-tr from-indigo-100 to-blue-100 rounded-xl hover:scale-105">
+                Cancelar
+            </button>
+            <button type="submit"
+                class="p-4 bg-gradient-to-tr from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] text-white rounded-xl font-medium shadow-md hover:scale-105 transition-all">
+                Guardar
+            </button>
+        </div>
+    </form>
+</template>
+</body>
+<script type="module" src="./../../js/controllers/auth/auth.controller.js"></script>
+<script type="module" src="./../../js/controllers/themes/themes.controller.js"></script>
+<script type="module" src="./../../js/controllers/planification/evaluation-instruments.controller.js"></script>
+<script type="module" src="./../../js/controllers/elements/footer.controller.js"></script>
+<script type="module" src="./../../js/controllers/elements/navbar.controller.js"></script>
+
+</html>

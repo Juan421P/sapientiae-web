@@ -1,24 +1,33 @@
-import { Service } from './../lib/service.js';
-import { DepartmentsContract } from './../contracts/departments.contract.js';
+import { Network } from '../lib/network';
 
-export class DepartmentsService extends Service {
-    
-    static baseEndpoint = '/Departments';
-    static contract = new DepartmentsContract();
+export class DepartmentsService {
 
-    static async list() {
-        return await this.get('getDepartmentsPagination', null, 'table');
-    }
+	static _ENDPOINT = '/Departments';
 
-    static async create(departmentData) {
-        return await this.post('newDepartment', departmentData, 'create');
-    }
+	static async get(){
+		return await Network.get({
+			path: `${this._ENDPOINT}/getDepartments`
+		});
+	}
 
-    static async update(departmentData) {
-        return await this.put('updateDepartment', departmentData, 'update');
-    }
+	static async post(data){
+		return await Network.post({
+			path: `${this._ENDPOINT}/newDepartment`,
+			body: data
+		});
+	}
 
-    static async delete(id) {
-        return await this.delete('deleteDeparmentn', id);
-    }
+	static async put(id){
+		return await Network.put({
+			path: `${this._ENDPOINT}/updateDepartment/${id}`,
+			body: data
+		});
+	}
+
+	static async delete(id){
+		return await Network.delete({
+			path: `${this._ENDPOINT}/deleteDeparment/${id}`
+		});
+	}
+
 }

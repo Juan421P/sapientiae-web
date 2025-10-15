@@ -1,33 +1,53 @@
-import { Network } from '../lib/network';
+import { Network } from '../lib/network.js';
 
 export class PensumSubjectsService {
+    static _ENDPOINT = '/Pensum';
+    static _CAREERS_ENDPOINT = '/Careers';
 
-    static _ENDPOINT = '/PensumSubjects';
-
-    static async get() {
+    // Obtener todas las carreras para el select
+    static async getAllCareers() {
         return await Network.get({
-            path: `${this._ENDPOINT}/getPenumSubjects`
+            path: `${this._CAREERS_ENDPOINT}/getCareers`
         });
     }
 
-    static async post(data) {
+    // Obtener todos los pensum
+    static async getAll() {
+        return await Network.get({
+            path: `${this._ENDPOINT}/getPensa`
+        });
+    }
+
+    // Obtener pensum con paginación
+    static async getPensumPagination(page = 0, size = 10) {
+        return await Network.get({
+            path: `${this._ENDPOINT}/getPensumPagination?page=${page}&size=${size}`
+        });
+    }
+
+    // Crear nuevo pensum
+    static async createPensum(data) {
+        console.log('📤 POST /newPensum:', data);
         return await Network.post({
-            path: `${this._ENDPOINT}/insertPensumSubject`,
+            path: `${this._ENDPOINT}/newPensum`,
             body: data
         });
     }
 
-    static async put(id) {
+    // Actualizar pensum
+    static async updatePensum(id, data) {
+        console.log(`📤 PUT /updatePensum/${id}:`, data);
         return await Network.put({
-            path: `${this._ENDPOINT}/updatePensumSubject/${id}`,
+            path: `${this._ENDPOINT}/updatePensum/${id}`,
             body: data
         });
     }
 
-    static async delete(id) {
+    // Eliminar pensum
+    static async deletePensum(id) {
+        console.log(`📤 DELETE /deletePensum/${id}`);
         return await Network.delete({
-            path: `${this._ENDPOINT}/deletePensumSubject/${id}`
+            path: `${this._ENDPOINT}/deletePensum/${id}`
         });
     }
-
 }

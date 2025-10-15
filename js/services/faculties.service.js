@@ -1,24 +1,33 @@
-import { Service } from './../lib/service.js';
-import { FacultiesContract } from './../contracts/faculties.contract.js';
+import { Network } from '../lib/network';
 
-export class FacultiesService extends Service {
-    
-    static baseEndpoint = '/Faculties';
-    static contract = new FacultiesContract();
+export class FacultiesService {
 
-    static async list() {
-        return await this.get('getFacultiesPagination', null, 'table');
-    }
+	static _ENDPOINT = '/Faculties';
 
-    static async create(facultyData) {
-        return await this.post('newFaculties', facultyData, 'create');
-    }
+	static async get(){
+		return await Network.get({
+			path: `${this._ENDPOINT}/getFaculties`
+		});
+	}
 
-    static async update(facultyData) {
-        return await this.put('updateFaculty', facultyData, 'update');
-    }
+	static async post(data){
+		return await Network.post({
+			path: `${this._ENDPOINT}/newFaculties`,
+			body: data
+		});
+	}
 
-    static async delete(id) {
-        return await this.delete('deleteFaculty', id);
-    }
+	static async put(id){
+		return await Network.put({
+			path: `${this._ENDPOINT}/updateFaculty/${id}`,
+			body: data
+		});
+	}
+
+	static async delete(id){
+		return await Network.delete({
+			path: `${this._ENDPOINT}/deleteFaculty/${id}`
+		});
+	}
+
 }
