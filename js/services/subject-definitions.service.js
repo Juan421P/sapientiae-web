@@ -1,24 +1,33 @@
-import { Service } from './../lib/service.js';
-import { SubjectDefinitionsContract } from './../contracts/subject-definitions.contract.js';
+import { Network } from '../lib/network';
 
-export class SubjectDefinitionsService extends Service {
+export class SubjectDefinitionsService {
 
-    static baseEndpoint = '/SubjectsDefinition';
-    static contract = new SubjectDefinitionsContract();
+    static _ENDPOINT = '/SubjectDefinitions';
 
-    static async list() {
-        return await this.get('', null, null, 'default');
+    static async get() {
+        return await Network.get({
+            path: `${this._ENDPOINT}/getSubjectDefinition`
+        });
     }
 
-    static async create(data) {
-        return await this.post('', data, 'default');
+    static async post(data) {
+        return await Network.post({
+            path: `${this._ENDPOINT}/newSubjectDefinition`,
+            body: data
+        });
     }
 
-    static async update(subjectID, data) {
-        return await this.put(`${subjectID}`, data, 'default');
+    static async put(id) {
+        return await Network.put({
+            path: `${this._ENDPOINT}/updateSubjectDefinition/${id}`,
+            body: data
+        });
     }
 
-    static async delete(subjectID) {
-        return await this.delete(`${subjectID}`);
+    static async delete(id) {
+        return await Network.delete({
+            path: `${this._ENDPOINT}/deleteSubjectDefinition/${id}`
+        });
     }
+
 }

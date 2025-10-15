@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es" class="scrollbar-width-none">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="./../../css/style.css">
+    <link rel="icon" href="./../../img/logo.ico">
+    <title>Estudiantes</title>
+</head>
+
+<body
+    class="relative flex justify-center min-h-screen mb-50 md:justify-start bg-gradient-to-tr from-[rgb(var(--body-from))] to-[rgb(var(--body-to))]">
+    <div class="fixed bottom-10 left-0 w-[600px] h-[600px] z-[50] pointer-events-none animate-left-spin-pulse">
+        <div class="absolute inset-0 border-2 border-[rgb(var(--button-to))] opacity-20"></div>
+        <div class="absolute border-2 border-[rgb(var(--placeholder-to))] inset-1 opacity-5"></div>
+        <div class="absolute inset-0 rotate-45 border-2 border-[rgb(var(--button-from))] opacity-40"></div>
+        <div class="absolute rotate-45 border-2 border-[rgb(var(--placeholder-from))] inset-1 opacity-20"></div>
+    </div>
+    <div class="fixed top-0 right-0 w-[300px] h-[300px] z-[-20] pointer-events-none animate-right-spin-pulse">
+        <div class="absolute inset-0 border-2 border-[rgb(var(--button-to))] opacity-20"></div>
+        <div class="absolute border-2 border-[rgb(var(--placeholder-to))] inset-1 opacity-5"></div>
+        <div class="absolute inset-0 rotate-45 border-2 border-[rgb(var(--button-from))] opacity-40"></div>
+        <div class="absolute rotate-45 border-2 border-[rgb(var(--placeholder-from))] inset-1 opacity-20"></div>
+    </div>
+    <div id="navbar" class="fixed top-0 left-0 w-full z-[52]">
+    </div>
+    <div id="main-view" class="flex-1 w-full z-51">
+        <main class="flex flex-col min-h-screen p-10 space-y-8 md:ml-80 pb-80 md:pb-56">
+            <div class="flex items-center justify-between">
+                <h1
+                    class="text-2xl font-bold bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent drop-shadow select-none">
+                    Gestión de Estudiantes
+                </h1>
+                <div
+                    class="block transition-shadow duration-300 bg-transparent group rounded-xl hover:bg-white hover:shadow-lg">
+                    <button type="button" class="btn-component" id="add-student">
+                        <div class="flex justify-center w-full gap-4">
+                            <svg id="button-icon" class="w-6 h-6 stroke-current fill-none drop-shadow-sm"
+                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10" />
+                                <path d="M8 12h8" />
+                                <path d="M12 8v8" />
+                            </svg>
+                            <span id="button-text" class="drop-shadow-sm">
+                                Agregar estudiante
+                            </span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+            <div class="sm:max-w-xs">
+                <input id="student-search" type="text" placeholder="Buscar"
+                    class="w-full bg-gradient-to-r from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] px-4 py-3 rounded-lg focus:outline-none text-[rgb(var(--button-from))] placeholder:text-[rgb(var(--placeholder-from))] placeholder:italic text-shadow shadow-md border-none select-none focus:ring-0" />
+            </div>
+            <div class="w-full p-5 overflow-x-auto select-none">
+                <div class="relative">
+                    <div
+                        class="p-0.5 rounded-xl bg-gradient-to-r from-[rgb(var(--placeholder-from))] to-[rgb(var(--placeholder-to))] shadow-lg">
+                        <div
+                            class="bg-gradient-to-br from-[rgb(var(--body-from))] to-[rgb(var(--body-to))] rounded-xl overflow-hidden">
+                            <table class="min-w-full text-sm bg-[rgb(var(--body-from))] text-left">
+                                <thead id="thead"
+                                    class="text-xs uppercase select-none bg-[rgb(var(--card-from))] bg-clip-text text-transparent drop-shadow">
+                                </thead>
+                                <tbody id="tbody" class="divide-y divide-[rgb(var(--placeholder-from))] text-left">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div data-pagination class="flex items-center justify-end hidden gap-2 mt-4 text-xs"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <footer id="footer"
+        class="fixed bottom-0 left-0 w-full bg-gradient-to-tr from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] z-[999] opacity-0 pointer-events-none translate-y-full transition-all duration-700 ease-in-out grid grid-cols-1 md:grid-cols-12 rounded-t-2xl md:rounded-t-none cursor-pointer">
+    </footer>
+</body>
+<script type="module" src="./../../js//controllers/themes/themes.controller.js"></script>
+<script type="module" src="./../../js/controllers/academic-record/students.controller.js"></script>
+<script type="module" src="./../../js/controllers/elements/footer.controller.js"></script>
+<script type="module" src="./../../js/controllers/elements/navbar.controller.js"></script>
+
+</html>

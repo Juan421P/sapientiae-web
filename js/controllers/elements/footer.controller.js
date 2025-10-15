@@ -23,8 +23,8 @@ const html = `
         class="flex items-center justify-center col-span-1 pb-10 pl-10 pr-10 md:col-span-4 lg:col-span-3 md:pb-0 md:pl-0 md:pr-15 md:mt-0">
         <div>
             <p class="font-bold text-white select-none text-shadow">
-                <!-- &copy; 2025 B. Alvarenga, D. Gómez, I. Nolazco, J. Pérez, J. Portillo. Todos los derechos reservados. -->
-                &copy; 2025 La Morenita, Tortillería & Meat Market. Todos los derechos reservados.
+                &copy; 2025 B. Alvarenga, D. Gómez, I. Nolazco, J. Pérez, J. Portillo. Todos los derechos reservados.
+                <!-- &copy; 2025 La Morenita, Tortillería & Meat Market. Todos los derechos reservados. -->
             </p>
         </div>
     </div>
