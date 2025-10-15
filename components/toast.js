@@ -1,5 +1,5 @@
 export class Toast {
-    
+
     static containerId = 'toast-container';
 
     static _ensureContainer() {
@@ -77,5 +77,69 @@ export class Toast {
             if (e.animationName === 'toast-fade') toast.remove();
         });
     }
-    
+
+    static confirm(message) {
+        return new Promise(resolve => {
+            const container = this._ensureContainer();
+
+            const toast = document.createElement('div');
+            toast.className = `
+            relative flex flex-col gap-3 pointer-events-auto px-5 py-4 rounded shadow-lg text-md
+            overflow-hidden max-w-sm min-w-[220px] text-[rgb(var(--card-from))]
+            bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))]
+            fade-in select-none
+        `;
+
+            toast.innerHTML = `
+            <div class="flex items-center gap-3 flex-1 min-w-[300px]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     class="drop-shadow">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                    <path d="M12 17h.01"/>
+                </svg>
+                <span class="drop-shadow-4xl select-none font-medium">${message}</span>
+            </div>
+            <div class="flex justify-end gap-3 mt-2">
+                <button class="flex items-center gap-1.5 px-3 py-1.5 rounded bg-red-600 hover:bg-red-700 transition select-none cursor-pointer duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         class="drop-shadow">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="m15 9-6 6"/><path d="m9 9 6 6"/>
+                    </svg>
+                    <span class="drop-shadow">
+                        No
+                    </span>
+                </button>
+                <button class="flex items-center gap-1.5 px-3 py-1.5 rounded bg-lime-600 hover:bg-lime-700 transition select-none cursor-pointer duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         class="drop-shadow">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="m9 12 2 2 4-4"/>
+                    </svg>
+                    <span class="drop-shadow">
+                        Sí
+                    </span>
+                </button>
+            </div>
+        `;
+
+            const [noBtn, yesBtn] = toast.querySelectorAll('button');
+
+            const close = (val) => {
+                toast.classList.add('opacity-0', 'transition', 'duration-300');
+                setTimeout(() => toast.remove(), 300);
+                resolve(val);
+            };
+
+            noBtn.addEventListener('click', () => close(false));
+            yesBtn.addEventListener('click', () => close(true));
+
+            container.appendChild(toast);
+        });
+    }
+
 }
