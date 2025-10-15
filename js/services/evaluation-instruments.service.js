@@ -1,24 +1,33 @@
-import { Service } from "../lib/service.js";
-import { EvaluationInstrumentsContract } from "../contracts/evaluation-instruments.contract.js";
+import { Network } from '../lib/network';
 
-export class EvaluationInstrumentsService extends Service{
-    
-    static baseEndpoint = '/EvaluationInstrument';
-    static contract = new EvaluationInstrumentsContract();
+export class EvaluationInstrumentsService {
 
-    static async list() {
-        return await this.get('getEvaluationInstruments', null, 'table');
-    }
+	static _ENDPOINT = '/EvaluationInstrument';
 
-    static async create(evaluationInstrumentData) {
-        return await this.post('insertEvaluationInstrument', evaluationInstrumentData, 'create');
-    }
+	static async get(){
+		return await Network.get({
+			path: `${this._ENDPOINT}/getEvaluationInstruments`
+		});
+	}
 
-    static async update(evaluationInstrumentData) {
-        return await this.put('updateEvaluationInstrument', evaluationInstrumentData, 'update');
-    }
+	static async post(data){
+		return await Network.post({
+			path: `${this._ENDPOINT}/insertEvaluationInstrument`,
+			body: data
+		});
+	}
 
-    static async delete(id) {
-        return await this.delete('deleteEvaluationInstrument', id);
-    }
+	static async put(id){
+		return await Network.put({
+			path: `${this._ENDPOINT}/updateEvaluationInstrument/${id}`,
+			body: data
+		});
+	}
+
+	static async delete(id){
+		return await Network.delete({
+			path: `${this._ENDPOINT}/deleteEvaluationInstrument/${id}`
+		});
+	}
+
 }
