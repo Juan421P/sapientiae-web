@@ -51,7 +51,6 @@ function populateTable(users) {
                     label: 'Ver perfil',
                     icon: 'view',
                     onClick: () => {
-                        Toast.show('Ver perfil');
                     },
                 },
                 {
@@ -68,6 +67,25 @@ function populateTable(users) {
                         Toast.show('Eliminar usuario', 'error');
                     },
                 },
+                {
+                    label: 'El select',
+                    icon: 'view',
+                    onClick: async () => {
+                        const template = document.querySelector('#select-template');
+                        if (!template) return;
+
+                        const selectModal = template.content.querySelector('#select-modal').cloneNode(true);
+                        Modal.show(selectModal);
+
+                        const selectRoot = selectModal.querySelector('[data-select]');
+
+                        populateSelect(selectRoot, [
+                            { value: 'opt1', label: 'Primera opción' },
+                            { value: 'opt2', label: 'Segunda opción' },
+                            { value: 'opt3', label: 'Tercera opción' }
+                        ]);
+                    }
+                }
             ]);
         });
     });
@@ -77,5 +95,74 @@ async function loadUsers() {
     const data = await UsersService.get();
     populateTable(data);
 }
+
+function populateSelect(selectRoot, options = [], selectedValue = null) {
+    if (!selectRoot) return;
+
+    const menu = selectRoot.querySelector('[data-menu]');
+    const text = selectRoot.querySelector('[data-text]');
+    const input = selectRoot.querySelector('[data-input]');
+    const chevron = selectRoot.querySelector('[data-chevron]');
+    const btn = selectRoot.querySelector('[data-btn]');
+
+    menu.innerHTML = options.map(opt => `
+        <li class="px-4 py-2 cursor-pointer transition select-none 
+                   bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] 
+                   bg-clip-text text-transparent font-medium
+                   hover:from-[rgb(var(--button-from))]/70 hover:to-[rgb(var(--button-to))]/70"
+            data-value="${opt.value || opt}">
+            ${opt.label || opt}
+        </li>
+    `).join('');
+
+    btn.addEventListener('click', () => {
+        const isOpen = !menu.classList.contains('hidden');
+        menu.classList.toggle('hidden', isOpen);
+        chevron.classList.toggle('rotate-180', !isOpen);
+    });
+
+    document.addEventListener('click', e => {
+        if (!selectRoot.contains(e.target)) {
+            menu.classList.add('hidden');
+            chevron.classList.remove('rotate-180');
+        }
+    });
+
+    menu.querySelectorAll('li').forEach(li => {
+        li.addEventListener('click', () => {
+            const val = li.dataset.value;
+            const label = li.textContent.trim();
+
+            text.textContent = label;
+
+            text.classList.remove('italic', 'text-[rgb(var(--placeholder-from))]');
+            text.classList.add('bg-gradient-to-r', 'from-[rgb(var(--button-from))]', 'to-[rgb(var(--button-to))]', 'bg-clip-text', 'text-transparent');
+
+            input.value = val;
+
+            menu.classList.add('hidden');
+            chevron.classList.remove('rotate-180');
+        });
+    });
+
+    btn.addEventListener('contextmenu', e => {
+        e.preventDefault();
+        text.textContent = 'Seleccione';
+        text.classList.add('italic', 'text-[rgb(var(--placeholder-from))]');
+        text.classList.remove('bg-gradient-to-r', 'from-[rgb(var(--button-from))]', 'to-[rgb(var(--button-to))]', 'bg-clip-text', 'text-transparent');
+        input.value = '';
+    });
+
+    if (selectedValue !== null) {
+        const found = options.find(opt => (opt.value || opt) === selectedValue);
+        if (found) {
+            text.textContent = found.label || found;
+            text.classList.remove('italic', 'text-[rgb(var(--placeholder-from))]');
+            text.classList.add('bg-gradient-to-r', 'from-[rgb(var(--button-from))]', 'to-[rgb(var(--button-to))]', 'bg-clip-text', 'text-transparent');
+            input.value = selectedValue;
+        }
+    }
+}
+
 
 await loadUsers();

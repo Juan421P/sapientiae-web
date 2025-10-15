@@ -90,4 +90,3 @@ async function insertCycle(data) {
 }
 
 await loadCycles();
-Toast.show(await Toast.confirm('Tublinbi???'));
