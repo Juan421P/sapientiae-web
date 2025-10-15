@@ -43,9 +43,9 @@ class PensumController {
     async loadCareers() {
         try {
             this.careers = await PensumService.getAllCareers();
-            console.log('✅ Carreras cargadas:', this.careers);
+            console.log('Carreras cargadas:', this.careers);
         } catch (error) {
-            console.error('❌ Error al cargar carreras:', error);
+            console.error('Error al cargar carreras:', error);
             this.careers = [];
         }
     }
@@ -90,17 +90,16 @@ class PensumController {
             const response = await PensumService.getPensumPagination(this.currentPage, this.pageSize);
             this.pensa = response.content;
             this.filteredPensa = this.pensa;
-            console.log('✅ Pensa cargados:', this.pensa);
             this.renderTable();
             this.updatePaginationInfo(response);
         } catch (error) {
-            console.error('❌ Error al cargar pensum:', error);
+            console.error('Error al cargar pensum:', error);
             this.showError('Error al cargar los pensum');
         }
     }
 
     getCareerName(careerID) {
-        const career = this.careers.find(c => c.id === careerID);
+        const career = this.careers.find(c => c.careerID === careerID);
         return career ? career.careerName : 'N/A';
     }
 
@@ -203,10 +202,10 @@ class PensumController {
         const modalTitle = document.getElementById('modal-title');
         const careerSelect = document.getElementById('pensum-career');
 
-        // Llenar select de carreras
+        // Llenar dropdown de carreras
         this.careers.forEach(career => {
             const option = document.createElement('option');
-            option.value = career.id;
+            option.value = career.careerID;
             option.textContent = career.careerName;
             careerSelect.appendChild(option);
         });
@@ -251,8 +250,6 @@ class PensumController {
         const version = document.getElementById('pensum-version').value.trim();
         const effectiveYear = parseInt(document.getElementById('pensum-year').value);
 
-        console.log('📤 Datos del formulario:', { careerID, version, effectiveYear });
-
         if (!careerID || !version || !effectiveYear) {
             this.showError('Todos los campos son obligatorios');
             return;
@@ -274,8 +271,6 @@ class PensumController {
             effectiveYear
         };
 
-        console.log('📦 Enviando datos:', pensumData);
-
         try {
             if (this.editingId) {
                 await PensumService.updatePensum(this.editingId, pensumData);
@@ -288,39 +283,20 @@ class PensumController {
             this.closeModal();
             this.loadPensa();
         } catch (error) {
-            console.error('❌ Error al guardar pensum:', error);
-            const errorText = (error.message || '') + ' ' + (error.detail || '');
-            
-            if (errorText.includes('integrity') || errorText.includes('constraint')) {
-                this.showError('No se puede guardar. Verifica que no exista un pensum con los mismos datos.');
-            } else {
-                this.showError(error.message || 'Error al guardar el pensum');
-            }
+            console.error('Error al guardar pensum:', error);
+            this.showError('Error al guardar el pensum');
         }
     }
 
     async editPensum(id) {
-        console.log('✏️ Editando pensum ID:', id);
         const pensum = this.pensa.find(p => p.pensumID === id);
-        console.log('📋 Pensum encontrado:', pensum);
-        
         if (pensum) {
             this.openModal(pensum);
-        } else {
-            this.showError('No se encontró el pensum');
         }
     }
 
     async deletePensum(id) {
-        console.log('🗑️ Eliminando pensum ID:', id);
-        const pensum = this.pensa.find(p => p.pensumID === id);
-        
-        if (!pensum) {
-            this.showError('No se encontró el pensum');
-            return;
-        }
-
-        if (!confirm(`¿Está seguro de eliminar el pensum versión "${pensum.version}"?`)) {
+        if (!confirm('¿Está seguro de eliminar este pensum?')) {
             return;
         }
 
@@ -329,14 +305,8 @@ class PensumController {
             this.showSuccess('Pensum eliminado exitosamente');
             this.loadPensa();
         } catch (error) {
-            console.error('❌ Error al eliminar pensum:', error);
-            const errorText = (error.message || '') + ' ' + (error.detail || '');
-            
-            if (errorText.includes('integrity') || errorText.includes('constraint') || errorText.includes('child record')) {
-                this.showError('No se puede eliminar este pensum porque tiene materias asociadas.\n\nPrimero debe eliminar las materias relacionadas.');
-            } else {
-                this.showError('Error al eliminar el pensum');
-            }
+            console.error('Error al eliminar pensum:', error);
+            this.showError('Error al eliminar el pensum');
         }
     }
 

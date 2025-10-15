@@ -13,7 +13,8 @@
     <title>Localidades</title>
 </head>
 
-<body class="relative flex justify-center min-h-screen mb-20 md:justify-start bg-gradient-to-tr from-[rgb(var(--body-from))] to-[rgb(var(--body-to))]">
+<body
+    class="relative flex justify-center min-h-screen mb-20 md:justify-start bg-gradient-to-tr from-[rgb(var(--body-from))] to-[rgb(var(--body-to))]">
     <div class="fixed bottom-10 left-0 w-[600px] h-[600px] pointer-events-none animate-left-spin-pulse">
         <div class="absolute inset-0 border-2 border-[rgb(var(--button-to))] opacity-20"></div>
         <div class="absolute border-2 border-[rgb(var(--placeholder-to))] inset-1 opacity-5"></div>
@@ -26,8 +27,9 @@
         <div class="absolute inset-0 rotate-45 border-2 border-[rgb(var(--button-from))] opacity-40"></div>
         <div class="absolute rotate-45 border-2 border-[rgb(var(--placeholder-from))] inset-1 opacity-20"></div>
     </div>
-    <div id="navbar" class="fixed top-0 left-0 w-full z-[51]">
-    </div>
+    
+    <div id="navbar" class="fixed top-0 left-0 w-full z-[51]"></div>
+    
     <div id="main-view" class="z-50 flex-1 w-full">
         <main class="flex flex-col min-h-screen p-10 space-y-8 md:ml-80 pb-80 md:pb-20">
             <div class="flex items-center justify-between">
@@ -37,7 +39,7 @@
                 </h1>
                 <div
                     class="block transition-shadow duration-300 bg-transparent group rounded-xl hover:bg-white hover:shadow-lg">
-                    <button type="button" class="btn-component" id="btn-new-locality">
+                    <button type="button" class="btn-component" id="add-locality">
                         <div class="flex justify-center w-full gap-4">
                             <svg id="button-icon" class="w-6 h-6 stroke-current fill-none drop-shadow-sm"
                                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2"
@@ -46,105 +48,105 @@
                                 <path d="M8 12h8" />
                                 <path d="M12 8v8" />
                             </svg>
-                            <span id="button-text" class="drop-shadow-sm">
-                                Nueva localidad
+                            <span class="drop-shadow-sm">
+                                Agregar localidad
                             </span>
                         </div>
                     </button>
                 </div>
             </div>
+
             <div class="sm:max-w-xs">
-                <input id="search-input" type="text" placeholder="Buscar"
+                <input id="locality-search" type="text" placeholder="Buscar localidad"
                     class="w-full bg-gradient-to-r from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] px-4 py-3 rounded-lg focus:outline-none text-[rgb(var(--button-from))] placeholder:text-[rgb(var(--placeholder-from))] placeholder:italic text-shadow shadow-md border-none select-none focus:ring-0" />
             </div>
 
-            <!-- Tabla -->
-            <div class="overflow-hidden rounded-xl bg-gradient-to-bl from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] shadow-md">
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))]">
-                            <tr>
-                                <th class="px-6 py-4 text-left text-sm font-semibold text-white">Dirección</th>
-                                <th class="px-6 py-4 text-left text-sm font-semibold text-white">Teléfono</th>
-                                <th class="px-6 py-4 text-left text-sm font-semibold text-white">Sede Principal</th>
-                                <th class="px-6 py-4 text-center text-sm font-semibold text-white">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="localities-table-body" class="divide-y divide-[rgb(var(--off-from))]">
-                            <!-- Las filas se insertan aquí -->
-                        </tbody>
-                    </table>
-                </div>
+            <div class="flex flex-wrap w-full gap-10 p-5 pl-0 select-none" id="locality-list">
             </div>
 
             <!-- Paginación -->
-            <div class="flex items-center justify-between">
-                <div class="text-sm text-[rgb(var(--text-from))]">
-                    Mostrando <span id="showing-start">0</span> a <span id="showing-end">0</span> de <span id="total-records">0</span> registros
-                </div>
-                <div class="flex gap-2">
-                    <button id="btn-prev-page" class="px-4 py-2 rounded-lg bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] text-white hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
-                        Anterior
-                    </button>
-                    <button id="btn-next-page" class="px-4 py-2 rounded-lg bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] text-white hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
-                        Siguiente
-                    </button>
-                </div>
+            <div class="flex items-center justify-center gap-4 mt-8">
+                <button id="prev-page" disabled
+                    class="p-3 bg-gradient-to-tr from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] text-[rgb(var(--text-from))] rounded-lg font-medium shadow-md hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
+                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                
+                <span id="page-info" class="text-[rgb(var(--text-from))] font-medium select-none">
+                    Página 1 de 1
+                </span>
+                
+                <button id="next-page" disabled
+                    class="p-3 bg-gradient-to-tr from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] text-[rgb(var(--text-from))] rounded-lg font-medium shadow-md hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
+                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
             </div>
         </main>
     </div>
+
     <footer id="footer"
         class="fixed bottom-0 left-0 w-full bg-gradient-to-tr from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] z-[999] opacity-0 pointer-events-none translate-y-full transition-all duration-700 ease-in-out grid grid-cols-1 md:grid-cols-12 rounded-t-2xl md:rounded-t-none cursor-pointer">
     </footer>
 
-    <!-- Modal Template -->
-    <template id="locality-modal-template">
-        <div id="locality-modal" class="fixed inset-0 backdrop-blur-sm bg-black/20 flex items-center justify-center z-[9999] p-4">
-            <div class="bg-gradient-to-br from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] rounded-2xl shadow-2xl w-full max-w-md p-6 transform transition-all">
-                <h2 id="modal-title" class="text-2xl font-bold mb-6 bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent">
-                    Nueva Localidad
-                </h2>
-                
-                <form id="locality-form" class="space-y-4">
-                    <input type="hidden" id="locality-id">
-                    
-                    <div>
-                        <label class="block text-sm font-medium mb-2 text-[rgb(var(--text-from))]">Dirección</label>
-                        <input type="text" id="address" required maxlength="500"
-                            class="w-full bg-white/10 px-4 py-3 rounded-lg focus:outline-none text-[rgb(var(--button-from))] placeholder:text-[rgb(var(--placeholder-from))] placeholder:italic shadow-md border-none backdrop-blur-sm">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium mb-2 text-[rgb(var(--text-from))]">Teléfono</label>
-                        <input type="text" id="phone-number" required maxlength="8"
-                            class="w-full bg-white/10 px-4 py-3 rounded-lg focus:outline-none text-[rgb(var(--button-from))] placeholder:text-[rgb(var(--placeholder-from))] placeholder:italic shadow-md border-none backdrop-blur-sm">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium mb-2 text-[rgb(var(--text-from))]">¿Es sede principal?</label>
-                        <select id="is-main-locality" required
-                            class="w-full bg-white/10 px-4 py-3 rounded-lg focus:outline-none text-[rgb(var(--button-from))] shadow-md border-none backdrop-blur-sm">
-                            <option value="">Seleccione una opción</option>
-                            <option value="true">Sí</option>
-                            <option value="false">No</option>
-                        </select>
-                    </div>
-
-                    <div class="flex gap-3 mt-6">
-                        <button type="button" id="btn-cancel-modal"
-                            class="flex-1 px-4 py-3 rounded-lg bg-gray-500 hover:bg-gray-600 text-white font-medium transition-colors">
-                            Cancelar
-                        </button>
-                        <button type="submit"
-                            class="flex-1 px-4 py-3 rounded-lg bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] text-white font-medium hover:shadow-lg transition-all">
-                            Guardar
-                        </button>
-                    </div>
-                </form>
+    <!-- Template para agregar/editar -->
+    <template id="tmpl-add-locality">
+        <form id="locality-form" novalidate class="flex flex-col max-w-md px-6 mx-auto gap-10 py-14">
+            <div class="flex flex-col items-center">
+                <span
+                    class="text-3xl font-bold text-center mb-2 drop-shadow bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent select-none"
+                    id="form-title">
+                    Nueva localidad
+                </span>
+                <span
+                    class="text-xl font-semibold text-center drop-shadow bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent select-none">
+                    Llena los campos requeridos
+                </span>
             </div>
-        </div>
+
+            <div class="flex flex-col gap-6">
+                <select id="university-select" name="universityID" required
+                    class="w-full bg-gradient-to-r from-[rgb(var(--body-from))] to-[rgb(var(--body-to))] px-6 py-4 rounded-lg focus:outline-none text-indigo-500 placeholder:text-indigo-300 text-xl text-shadow shadow-md border-none">
+                    <option value="">Selecciona una universidad</option>
+                </select>
+
+                <input id="locality-address" name="address" type="text" placeholder="Dirección" maxlength="500"
+                    class="w-full bg-gradient-to-r from-[rgb(var(--body-from))] to-[rgb(var(--body-to))] px-6 py-4 rounded-lg focus:outline-none text-indigo-500 placeholder:text-indigo-300 text-xl placeholder:italic text-shadow shadow-md border-none"
+                    required>
+
+                <input id="locality-phone" name="phoneNumber" type="text" placeholder="Teléfono (2222-2222)" maxlength="9"
+                    class="w-full bg-gradient-to-r from-[rgb(var(--body-from))] to-[rgb(var(--body-to))] px-6 py-4 rounded-lg focus:outline-none text-indigo-500 placeholder:text-indigo-300 text-xl placeholder:italic text-shadow shadow-md border-none"
+                    required>
+
+                <!-- Checkbox personalizado -->
+                <label class="flex items-center gap-4 cursor-pointer select-none">
+                    <div class="relative">
+                        <input id="is-main-locality" name="isMainLocality" type="checkbox" class="peer sr-only">
+                        <div class="w-14 h-8 bg-gradient-to-r from-gray-300 to-gray-400 rounded-full peer-checked:from-[rgb(var(--button-from))] peer-checked:to-[rgb(var(--button-to))] transition-all duration-300 shadow-md"></div>
+                        <div class="absolute left-1 top-1 w-6 h-6 bg-white rounded-full transition-all duration-300 peer-checked:translate-x-6 shadow"></div>
+                    </div>
+                    <span class="text-lg bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent font-medium">
+                        ¿Es sede principal?
+                    </span>
+                </label>
+            </div>
+
+            <div class="flex justify-end gap-3">
+                <button type="button" id="cancel-btn"
+                    class="p-4 bg-gradient-to-tr from-indigo-100 to-blue-100 text-indigo-400 hover:scale-[1.015] hover:from-indigo-200 hover:to-blue-200 rounded-xl font-medium shadow-md transition-all">
+                    Cancelar
+                </button>
+                <button type="submit" id="save-btn"
+                    class="p-4 bg-gradient-to-tr from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] text-white drop-shadow rounded-xl font-medium shadow-md hover:from-[rgb(var(--body-from))] hover:to-[rgb(var(--body-to))] hover:scale-[1.015] transition-all">
+                    Guardar
+                </button>
+            </div>
+        </form>
     </template>
 </body>
+
 <script type="module" src="./../../js/controllers/auth/auth.controller.js"></script>
 <script type="module" src="./../../js/controllers/themes/themes.controller.js"></script>
 <script type="module" src="./../../js/controllers/planification/localities.controller.js"></script>
