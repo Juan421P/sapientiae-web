@@ -125,21 +125,27 @@
             <div class="w-full space-y-8">
 
                 <!-- Encabezado -->
-                <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between mb-5 mt-5">
                     <h1
-                        class="text-3xl font-bold bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent drop-shadow select-none">
+                        class="text-2xl font-bold bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent drop-shadow select-none">
                         Pensum
                     </h1>
-                    <button id="btn-new-pensum" class="group">
-                        <div
-                            class="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] hover:shadow-lg transition-all duration-300">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-white">
-                                <path d="M12 5v14M5 12h14" />
+                    <div class="block transition-shadow duration-300 bg-transparent group rounded-xl hover:bg-white hover:shadow-lg">
+                        <button id="btn-new-pensum" type="button"
+                            class="flex items-center gap-5 px-5 py-4 text-indigo-400 transition-colors duration-300 rounded-lg group-hover:bg-gradient-to-r group-hover:from-indigo-400 group-hover:to-blue-400">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="flex-shrink-0 w-6 h-6 text-indigo-400 transition-colors duration-300 stroke-current group-hover:text-white drop-shadow fill-none"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10" />
+                                <path d="M8 12h8" />
+                                <path d="M12 8v8" />
                             </svg>
-                            <span class="font-medium text-white">Nuevo Pensum</span>
-                        </div>
-                    </button>
+                            <span
+                                class="hidden pr-1 font-medium transition-all duration-300 select-none lg:block group-hover:text-white drop-shadow">
+                                Agregar pensum
+                            </span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Buscador -->
