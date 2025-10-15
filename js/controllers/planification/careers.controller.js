@@ -57,6 +57,19 @@ function populateCareers(careers) {
                     onClick: () => {
                         Toast.show('hola', 'info');
                     }
+                },
+                {
+                    label: 'Eliminar',
+                    icon: 'trash',
+                    onClick: async () => {
+                        try {
+                            await CareersService.delete(id);
+                            Toast.show('Ciclo eliminado', 'error');
+                            await loadCareers();
+                        } catch {
+                            Toast.show('Error al eliminar', 'error');
+                        }
+                    }
                 }
             ]);
         });

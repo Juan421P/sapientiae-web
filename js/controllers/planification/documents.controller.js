@@ -1,17 +1,14 @@
-import { DocumentsService } from '../../services/documents.service'; // tu servicio de documentos
+import { DocumentsService } from "../../services/documents.service";
 
 const documentsList = document.querySelector('#documents-list');
 const user = JSON.parse(sessionStorage.getItem('user'));
 
 function populateDocuments(documents) {
-    // Filtrar documentos según la universidad del usuario
-    const filtered = documents.filter(d => d.universityID === user.universityID);
-
-    documentsList.innerHTML = filtered.length
-        ? filtered.map(d => `
-            <div class="w-64 p-6 bg-gradient-to-tr from-[rgb(var(--body-from))] to-[rgb(var(--body-to))] rounded-lg shadow hover:shadow-lg hover:scale-[1.015] transition-transform duration-300 cursor-pointer flex flex-col justify-between" data-id="${d.id}">
-                <h3 class="mb-1 font-semibold text-indigo-700" id="document-name">${d.name}</h3>
-                <p class="text-sm text-indigo-500" id="document-description">${d.description || 'Sin descripción'}</p>
+    documentsList.innerHTML = documents.length
+        ? documents.map(d => `
+            <div class="document-card min-w-[300px] max-w-[500px] p-6 bg-gradient-to-tr from-[rgb(var(--body-from))] to-[rgb(var(--body-to))] rounded-lg shadow hover:shadow-lg hover:scale-[1.015] transition-transform duration-300 cursor-pointer flex flex-col justify-between" data-id="${d.id}">
+                <h3 class="mb-1 font-semibold text-indigo-700" id="document-name">${d.documentName}</h3>
+                <p class="text-sm text-indigo-500" id="document-description">${d.documentCategory || 'Sin descripción'}</p>
             </div>
         `).join('')
         : `
@@ -19,25 +16,42 @@ function populateDocuments(documents) {
                 No hay documentos registrados.
             </div>
         `;
-
-    // Agregar listener a cada tarjeta
-    documentsList.querySelectorAll('[data-id]').forEach(card => {
+    documentsList.querySelectorAll('.document-card').forEach(card => {
         card.addEventListener('click', () => {
             const id = card.dataset.id;
-            // Aquí puedes abrir un modal o menú contextual
-            Toast.show(`Seleccionaste el documento con ID: ${id}`);
+
+            ContextMenu.show([
+                {
+                    label: 'Ver detalles',
+                    icon: 'view',
+                    onClick: () => Toast.show(`Mostrando detalles de la facultad #${id}`, 'info')
+                },
+                {
+                    label: 'Editar',
+                    icon: 'edit',
+                    onClick: () => Toast.show(`Editar facultad #${id}`, 'info')
+                },
+                {
+                    label: 'Eliminar',
+                    icon: 'trash',
+                    onClick: async () => {
+                        try {
+                            await DocumentsService.delete(id);
+                            Toast.show('Ciclo eliminado', 'error');
+                            await loadDocuments();
+                        } catch {
+                            Toast.show('Error al eliminar', 'error');
+                        }
+                    }
+                }
+            ]);
         });
     });
 }
 
 async function loadDocuments() {
-    try {
-        const data = await DocumentsService.get(); // Traer documentos desde el servicio
-        populateDocuments(data);
-    } catch (error) {
-        console.error('Error cargando documentos:', error);
-        Toast.show('No se pudieron cargar los documentos', 'error');
-    }
+    const data = await DocumentsService.get(); // Traer documentos desde el servicio
+    populateDocuments(data);
 }
 
 // Ejecutar la carga

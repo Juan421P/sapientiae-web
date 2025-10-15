@@ -1,44 +1,104 @@
 import { FacultiesService } from "../../services/faculties.service";
 
-const localitiesList = document.querySelector('#localities-list');
-const user = JSON.parse(sessionStorage.getItem('user')); // para filtrar por universidad, si aplica
+const careerList = document.querySelector('#career-list');
+const user = JSON.parse(sessionStorage.getItem('user'));
 
-function populateLocalities(localities) {
-    // Filtrar solo los que pertenecen a la misma universidad del usuario
-    const filtered = localities.filter(l => l.universityID === user.universityID);
+// --- Renderizado dinámico de facultades ---
+function populateCareers(faculties) {
+    const filtered = faculties.filter(c => c.universityID === user.universityID);
 
-    localitiesList.innerHTML = filtered.length
-        ? filtered.map(l => `
-            <div class="bg-gradient-to-tr from-indigo-50 to-blue-50 rounded-lg shadow p-6 w-80 flex flex-col justify-between cursor-pointer hover:shadow-lg hover:scale-[1.015] transition-transform duration-300" data-id="${l.id}">
-                <h3 class="font-semibold text-indigo-700 mb-1" id="locality-address">${l.address}</h3>
-                <p class="text-sm text-indigo-500 mb-1">Teléfono: <span id="locality-phone">${l.phone || 'No asignado'}</span></p>
-                <div class="mt-4">
-                    <span class="inline-block mt-1 px-2 py-0.5 text-xs rounded bg-indigo-400 text-white font-semibold select-none ${l.isMain ? '' : 'hidden'}">
-                        Sede principal
+    // Renderizar el contenido dinámicamente
+    careerList.innerHTML = faculties.length
+        ? faculties.map(c => `
+            <div class="career-card min-w-[300px] max-w-[500px] p-6 bg-gradient-to-tr from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] 
+                       rounded-xl shadow hover:shadow-lg hover:scale-[1.015] transition-transform duration-300 
+                       cursor-pointer flex flex-col justify-between" 
+                data-id="${c.facultyID}">
+                <div class="mb-10">
+                    <h2 class="font-bold bg-gradient-to-tr from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] 
+                               bg-clip-text text-transparent text-lg">
+                        ${c.facultyName}
+                    </h2>
+                    <p class="text-md font-bold text-sm bg-gradient-to-tr from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] 
+                        bg-clip-text text-transparent italic mb-2 mt-5">
+                        ID: ${c.facultyID || '—'}
+                    </p>
+                    <p class="text-sm bg-gradient-to-tr from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] 
+                              bg-clip-text text-transparent mb-2">
+                        Telefono de contacto: ${c.contactPhone || 'Sin descripción'}
+                    </p>
+                    <p class="text-sm bg-gradient-to-tr from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] 
+                              bg-clip-text text-transparent">
+                        Codigo Correlativo: ${c.correlativeCode ?? 'N/A'}
+                    </p>
+                </div>
+
+                <!--
+                <div class="flex flex-wrap gap-2">
+                    <span class="inline-block mt-1 px-2 py-0.5 text-xs rounded bg-indigo-400 text-white font-semibold select-none">
+                        ${c.departmentName || 'Departamento'}
+                    </span>
+                    <span class="inline-block mt-1 px-2 py-0.5 text-xs rounded bg-indigo-400 text-white font-semibold select-none">
+                        ${c.facultyName || 'Facultad'}
+                    </span>
+                    <span class="inline-block mt-1 px-2 py-0.5 text-xs rounded bg-indigo-400 text-white font-semibold select-none">
+                        ${c.location || 'Localidad'}
+                    </span>
+                    <span class="inline-block mt-1 px-2 py-0.5 text-xs rounded bg-indigo-400 text-white font-semibold select-none">
+                        ${c.pensumName || 'Pensum'}
                     </span>
                 </div>
+                -->
             </div>
         `).join('')
         : `
-            <div class="text-center text-gray-500 w-full py-10">
-                No hay localidades registradas.
+            <div class="text-center w-full py-10">
+                <span class="bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] 
+                             bg-clip-text text-transparent drop-shadow">
+                    No hay facultades registradas.
+                </span>
             </div>
         `;
 
-    // Agregar listener a cada tarjeta
-    localitiesList.querySelectorAll('[data-id]').forEach(card => {
+    // --- Eventos por tarjeta ---
+    careerList.querySelectorAll('.career-card').forEach(card => {
         card.addEventListener('click', () => {
             const id = card.dataset.id;
-            // Aquí puedes abrir modal, menú contextual, editar, etc.
-            Toast.show(`Seleccionaste la localidad con ID: ${id}`);
+
+            ContextMenu.show([
+                {
+                    label: 'Ver detalles',
+                    icon: 'view',
+                    onClick: () => Toast.show(`Mostrando detalles de la facultad #${id}`, 'info')
+                },
+                {
+                    label: 'Editar',
+                    icon: 'edit',
+                    onClick: () => Toast.show(`Editar facultad #${id}`, 'info')
+                },
+                {
+                    label: 'Eliminar',
+                    icon: 'trash',
+                    onClick: async () => {
+                        try {
+                            await FacultiesService.delete(id);
+                            Toast.show('Ciclo eliminado', 'error');
+                            await loadCareers();
+                        } catch {
+                            Toast.show('Error al eliminar', 'error');
+                        }
+                    }
+                }
+            ]);
         });
     });
 }
 
-async function loadLocalities() {
-    const data = await FacultiesService.get(); // método que devuelve las localidades
-    populateLocalities(data);
+// --- Cargar los datos desde el servicio ---
+async function loadCareers() {
+    const data = await FacultiesService.get();
+    populateCareers(data);
 }
 
-// Carga inicial
-await loadLocalities();
+// --- Inicialización ---
+await loadCareers();

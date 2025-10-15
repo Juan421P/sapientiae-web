@@ -1,45 +1,75 @@
 import { EvaluationInstrumentsService } from "../../services/evaluation-instruments.service";
 
-const instrumentList = document.querySelector('#instruments-list'); // sección donde irán las tarjetas
-const template = document.querySelector('#tmpl-instrument-card');
-const user = JSON.parse(sessionStorage.getItem('user')); // si quieres filtrar por universidad
+const instrumentsList = document.querySelector('#instruments-list');
+const user = JSON.parse(sessionStorage.getItem('user'));
 
 function populateInstruments(instruments) {
-    const filtered = instruments.filter(i => i.universityID === user.universityID);
+    const filtered = instruments.filter(c => c.universityID === user.universityID);
 
-    instrumentList.innerHTML = ''; // limpiar antes de renderizar
+    instrumentsList.innerHTML = instruments.length
+        ? instruments.map(i => `
+            <div 
+                class="instrument-card bg-gradient-to-tr from-[rgb(var(--body-from))] to-[rgb(var(--body-to))] 
+                       rounded-lg shadow p-6 min-w-[300px] max-w-[500px] cursor-pointer hover:shadow-lg hover:scale-[1.015] 
+                       transition-transform duration-300"
+                data-id="${i.instrumentTypeID}"
+            >
+                <h3 class="mb-1 font-semibold text-indigo-700">
+                    ${i.description || 'Sin nombre'}
+                </h3>
+                <p class="text-sm text-indigo-500">
+                    Tipo: ${i.usesRubric || 'No especificado'}
+                </p>
+            </div>
+        `).join('')
+        : `
+            <div class="text-center w-full py-10">
+                <span class="bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] 
+                             bg-clip-text text-transparent drop-shadow">
+                    No hay instrumentos registrados.
+                </span>
+            </div>
+        `;
 
-    if (filtered.length === 0) {
-        const div = document.createElement('div');
-        div.className = 'text-center text-gray-500 w-full py-10';
-        div.textContent = 'No hay instrumentos registrados.';
-        instrumentList.appendChild(div);
-        return;
-    }
-
-    filtered.forEach(i => {
-        const clone = template.content.cloneNode(true);
-        const card = clone.querySelector('div');
-        card.dataset.id = i.id;
-        card.classList.add('instrument-card'); // opcional para seleccionar más tarde
-
-        clone.querySelector('#instrument-name').textContent = i.name;
-        clone.querySelector('#instrument-type').textContent = i.type || 'Tipo no especificado';
-
-        // Listener de click
+    // --- Eventos por tarjeta ---
+    instrumentsList.querySelectorAll('.instrument-card').forEach(card => {
         card.addEventListener('click', () => {
-            Toast.show(`Seleccionaste el instrumento con ID: ${i.id}`);
-        });
+            const id = card.dataset.id;
 
-        instrumentList.appendChild(clone);
+            ContextMenu.show([
+                {
+                    label: 'Ver detalles',
+                    icon: 'view',
+                    onClick: () => Toast.show(`Mostrando detalles de la facultad #${id}`, 'info')
+                },
+                {
+                    label: 'Editar',
+                    icon: 'edit',
+                    onClick: () => Toast.show(`Editar facultad #${id}`, 'info')
+                },
+                {
+                    label: 'Eliminar',
+                    icon: 'trash',
+                    onClick: async () => {
+                        try {
+                            await EvaluationInstrumentsService.delete(id);
+                            Toast.show('Ciclo eliminado', 'error');
+                            await loadInstruments();
+                        } catch {
+                            Toast.show('Error al eliminar', 'error');
+                        }
+                    }
+                }
+            ]);
+        });
     });
 }
 
-// Cargar los instrumentos desde el servicio
+// --- Función asíncrona para cargar instrumentos ---
 async function loadInstruments() {
     const data = await EvaluationInstrumentsService.get();
     populateInstruments(data);
 }
 
-// Inicializar
+// --- Inicialización ---
 await loadInstruments();
