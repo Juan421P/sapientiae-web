@@ -1,54 +1,33 @@
-import { fetchJSON,postJSON,putJSON, deleteJSON } from "../lib/network";
-import { PeopleContract } from "../contracts/people.contract";
+import { Network } from '../lib/network';
 
-const ENDPOINT = '/People'
+export class PeopleService {
 
-export const PeopleService = {
-    contract: PeopleContract,
+	static _ENDPOINT = '/People';
 
-    async list(){
-        const people = await fetchJSON(
-            `${ENDPOINT}/getPeople`
-        );
-        const parsed = Array.isArray(people) ? people.map(n => PeopleContract.parse(n, 'table')) : [];
-        document.dispatchEvent(new CustomEvent('people:list', {
-            detail: parsed
-        }));
-        return parsed
-    },
+	static async get(){
+		return await Network.get({
+			path: `${this._ENDPOINT}/getPeople`
+		});
+	}
 
-    async create(data){
-        const people = await postJSON(
-            `${ENDPOINT}/newPeople`,
-            PeopleContract.parse(data, 'create')
-        );
-        const parsed = PeopleContract.parse(people, 'table');
-        document.dispatchEvent(new CustomEvent('people:create', {
-            detial: parsed
-        }));
-        return parsed;
-    },
+	static async post(data){
+		return await Network.post({
+			path: `${this._ENDPOINT}/newPeople`,
+			body: data
+		});
+	}
 
-    async update(data){
-        const people = await putJSON(
-            `${ENDPOINT}/${data.personID}`,
-            PeopleContract.parse(data, 'update')
-        );
-        const parsed = PeopleContract.parse(people, 'table');
-        document.dispatchEvent(new CustomEvent('people:update', { detail:parsed}));
-        return parsed;
-    },
+	static async put(id){
+		return await Network.put({
+			path: `${this._ENDPOINT}/updatePeople/${id}`,
+			body: data
+		});
+	}
 
-    async delete(id){
-        const success = await deleteJSON(
-            `${ENDPOINT}/deletePeople/${id}`
-        );
-        document.dispatchEvent(new CustomEvent('people:delete', {
-            detail: {
-                id,
-                success
-            }
-        }));
-        return success === true;
-    }
+	static async delete(id){
+		return await Network.delete({
+			path: `${this._ENDPOINT}/deletePeople/${id}`
+		});
+	}
+
 }
