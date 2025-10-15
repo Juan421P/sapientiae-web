@@ -1,6 +1,6 @@
 import { Network } from '../lib/network.js';
 
-export class PensumService {
+export class PensumSubjectsService {
     static _ENDPOINT = '/Pensum';
     static _CAREERS_ENDPOINT = '/Careers';
 

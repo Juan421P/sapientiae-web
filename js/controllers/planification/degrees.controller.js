@@ -4,11 +4,9 @@ const gradeList = document.querySelector('#grades-list');
 const user = JSON.parse(sessionStorage.getItem('user'));
 
 function populateGrades(grades) {
-    const filtered = grades.filter(g => g.universityID === user.universityID);
-
-    gradeList.innerHTML = filtered.length
-        ? filtered.map(g => `
-            <div class="w-64 p-6 bg-gradient-to-tr from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] rounded-xl shadow hover:shadow-lg hover:scale-[1.015] transition-transform duration-300 cursor-pointer flex flex-col justify-between" data-id="${g.id}">
+    gradeList.innerHTML = grades.length
+        ? grades.map(g => `
+            <div class="grade-card p-6 bg-gradient-to-tr from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] rounded-xl shadow hover:shadow-lg hover:scale-[1.015] transition-transform duration-300 cursor-pointer flex flex-col justify-between" data-id="${g.id} min-w-[300px] max-w-[500px]">
                 <div class="mb-5">
                     <h2 class="font-bold bg-gradient-to-tr from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent text-lg">
                         ${g.degreeTypeName || 'Sin nombre'}
@@ -34,27 +32,42 @@ function populateGrades(grades) {
         `;
 
     // Listeners de las tarjetas
-    gradeList.querySelectorAll('[data-id]').forEach(card => {
+    gradeList.querySelectorAll('.grade-card').forEach(card => {
         card.addEventListener('click', () => {
             const id = card.dataset.id;
-            Toast.show(`Seleccionaste el grado con ID: ${id}`);
+
+            ContextMenu.show([
+                {
+                    label: 'Ver detalles',
+                    icon: 'view',
+                    onClick: () => Toast.show(`Mostrando detalles de la facultad #${id}`, 'info')
+                },
+                {
+                    label: 'Editar',
+                    icon: 'edit',
+                    onClick: () => Toast.show(`Editar facultad #${id}`, 'info')
+                },
+                {
+                    label: 'Eliminar',
+                    icon: 'trash',
+                    onClick: async () => {
+                        try {
+                            await DegreeTypesService.delete(id);
+                            Toast.show('Ciclo eliminado', 'error');
+                            await loadGrades();
+                        } catch {
+                            Toast.show('Error al eliminar', 'error');
+                        }
+                    }
+                }
+            ]);
         });
     });
 }
 
 async function loadGrades() {
-    try {
-        const data = await DegreeTypesService.get();
-        console.log('✅ Grados recibidos:', data);
-        populateGrades(data);
-    } catch (error) {
-        console.error('❌ Error al cargar grados:', error);
-        gradeList.innerHTML = `
-            <div class="text-center text-red-500 w-full py-10">
-                Error al cargar los grados.
-            </div>
-        `;
-    }
+    const data = await DegreeTypesService.get();
+    populateGrades(data);
 }
 
 await loadGrades();

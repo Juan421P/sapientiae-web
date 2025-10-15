@@ -5,11 +5,9 @@ const addDepartmentBtn = document.querySelector('#add-department-btn');
 const user = JSON.parse(sessionStorage.getItem('user'));
 
 function populateDepartments(departments) {
-    const filtered = departments.filter(d => d.universityID === user.universityID);
-
-    departmentList.innerHTML = filtered.length
-        ? filtered.map(d => `
-            <div class="w-72 p-6 bg-gradient-to-tr from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] 
+    departmentList.innerHTML = departments.length
+        ? departments.map(d => `
+            <div class="department-card min-w-[300px] max-w-[500px] p-6 bg-gradient-to-tr from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] 
                         rounded-xl shadow hover:shadow-lg hover:scale-[1.015] transition-transform duration-300 cursor-pointer flex flex-col justify-between"
                  data-id="${d.id}">
                  
@@ -20,15 +18,15 @@ function populateDepartments(departments) {
                     </h2>
                     <p id="departmentCode" class="text-md font-bold text-sm bg-gradient-to-tr from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] 
                         bg-clip-text text-transparent italic mb-2">
-                        ID ${d.departmentCode}
+                        ID: ${d.departmentID}
                     </p>
                     <p class="text-sm bg-gradient-to-tr from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent">
-                        Facultad: ${d.facultyName || 'Sin asignar'}
+                        Facultad: ${d.faculty}
                     </p>
                 </div>
                 <div>
                     <span class="inline-block mt-1 px-2 py-0.5 text-xs rounded bg-indigo-400 text-white font-semibold select-none">
-                        ${d.universityName || 'Universidad'}
+                        ${d.departmentType || 'Universidad'}
                     </span>
                 </div>
             </div>
@@ -39,34 +37,42 @@ function populateDepartments(departments) {
             </div>
         `;
 
-    // Eventos click en cada tarjeta
-    departmentList.querySelectorAll('[data-id]').forEach(card => {
+    departmentList.querySelectorAll('.department-card').forEach(card => {
         card.addEventListener('click', () => {
             const id = card.dataset.id;
-            Toast.show(`Seleccionaste el departamento con ID: ${id}`);
-            // Aquí podrías abrir un modal o menú contextual si quieres
+
+            ContextMenu.show([
+                {
+                    label: 'Ver detalles',
+                    icon: 'view',
+                    onClick: () => Toast.show(`Mostrando detalles de la facultad #${id}`, 'info')
+                },
+                {
+                    label: 'Editar',
+                    icon: 'edit',
+                    onClick: () => Toast.show(`Editar facultad #${id}`, 'info')
+                },
+                {
+                    label: 'Eliminar',
+                    icon: 'trash',
+                    onClick: async () => {
+                        try {
+                            await DepartmentsService.delete(id);
+                            Toast.show('Ciclo eliminado', 'error');
+                            await loadDepartments();
+                        } catch {
+                            Toast.show('Error al eliminar', 'error');
+                        }
+                    }
+                }
+            ]);
         });
     });
 }
 
-/*
-// Botón de agregar departamento
-addDepartmentBtn.addEventListener('click', () => {
-    Toast.show('Abrir formulario de nuevo departamento');
-    // Aquí podrías mostrar un <template> con el formulario de agregar
-});
-*/
-
-// Cargar departamentos
 async function loadDepartments() {
-    try {
-        const data = await DepartmentsService.get();
-        populateDepartments(data);
-    } catch (error) {
-        console.error('Error cargando departamentos:', error);
-        Toast.show('No se pudieron cargar los departamentos', 'error');
-    }
+    const data = await DepartmentsService.get();
+    populateDepartments(data);
 }
 
-// Ejecutar
 await loadDepartments();
