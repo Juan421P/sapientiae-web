@@ -102,7 +102,7 @@ async function checkAuth() {
             window.location.replace('/html/general/main.html');
         }
     } catch (err) {
-        if (err?.status !== 401) console.error('checkAuth error:', err);
+        return;
     }
 }
 

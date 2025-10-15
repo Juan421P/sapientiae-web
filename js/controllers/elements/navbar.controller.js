@@ -71,7 +71,7 @@ const html = `
                     <!-- MÓDULO DE SISTEMA -->
                     <li>
                         <div
-                            class="group block rounded-xl hover:bg-gradient-to-tr hover:from-[rgb(var(--body-from))] hover:to-[rgb(var(--body-to))] hover:shadow-lg transition-shadow duration-300 nav-btn hidden">
+                            class="group block rounded-xl hover:shadow-lg transition-shadow duration-300 nav-btn hidden">
                             <button type="button" data-toggle="collapse" data-target="#mod-system"
                                 class="flex items-center justify-between w-full px-5 py-4 text-[rgb(var(--button-from))] transition-colors duration-300 cursor-pointer rounded-xl group-hover:bg-gradient-to-r group-hover:from-[rgb(var(--button-from))] group-hover:to-[rgb(var(--button-to))]">
                                 <div class="flex items-center gap-5">
@@ -105,7 +105,7 @@ const html = `
                     <!-- MÓDULO DE PLANIFICACIÓN -->
                     <li>
                         <div
-                            class="group block rounded-xl hover:bg-gradient-to-tr hover:from-[rgb(var(--body-from))] hover:to-[rgb(var(--body-to))] hover:shadow-lg transition-shadow duration-300 nav-btn hidden">
+                            class="group block rounded-xl hover:shadow-lg transition-shadow duration-300 nav-btn hidden">
                             <button type="button" data-toggle="collapse" data-target="#mod-planification"
                                 class="flex items-center justify-between w-full px-5 py-4 text-[rgb(var(--button-from))] transition-colors duration-300 cursor-pointer rounded-xl group-hover:bg-gradient-to-r group-hover:from-[rgb(var(--button-from))] group-hover:to-[rgb(var(--button-to))]">
                                 <div class="flex items-center gap-5">
@@ -188,7 +188,7 @@ const html = `
                     <!-- MÓDULO DE RECURSOS HUMANOS -->
                     <li>
                         <div
-                            class="group block rounded-xl hover:bg-gradient-to-tr hover:from-[rgb(var(--body-from))] hover:to-[rgb(var(--body-to))] hover:shadow-lg transition-shadow duration-300 nav-btn hidden cursor-pointer">
+                            class="group block rounded-xl hover:shadow-lg transition-shadow duration-300 nav-btn hidden cursor-pointer">
                             <a href="/html/human-resources/employees"
                                 class="flex items-center gap-5 px-5 py-4 text-[rgb(var(--button-from))] transition-colors duration-300 rounded-xl hover:bg-gradient-to-r hover:from-[rgb(var(--button-from))] hover:to-[rgb(var(--button-to))]">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -208,74 +208,65 @@ const html = `
                     </li>
                     <!-- MÓDULO DE REGISTRO ACADÉMICO -->
                     <li>
-                        <div
-                            class="group block rounded-xl hover:bg-gradient-to-tr hover:from-[rgb(var(--body-from))] hover:to-[rgb(var(--body-to))] hover:shadow-lg transition-shadow duration-300 nav-btn hidden cursor-pointer">
-                            <a href="/html/academic-record/students.html"
-                                class="flex items-center gap-5 px-5 py-4 text-[rgb(var(--button-from))] transition-colors duration-300 rounded-xl hover:bg-gradient-to-r hover:from-[rgb(var(--button-from))] hover:to-[rgb(var(--button-to))]">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="flex-shrink-0 w-5 h-5 text-[rgb(var(--button-from))] transition-colors duration-300 group-hover:text-white drop-shadow">
+                        <div class="group block rounded-xl hover:shadow-lg transition-shadow duration-300 nav-btn hidden cursor-pointer">
+                            <a href="/html/academic-record/students.html" class="flex items-center gap-5 px-5 py-4 text-[rgb(var(--button-from))] transition-colors duration-300 rounded-xl hover:bg-gradient-to-r hover:from-[rgb(var(--button-from))] hover:to-[rgb(var(--button-to))]">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 w-5 h-5 text-[rgb(var(--button-from))] transition-colors duration-300 group-hover:text-white drop-shadow">
                                     <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
                                     <circle cx="9" cy="7" r="4" />
                                     <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
                                     <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                                 </svg>
-                                <span
-                                    class="font-medium transition-all duration-300 select-none group-hover:text-white drop-shadow">
+                                <span class="font-medium transition-all duration-300 select-none group-hover:text-white drop-shadow">
                                     Estudiantes
                                 </span>
                             </a>
                         </div>
-                        <div
-                            class="group block rounded-xl hover:bg-gradient-to-tr hover:from-[rgb(var(--body-from))] hover:to-[rgb(var(--body-to))] hover:shadow-lg transition-shadow duration-300 nav-btn hidden cursor-pointer">
+                    </li>
+                    <li>
+                        <div class="group block rounded-xl hover:shadow-lg transition-shadow duration-300 nav-btn hidden cursor-pointer">
                             <a href="/html/academic-record/career-enrollments.html"
                                 class="flex items-center gap-5 px-5 py-4 text-[rgb(var(--button-from))] transition-colors duration-300 rounded-xl hover:bg-gradient-to-r hover:from-[rgb(var(--button-from))] hover:to-[rgb(var(--button-to))]">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="flex-shrink-0 w-5 h-5 text-[rgb(var(--button-from))] transition-colors duration-300 group-hover:text-white drop-shadow">
-                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                                    <circle cx="9" cy="7" r="4" />
-                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 w-5 h-5 text-[rgb(var(--button-from))] transition-colors duration-300 group-hover:text-white drop-shadow">
+                                    <path d="M10 2v8l3-3 3 3V2"/>
+                                    <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/>
                                 </svg>
-                                <span
-                                    class="font-medium transition-all duration-300 select-none group-hover:text-white drop-shadow">
+                                <span class="font-medium transition-all duration-300 select-none group-hover:text-white drop-shadow">
                                     Inscripciones Carreras
                                 </span>
                             </a>
                         </div>
-                        <div
-                            class="group block rounded-xl hover:bg-gradient-to-tr hover:from-[rgb(var(--body-from))] hover:to-[rgb(var(--body-to))] hover:shadow-lg transition-shadow duration-300 nav-btn hidden cursor-pointer">
+                    </li>
+                    <li>
+                        <div class="group block rounded-xl hover:shadow-lg transition-shadow duration-300 nav-btn hidden cursor-pointer">
                             <a href="/html/academic-record/cycle-enrollments.html"
                                 class="flex items-center gap-5 px-5 py-4 text-[rgb(var(--button-from))] transition-colors duration-300 rounded-xl hover:bg-gradient-to-r hover:from-[rgb(var(--button-from))] hover:to-[rgb(var(--button-to))]">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="flex-shrink-0 w-5 h-5 text-[rgb(var(--button-from))] transition-colors duration-300 group-hover:text-white drop-shadow">
-                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                                    <circle cx="9" cy="7" r="4" />
-                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 w-5 h-5 text-[rgb(var(--button-from))] transition-colors duration-300 group-hover:text-white drop-shadow">
+                                    <path d="M11 10v4h4"/>
+                                    <path d="m11 14 1.535-1.605a5 5 0 0 1 8 1.5"/>
+                                    <path d="M16 2v4"/><path d="m21 18-1.535 1.605a5 5 0 0 1-8-1.5"/>
+                                    <path d="M21 22v-4h-4"/><path d="M21 8.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4.3"/><path d="M3 10h4"/>
+                                    <path d="M8 2v4"/>
                                 </svg>
-                                <span
-                                    class="font-medium transition-all duration-300 select-none group-hover:text-white drop-shadow">
+                                <span class="font-medium transition-all duration-300 select-none group-hover:text-white drop-shadow">
                                     Inscripciones Ciclos
                                 </span>
                             </a>
                         </div>
-                        <div
-                            class="group block rounded-xl hover:bg-gradient-to-tr hover:from-[rgb(var(--body-from))] hover:to-[rgb(var(--body-to))] hover:shadow-lg transition-shadow duration-300 nav-btn hidden cursor-pointer">
+                    </li>
+                    <li>
+                        <div class="group block rounded-xl hover:shadow-lg transition-shadow duration-300 nav-btn hidden cursor-pointer">
                             <a href="/html/academic-record/performances.html"
                                 class="flex items-center gap-5 px-5 py-4 text-[rgb(var(--button-from))] transition-colors duration-300 rounded-xl hover:bg-gradient-to-r hover:from-[rgb(var(--button-from))] hover:to-[rgb(var(--button-to))]">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="flex-shrink-0 w-5 h-5 text-[rgb(var(--button-from))] transition-colors duration-300 group-hover:text-white drop-shadow">
-                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                                    <circle cx="9" cy="7" r="4" />
-                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 w-5 h-5 text-[rgb(var(--button-from))] transition-colors duration-300 group-hover:text-white drop-shadow">
+                                    <path d="m13.11 7.664 1.78 2.672"/>
+                                    <path d="m14.162 12.788-3.324 1.424"/>
+                                    <path d="m20 4-6.06 1.515"/>
+                                    <path d="M3 3v16a2 2 0 0 0 2 2h16"/>
+                                    <circle cx="12" cy="6" r="2"/>
+                                    <circle cx="16" cy="12" r="2"/>
+                                    <circle cx="9" cy="15" r="2"/>
                                 </svg>
-                                <span
-                                    class="font-medium transition-all duration-300 select-none group-hover:text-white drop-shadow">
+                                <span class="font-medium transition-all duration-300 select-none group-hover:text-white drop-shadow">
                                     Rendimientos
                                 </span>
                             </a>
@@ -284,7 +275,7 @@ const html = `
                     <!-- MÓDULO DE PORTAL DE DOCENTE -->
                     <li>
                         <a href="/html/teacher-portal/courses.html"
-                            class="group block rounded-xl hover:bg-gradient-to-tr hover:from-[rgb(var(--body-from))] hover:to-[rgb(var(--body-to))] hover:shadow-lg transition-shadow duration-300 nav-btn hidden cursor-pointer">
+                            class="group block rounded-xl hover:shadow-lg transition-shadow duration-300 nav-btn hidden cursor-pointer">
                             <div
                                 class="flex items-center gap-5 px-5 py-4 transition-colors duration-300 inner rounded-xl group-hover:bg-gradient-to-r group-hover:from-[rgb(var(--button-from))] group-hover:to-[rgb(var(--button-to))]">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -302,7 +293,7 @@ const html = `
                     </li>
                     <li>
                         <a href="/html/teacher-portal/evaluation-plans.html"
-                            class="group block rounded-xl hover:bg-gradient-to-tr hover:from-[rgb(var(--body-from))] hover:to-[rgb(var(--body-to))] hover:shadow-lg transition-shadow duration-300 nav-btn hidden cursor-pointer">
+                            class="group block rounded-xl hover:shadow-lg transition-shadow duration-300 nav-btn hidden cursor-pointer">
                             <div
                                 class="flex items-center gap-5 px-5 py-4 transition-colors duration-300 inner rounded-xl group-hover:bg-gradient-to-r group-hover:from-[rgb(var(--button-from))] group-hover:to-[rgb(var(--button-to))]">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -320,7 +311,7 @@ const html = `
                     </li>
                     <li>
                         <a href="/html/teacher-portal/evaluations.html"
-                            class="group block rounded-xl hover:bg-gradient-to-tr hover:from-[rgb(var(--body-from))] hover:to-[rgb(var(--body-to))] hover:shadow-lg transition-shadow duration-300 nav-btn hidden cursor-pointer">
+                            class="group block rounded-xl hover:shadow-lg transition-shadow duration-300 nav-btn hidden cursor-pointer">
                             <div
                                 class="flex items-center gap-5 px-5 py-4 transition-colors duration-300 inner rounded-xl group-hover:bg-gradient-to-r group-hover:from-[rgb(var(--button-from))] group-hover:to-[rgb(var(--button-to))]">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -339,7 +330,7 @@ const html = `
                     <!-- MÓDULO DE PORTAL DE ESTUDIANTE -->
                     <li>
                         <a href="/html/student-portal/evaluations.html"
-                            class="group block rounded-xl hover:bg-gradient-to-tr hover:from-[rgb(var(--body-from))] hover:to-[rgb(var(--body-to))] hover:shadow-lg transition-shadow duration-300 nav-btn hidden cursor-pointer">
+                            class="group block rounded-xl hover:shadow-lg transition-shadow duration-300 nav-btn hidden cursor-pointer">
                             <div
                                 class="flex items-center gap-5 px-5 py-4 transition-colors duration-300 inner rounded-xl group-hover:bg-gradient-to-r group-hover:from-[rgb(var(--button-from))] group-hover:to-[rgb(var(--button-to))]">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -357,7 +348,7 @@ const html = `
                     </li>
                     <li>
                         <div
-                            class="group block rounded-xl hover:bg-gradient-to-tr hover:from-[rgb(var(--body-from))] hover:to-[rgb(var(--body-to))] hover:shadow-lg transition-shadow duration-300 nav-btn hidden">
+                            class="group block rounded-xl hover:shadow-lg transition-shadow duration-300 nav-btn hidden">
                             <button type="button" data-toggle="collapse" data-target="#mod-sp-enrollments"
                                 class="flex items-center justify-between w-full px-5 py-4 text-[rgb(var(--button-from))] transition-colors duration-300 cursor-pointer rounded-xl group-hover:bg-gradient-to-r group-hover:from-[rgb(var(--button-from))] group-hover:to-[rgb(var(--button-to))]">
                                 <div class="flex items-center gap-5">
@@ -394,7 +385,7 @@ const html = `
                     </li>
                     <li>
                         <a href="/html/student-portal/pensum.html"
-                            class="group block rounded-xl hover:bg-gradient-to-tr hover:from-[rgb(var(--body-from))] hover:to-[rgb(var(--body-to))] hover:shadow-lg transition-shadow duration-300 nav-btn hidden cursor-pointer">
+                            class="group block rounded-xl hover:shadow-lg transition-shadow duration-300 nav-btn hidden cursor-pointer">
                             <div
                                 class="flex items-center gap-5 px-5 py-4 transition-colors duration-300 inner rounded-xl group-hover:bg-gradient-to-r group-hover:from-[rgb(var(--button-from))] group-hover:to-[rgb(var(--button-to))]">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -412,7 +403,7 @@ const html = `
                     </li>
                     <li>
                         <a href="/html/student-portal/grades.html"
-                            class="group block rounded-xl hover:bg-gradient-to-tr hover:from-[rgb(var(--body-from))] hover:to-[rgb(var(--body-to))] hover:shadow-lg transition-shadow duration-300 nav-btn hidden cursor-pointer">
+                            class="group block rounded-xl hover:shadow-lg transition-shadow duration-300 nav-btn hidden cursor-pointer">
                             <div
                                 class="flex items-center gap-5 px-5 py-4 transition-colors duration-300 inner rounded-xl group-hover:bg-gradient-to-r group-hover:from-[rgb(var(--button-from))] group-hover:to-[rgb(var(--button-to))]">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -637,6 +628,11 @@ function highlightActive() {
         sp?.classList.remove('text-white');
         sp?.classList.add('text-[rgb(var(--button-from))]');
         entry.querySelector('ul')?.classList.remove('bg-gradient-to-tr', 'from-[rgb(var(--body-from))]', 'to-[rgb(var(--body-to))]');
+
+        const inner = entry.querySelector('.inner');
+        if (inner) {
+            inner.classList.remove('bg-gradient-to-r', 'from-[rgb(var(--button-from))]', 'to-[rgb(var(--button-to))]');
+        }
     });
 
     const activeLink = Array.from(document.querySelectorAll('#sidebar a[href]')).find(a => a.getAttribute('href') === path);
@@ -661,6 +657,11 @@ function highlightActive() {
         } else {
             sp.textContent = sp.dataset.originalLabel;
         }
+    }
+
+    const inner = entry.querySelector('.inner');
+    if (inner) {
+        inner.classList.remove('bg-gradient-to-r', 'from-[rgb(var(--button-from))]', 'to-[rgb(var(--button-to))]');
     }
 
     entry.querySelector('ul')?.classList.add('bg-gradient-to-tr', 'from-[rgb(var(--body-from))]', 'to-[rgb(var(--body-to))]');

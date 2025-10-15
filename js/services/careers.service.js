@@ -1,24 +1,32 @@
-import { Service } from './../lib/service.js';
-import { CareersContract } from './../contracts/careers.contract.js';
+import { Network } from './../lib/network';
 
-export class CareersService extends Service {
-    
-    static baseEndpoint = '/Careers';
-    static contract = new CareersContract();
+export class CareersService {
 
-    static async list() {
-        return await this.get('getCareersPaginated', null, 'table');
+    static _ENDPOINT = '/Careers';
+
+    static async get() {
+        return await Network.get({
+            path: `${this._ENDPOINT}/getCareers`
+        });
     }
 
-    static async create(data) {
-        return await this.post('insertCareer', data, 'create');
+    static async post(data) {
+        return await Network.post({
+            path: `${this._ENDPOINT}/insertCareer`,
+            body: data
+        });
     }
 
-    static async update(data) {
-        return await this.put('updateCareer', data, 'update');
+    static async put(id) {
+        return await Network.put({
+            path: `${this._ENDPOINT}/updateCareer/${id}`,
+            body: data
+        });
     }
 
     static async delete(id) {
-        return await this.delete('deleteCareer', id);
+        return await Network.delete({
+            path: `${this._ENDPOINT}/deleteCareer/${id}`
+        });
     }
 }

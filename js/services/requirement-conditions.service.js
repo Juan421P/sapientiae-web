@@ -1,43 +1,33 @@
-import { fetchJSON,postJSON,putJSON, deleteJSON } from "../lib/network";
-import { RequirementConditionsContract } from "../contracts/requirement-conditions.contract";
+import { Network } from '../lib/network';
 
-const ENDPOINT = '/RequirementConditions'
+export class RequirementConditionsService {
 
-export const RequirementConditionsService = {
-    contract: RequirementConditionsContract,
+    static _ENDPOINT = '/RequirementConditions';
 
-    async create(data){
-        const requirementCondition = await postJSON(
-            `${ENDPOINT}/newRequirementCondition`,
-            RequirementConditionsContract.parse(data, 'create')
-        );
-        const parsed = RequirementConditionsContract.parse(requirementCondition, 'table');
-        document.dispatchEvent(new CustomEvent('requirementCondition:create', {
-            detial: parsed
-        }));
-        return parsed;
-    },
-
-    async update(data){
-        const requirementCondition = await putJSON(
-            `${ENDPOINT}/${data.requirementConditionID}`,
-            RequirementConditionsContract.parse(data, 'update')
-        );
-        const parsed = RequirementConditionsContract.parse(requirementCondition, 'table');
-        document.dispatchEvent(new CustomEvent('requirementCondition:update', { detail:parsed}));
-        return parsed;
-    },
-
-    async delete(id){
-        const success = await deleteJSON(
-            `${ENDPOINT}/deleteRequirementCondition/${id}`
-        );
-        document.dispatchEvent(new CustomEvent('requirementCondition:delete', {
-            detail: {
-                id,
-                success
-            }
-        }));
-        return success === true;
+    static async get() {
+        return await Network.get({
+            path: `${this._ENDPOINT}/getRequirementCondition`
+        });
     }
+
+    static async post(data) {
+        return await Network.post({
+            path: `${this._ENDPOINT}/newRequirementCondition`,
+            body: data
+        });
+    }
+
+    static async put(id) {
+        return await Network.put({
+            path: `${this._ENDPOINT}/updateRequirementCondition/${id}`,
+            body: data
+        });
+    }
+
+    static async delete(id) {
+        return await Network.delete({
+            path: `${this._ENDPOINT}/deleteRequirementCondition/${id}`
+        });
+    }
+
 }

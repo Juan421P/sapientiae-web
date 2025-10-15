@@ -25,15 +25,15 @@ export class Network {
 
         const sendCreds = includeCredentials === true || includeCredentials === 'include';
 
-        console.info('[Network] Network request:', {
-            path,
-            method,
-            includeCredentials: sendCreds ? 'include' : 'omit',
-            hasBody: !!body
-        });
+        // console.info('[Network] Network request:', {
+        //     path,
+        //     method,
+        //     includeCredentials: sendCreds ? 'include' : 'omit',
+        //     hasBody: !!body
+        // });
 
         let url = `${API_BASE}${path}`;
-        console.info(`[Network] Full URL: ${url}`);
+        // console.info(`[Network] Full URL: ${url}`);
 
         let options = {
             method,
@@ -46,23 +46,23 @@ export class Network {
             options.body = JSON.stringify(body);
         }
 
-        console.info('[Network] Request options:', {
-            method: options.method,
-            credentials: options.credentials,
-            headers: options.headers
-        });
+        // console.info('[Network] Request options:', {
+        //     method: options.method,
+        //     credentials: options.credentials,
+        //     headers: options.headers
+        // });
 
         for (const fn of interceptors.request) {
             const modified = await fn({ url, options });
             if (modified) ({ url, options } = modified);
         }
 
-        console.info('[Network] Making fetch request... 🤔');
+        console.info('[Network] Making fetch request... 😴');
         const res = await fetch(url, options);
 
-        console.info('[Network] Response status:', res.status, res.statusText);
-        console.info('[Network] Response headers:');
-        res.headers.forEach((value, name) => console.info(`[Network] ${name}: ${value}`));
+        // console.info('[Network] Response status:', res.status, res.statusText);
+        // console.info('[Network] Response headers:');
+        // res.headers.forEach((value, name) => console.info(`[Network] ${name}: ${value}`));
 
         if (!res.ok) {
             let error = await this._buildError(res);
@@ -77,7 +77,7 @@ export class Network {
             data = (await fn(data)) || data;
         }
 
-        console.info('[Network] Request successful');
+        // console.info('[Network] Request successful');
         return data;
     }
 

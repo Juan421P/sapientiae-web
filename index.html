@@ -7,7 +7,7 @@
     <script type="module">
         import { AuthService } from './js/services/auth.service.js';
 
-        (async () => {
+        await (async () => {
             try {
                 const session = await AuthService.me();
                 if (session && session.user) {
