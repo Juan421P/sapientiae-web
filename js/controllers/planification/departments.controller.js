@@ -10,7 +10,6 @@ function populateDepartments(departments) {
             <div class="department-card min-w-[300px] max-w-[500px] p-6 bg-gradient-to-tr from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] 
                         rounded-xl shadow hover:shadow-lg hover:scale-[1.015] transition-transform duration-300 cursor-pointer flex flex-col justify-between"
                  data-id="${d.id}">
-                 
                 <div class="mb-10">
                     <h2 id="departmentName" class="font-bold bg-gradient-to-tr from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] 
                         bg-clip-text text-transparent text-lg">
