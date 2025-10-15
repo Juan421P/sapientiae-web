@@ -1,24 +1,33 @@
-import { Service } from "../lib/service.js";
-import { DocumentsContract } from "../contracts/documents.contract.js";
+import { Network } from '../lib/network';
 
-export class DocumentsService extends Service{
+export class DocumentsService {
 
-    static baseEndpoint = '/Documents';
-    static contract = new DocumentsContract();
+	static _ENDPOINT = '/Documents';
 
-    static async list() {
-        return await this.get('getDocuments', null, 'table');
-    }
+	static async get(){
+		return await Network.get({
+			path: `${this._ENDPOINT}/getDocuments`
+		});
+	}
 
-    static async create(documentData) {
-        return await this.post('insertDocument', documentData, 'create');
-    }
+	static async post(data){
+		return await Network.post({
+			path: `${this._ENDPOINT}/insertDocument`,
+			body: data
+		});
+	}
 
-    static async update(documentData) {
-        return await this.put('updateDocument', documentData, 'update');
-    }
+	static async put(id){
+		return await Network.put({
+			path: `${this._ENDPOINT}/updateDocument/${id}`,
+			body: data
+		});
+	}
 
-    static async delete(id) {
-        return await this.delete('deleteDocument', id);
-    }
+	static async delete(id){
+		return await Network.delete({
+			path: `${this._ENDPOINT}/deleteDocument/${id}`
+		});
+	}
+
 }
