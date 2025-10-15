@@ -1,24 +1,33 @@
-import { Service } from './../lib/service.js';
-import { SystemRolesContract } from '../contracts/system-roles.contract.js'
+import { Network } from '../lib/network';
 
-export class SystemRolesService extends Service {
-    
-    static baseEndpoint = '/SystemRol';
-    static contract = new SystemRolesContract();
+export class SystemRolesService {
 
-    static async list() {
-        return await this.get('getSystemRol', null, 'table');
+    static _ENDPOINT = '/SystemRol';
+
+    static async get(){
+        return await Network.get({
+            path: `${this._ENDPOINT}/getSystemRol`
+        });
     }
 
-    static async create(data) {
-        return await this.post('newSystemaRol', data, 'create');
+    static async post(data){
+        return await Network.post({
+            path: `${this._ENDPOINT}/newSystemaRol`,
+            body: data
+        });
     }
 
-    static async update(data) {
-        return await this.put('updateSystemRol', data, 'update');
+    static async put(id){
+        return await Network.put({
+            path: `${this._ENDPOINT}/updateSystemRol/${id}`,
+            body: data
+        });
     }
 
-    static async delete(id) {
-        return await this.delete('eliminarSystemRol', id);
+    static async delete(id){
+        return await Network.delete({
+            path: `${this._ENDPOINT}/eliminarSystemRol/${id}`
+        });
     }
+
 }
