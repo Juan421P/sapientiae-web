@@ -1,54 +1,33 @@
-import { fetchJSON, postJSON, putJSON } from './../lib/network.js';
-import { CourseOfferingTeachersContract } from './../contracts/course-offering-teachers.contract.js';
+import { Network } from '../lib/network';
 
-const ENDPOINT = '/CourseOfferingsTeachers';
+export class CourseOfferingsTeachersService {
 
-export const CourseOfferingTeachersService = {
-    contract: CourseOfferingTeachersContract,
+    static _ENDPOINT = '/CourseOfferingsTeachers';
 
-    async list() {
-        const courseOfferingTeachers = await fetchJSON(
-            `${ENDPOINT}/getAllCourseOfferingsTeachers`
-        );
-        const parsed = Array.isArray(courseOfferingTeachers) ? courseOfferingTeachers.map(n => CourseOfferingTeachersContract.parse(n, 'table')) : [];
-        document.dispatchEvent(new CustomEvent('CourseOfferingTeachers:list', {
-            detail: parsed
-        }));
-        return parsed;
-    },
-
-    async create(data) {
-        const courseOfferingTeachers = await postJSON(
-            `${ENDPOINT}/insertCourseOfferingTeacher`,
-            CourseOfferingTeachersContract.parse(data, 'create')
-        );
-        const parsed = CourseOfferingTeachersContract.parse(courseOfferingTeachers, 'table');
-        document.dispatchEvent(new CustomEvent('CourseOfferingTeachers:create', {
-            detail: parsed
-        }));
-        return parsed;
-    },
-
-    async update(data) {
-        const courseOfferingTeachers = await putJSON(
-            `${ENDPOINT}/updateCourseOfferingTeacher/${data.courseOfferingTeacherID}`,
-            CourseOfferingTeachersContract.parse(data, 'update')
-        );
-        const parsed = CourseOfferingTeachersContract.parse(courseOfferingTeachers, 'table');
-        document.dispatchEvent(new CustomEvent('CourseOfferingTeachers:update', { detail: parsed }));
-        return parsed;
-    },
-
-    async delete(id) {
-        const success = await deleteJSON(
-            `${ENDPOINT}/deleteCourseOfferingTeacher/${id}`
-        );
-        document.dispatchEvent(new CustomEvent('CourseOfferingTeachers:delete', {
-            detail: {
-                id,
-                success
-            }
-        }));
-        return success === true;
+    static async get(){
+        return await Network.get({
+            path: `${this._ENDPOINT}/getAllCourseOfferingsTeachers`
+        });
     }
-};
+
+    static async post(data){
+        return await Network.post({
+            path: `${this._ENDPOINT}/insertCourseOfferingTeacher`,
+            body: data
+        });
+    }
+
+    static async put(id){
+        return await Network.put({
+            path: `${this._ENDPOINT}/updateCourseOfferingTeacher/${id}`,
+            body: data
+        });
+    }
+
+    static async delete(id){
+        return await Network.delete({
+            path: `${this._ENDPOINT}/deleteCourseOfferingTeacher/${id}`
+        });
+    }
+
+}
