@@ -1,32 +1,30 @@
 import { Network } from './../lib/network.js';
 
-const BASE = '/api/StudentEvaluations';
+const BASE = '/StudentEvaluations';
 
 export const StudentEvaluationsService = {
   async getAll() {
     // Espera 200 con lista o 204 sin contenido
-    return await Network.get({ path: `${BASE}/getStudentEvaluations` });
+    return await Network.get({ path: `${BASE}/GetAllStudentsEvaluations` });
   },
 
   async create(payload) {
-    // Ajusta el DTO al esperado por tu backend:
-    // title/description/date/topics/questionTypes → mapea en el controller si difieren
     return await Network.post({
-      path: `${BASE}/insertStudentEvaluation`,
+      path: `${BASE}/AddtudentEvaluation`,
       body: payload
     });
   },
 
   async update(id, payload) {
     return await Network.put({
-      path: `${BASE}/updateStudentEvaluation/${encodeURIComponent(id)}`,
+      path: `${BASE}/UpdateStudentEvaluation/${(id)}`,
       body: payload
     });
   },
 
   async remove(id) {
     return await Network.delete({
-      path: `${BASE}/deleteStudentEvaluation/${encodeURIComponent(id)}`
+      path: `${BASE}/DeleteStudentEvaluation/${(id)}`
     });
   }
 };
