@@ -1,16 +1,16 @@
 // Controller para Localities
-
-import LocalitiesService from '../../services/localities.service';
+import { LocalitiesService } from '../../services/localities.service.js';
 
 class LocalitiesController {
     constructor() {
-        this.service = new LocalitiesService();
-        this.currentPage = 0;
-        this.pageSize = 10;
         this.localities = [];
         this.filteredLocalities = [];
+        this.currentPage = 0;
+        this.pageSize = 10;
+        this.totalPages = 0;
         this.editingId = null;
-        
+        this.tableBody = document.querySelector('#localities-table-body');
+
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.init());
         } else {
@@ -18,8 +18,8 @@ class LocalitiesController {
         }
     }
 
-    init() {
-        console.log('Inicializando controller...');
+    async init() {
+        console.log('Inicializando Localities controller...');
         this.setupEventListeners();
         this.loadLocalities();
     }
@@ -30,11 +30,8 @@ class LocalitiesController {
         const btnPrev = document.getElementById('btn-prev-page');
         const btnNext = document.getElementById('btn-next-page');
 
-        console.log('Botones encontrados:', { btnNew, searchInput, btnPrev, btnNext });
-
         if (btnNew) {
             btnNew.addEventListener('click', () => {
-                console.log('Click en nueva localidad');
                 this.openModal();
             });
         }
@@ -64,9 +61,10 @@ class LocalitiesController {
 
     async loadLocalities() {
         try {
-            const response = await this.service.getLocalitiesPagination(this.currentPage, this.pageSize);
+            const response = await LocalitiesService.getPagination(this.currentPage, this.pageSize);
             this.localities = response.content;
             this.filteredLocalities = this.localities;
+            this.totalPages = response.totalPages;
             this.renderTable();
             this.updatePaginationInfo(response);
         } catch (error) {
@@ -76,11 +74,10 @@ class LocalitiesController {
     }
 
     renderTable() {
-        const tbody = document.getElementById('localities-table-body');
-        tbody.innerHTML = '';
+        this.tableBody.innerHTML = '';
 
         if (this.filteredLocalities.length === 0) {
-            tbody.innerHTML = `
+            this.tableBody.innerHTML = `
                 <tr>
                     <td colspan="4" class="px-6 py-8 text-center text-[rgb(var(--text-from))]">
                         No se encontraron localidades
@@ -121,7 +118,7 @@ class LocalitiesController {
                     </div>
                 </td>
             `;
-            tbody.appendChild(row);
+            this.tableBody.appendChild(row);
         });
 
         document.querySelectorAll('.btn-edit').forEach(btn => {
@@ -147,8 +144,11 @@ class LocalitiesController {
         document.getElementById('showing-end').textContent = end;
         document.getElementById('total-records').textContent = response.totalElements;
 
-        document.getElementById('btn-prev-page').disabled = response.first;
-        document.getElementById('btn-next-page').disabled = response.last;
+        const btnPrev = document.getElementById('btn-prev-page');
+        const btnNext = document.getElementById('btn-next-page');
+
+        if (btnPrev) btnPrev.disabled = response.first;
+        if (btnNext) btnNext.disabled = response.last;
     }
 
     handleSearch(searchTerm) {
@@ -157,10 +157,12 @@ class LocalitiesController {
         if (!term) {
             this.filteredLocalities = this.localities;
         } else {
-            this.filteredLocalities = this.localities.filter(locality => 
-                locality.address?.toLowerCase().includes(term) ||
-                locality.phoneNumber?.toLowerCase().includes(term)
-            );
+            this.filteredLocalities = this.localities.filter(locality => {
+                const address = (locality.address || '').toLowerCase();
+                const phoneNumber = (locality.phoneNumber || '').toLowerCase();
+                
+                return address.includes(term) || phoneNumber.includes(term);
+            });
         }
         
         this.renderTable();
@@ -211,41 +213,41 @@ class LocalitiesController {
     }
 
     async saveLocality() {
-    const address = document.getElementById('address').value.trim();
-    const phoneNumber = document.getElementById('phone-number').value.trim();
-    const isMainLocality = document.getElementById('is-main-locality').value === 'true';
+        const address = document.getElementById('address').value.trim();
+        const phoneNumber = document.getElementById('phone-number').value.trim();
+        const isMainLocalityValue = document.getElementById('is-main-locality').value;
 
-    if (!address || !phoneNumber) {
-        this.showError('Todos los campos son obligatorios');
-        return;
-    }
-
-    // Obtener universityID del usuario logueado
-    const user = JSON.parse(sessionStorage.getItem('user'));
-    
-    const localityData = {
-        address,
-        phoneNumber,
-        isMainLocality,
-        universityID: user?.userID || "3F464A1A464C6DF4E063DE54000A8EDM"  // ← USA userID
-    };
-
-    try {
-        if (this.editingId) {
-            await this.service.updateLocality(this.editingId, localityData);
-            this.showSuccess('Localidad actualizada exitosamente');
-        } else {
-            await this.service.createLocality(localityData);
-            this.showSuccess('Localidad creada exitosamente');
+        if (!address || !phoneNumber || !isMainLocalityValue) {
+            this.showError('Todos los campos son obligatorios');
+            return;
         }
 
-        this.closeModal();
-        this.loadLocalities();
-    } catch (error) {
-        console.error('Error al guardar localidad:', error);
-        this.showError('Error al guardar la localidad');
+        const user = JSON.parse(sessionStorage.getItem('user'));
+        const isMainLocality = isMainLocalityValue === 'true';
+        
+        const localityData = {
+            address,
+            phoneNumber,
+            isMainLocality,
+            universityID: user?.universityID || "3F464A1A4360DF4E063DE54000A8ED4"
+        };
+
+        try {
+            if (this.editingId) {
+                await LocalitiesService.put(this.editingId, localityData);
+                this.showSuccess('Localidad actualizada exitosamente');
+            } else {
+                await LocalitiesService.post(localityData);
+                this.showSuccess('Localidad creada exitosamente');
+            }
+
+            this.closeModal();
+            this.loadLocalities();
+        } catch (error) {
+            console.error('Error al guardar localidad:', error);
+            this.showError(error.message || 'Error al guardar la localidad');
+        }
     }
-}
 
     async editLocality(id) {
         const locality = this.localities.find(l => l.localityID === id);
@@ -255,12 +257,13 @@ class LocalitiesController {
     }
 
     async deleteLocality(id) {
-        if (!confirm('¿Está seguro de eliminar esta localidad?')) {
+        const locality = this.localities.find(l => l.localityID === id);
+        if (!confirm(`¿Está seguro de eliminar la localidad "${locality.address}"?`)) {
             return;
         }
 
         try {
-            await this.service.deleteLocality(id);
+            await LocalitiesService.delete(id);
             this.showSuccess('Localidad eliminada exitosamente');
             this.loadLocalities();
         } catch (error) {

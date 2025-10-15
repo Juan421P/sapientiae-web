@@ -10,10 +10,11 @@
         rel="stylesheet">
     <link rel="stylesheet" href="./../../css/style.css">
     <link rel="icon" href="./../../img/logo.ico">
-    <title>Localidades</title>
+    <title>Definiciones de Materias</title>
 </head>
 
-<body class="relative flex justify-center min-h-screen mb-20 md:justify-start bg-gradient-to-tr from-[rgb(var(--body-from))] to-[rgb(var(--body-to))]">
+<body
+    class="relative flex justify-center min-h-screen mb-20 md:justify-start bg-gradient-to-tr from-[rgb(var(--body-from))] to-[rgb(var(--body-to))]">
     <div class="fixed bottom-10 left-0 w-[600px] h-[600px] pointer-events-none animate-left-spin-pulse">
         <div class="absolute inset-0 border-2 border-[rgb(var(--button-to))] opacity-20"></div>
         <div class="absolute border-2 border-[rgb(var(--placeholder-to))] inset-1 opacity-5"></div>
@@ -33,11 +34,11 @@
             <div class="flex items-center justify-between">
                 <h1
                     class="text-2xl font-bold bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent drop-shadow select-none">
-                    Localidades
+                    Definiciones de Materias
                 </h1>
                 <div
                     class="block transition-shadow duration-300 bg-transparent group rounded-xl hover:bg-white hover:shadow-lg">
-                    <button type="button" class="btn-component" id="btn-new-locality">
+                    <button type="button" class="btn-component" id="btn-new-subject-definition">
                         <div class="flex justify-center w-full gap-4">
                             <svg id="button-icon" class="w-6 h-6 stroke-current fill-none drop-shadow-sm"
                                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2"
@@ -47,7 +48,7 @@
                                 <path d="M12 8v8" />
                             </svg>
                             <span id="button-text" class="drop-shadow-sm">
-                                Nueva localidad
+                                Agregar materia
                             </span>
                         </div>
                     </button>
@@ -57,39 +58,7 @@
                 <input id="search-input" type="text" placeholder="Buscar"
                     class="w-full bg-gradient-to-r from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] px-4 py-3 rounded-lg focus:outline-none text-[rgb(var(--button-from))] placeholder:text-[rgb(var(--placeholder-from))] placeholder:italic text-shadow shadow-md border-none select-none focus:ring-0" />
             </div>
-
-            <!-- Tabla -->
-            <div class="overflow-hidden rounded-xl bg-gradient-to-bl from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] shadow-md">
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))]">
-                            <tr>
-                                <th class="px-6 py-4 text-left text-sm font-semibold text-white">Dirección</th>
-                                <th class="px-6 py-4 text-left text-sm font-semibold text-white">Teléfono</th>
-                                <th class="px-6 py-4 text-left text-sm font-semibold text-white">Sede Principal</th>
-                                <th class="px-6 py-4 text-center text-sm font-semibold text-white">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="localities-table-body" class="divide-y divide-[rgb(var(--off-from))]">
-                            <!-- Las filas se insertan aquí -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Paginación -->
-            <div class="flex items-center justify-between">
-                <div class="text-sm text-[rgb(var(--text-from))]">
-                    Mostrando <span id="showing-start">0</span> a <span id="showing-end">0</span> de <span id="total-records">0</span> registros
-                </div>
-                <div class="flex gap-2">
-                    <button id="btn-prev-page" class="px-4 py-2 rounded-lg bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] text-white hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
-                        Anterior
-                    </button>
-                    <button id="btn-next-page" class="px-4 py-2 rounded-lg bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] text-white hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
-                        Siguiente
-                    </button>
-                </div>
+            <div class="flex flex-wrap w-full gap-10 p-5 pl-0 select-none" id="subject-definition-list">
             </div>
         </main>
     </div>
@@ -98,35 +67,33 @@
     </footer>
 
     <!-- Modal Template -->
-    <template id="locality-modal-template">
-        <div id="locality-modal" class="fixed inset-0 backdrop-blur-sm bg-black/20 flex items-center justify-center z-[9999] p-4">
+    <template id="subject-definition-modal-template">
+        <div id="subject-definition-modal" class="fixed inset-0 backdrop-blur-sm bg-black/20 flex items-center justify-center z-[9999] p-4">
             <div class="bg-gradient-to-br from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] rounded-2xl shadow-2xl w-full max-w-md p-6 transform transition-all">
                 <h2 id="modal-title" class="text-2xl font-bold mb-6 bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent">
-                    Nueva Localidad
+                    Nueva Materia
                 </h2>
                 
-                <form id="locality-form" class="space-y-4">
-                    <input type="hidden" id="locality-id">
+                <form id="subject-definition-form" class="space-y-4">
+                    <input type="hidden" id="subject-definition-id">
                     
                     <div>
-                        <label class="block text-sm font-medium mb-2 text-[rgb(var(--text-from))]">Dirección</label>
-                        <input type="text" id="address" required maxlength="500"
+                        <label class="block text-sm font-medium mb-2 text-[rgb(var(--text-from))]">Nombre de la Materia</label>
+                        <input type="text" id="subject-name" required maxlength="100"
                             class="w-full bg-white/10 px-4 py-3 rounded-lg focus:outline-none text-[rgb(var(--button-from))] placeholder:text-[rgb(var(--placeholder-from))] placeholder:italic shadow-md border-none backdrop-blur-sm">
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium mb-2 text-[rgb(var(--text-from))]">Teléfono</label>
-                        <input type="text" id="phone-number" required maxlength="8"
+                        <label class="block text-sm font-medium mb-2 text-[rgb(var(--text-from))]">Código de Materia</label>
+                        <input type="text" id="subject-code" required maxlength="10"
                             class="w-full bg-white/10 px-4 py-3 rounded-lg focus:outline-none text-[rgb(var(--button-from))] placeholder:text-[rgb(var(--placeholder-from))] placeholder:italic shadow-md border-none backdrop-blur-sm">
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium mb-2 text-[rgb(var(--text-from))]">¿Es sede principal?</label>
-                        <select id="is-main-locality" required
+                        <label class="block text-sm font-medium mb-2 text-[rgb(var(--text-from))]">Familia de Materia</label>
+                        <select id="subject-family-select" required
                             class="w-full bg-white/10 px-4 py-3 rounded-lg focus:outline-none text-[rgb(var(--button-from))] shadow-md border-none backdrop-blur-sm">
-                            <option value="">Seleccione una opción</option>
-                            <option value="true">Sí</option>
-                            <option value="false">No</option>
+                            <option value="">Seleccione una familia</option>
                         </select>
                     </div>
 
@@ -147,7 +114,7 @@
 </body>
 <script type="module" src="./../../js/controllers/auth/auth.controller.js"></script>
 <script type="module" src="./../../js/controllers/themes/themes.controller.js"></script>
-<script type="module" src="./../../js/controllers/planification/localities.controller.js"></script>
+<script type="module" src="./../../js/controllers/planification/subjects.definitions.controller.js"></script>
 <script type="module" src="./../../js/controllers/elements/footer.controller.js"></script>
 <script type="module" src="./../../js/controllers/elements/navbar.controller.js"></script>
 

@@ -46,9 +46,11 @@ class ModalitiesService {
         }
     }
 
-    // Crear nueva modalidad
     async createModality(modalityData) {
         try {
+            console.log('📤 POST Request:', `${this.baseURL}/insertModality`);
+            console.log('📦 Body:', JSON.stringify(modalityData));
+
             const response = await fetch(`${this.baseURL}/insertModality`, {
                 method: 'POST',
                 headers: {
@@ -58,21 +60,27 @@ class ModalitiesService {
                 body: JSON.stringify(modalityData)
             });
 
+            console.log('📥 Response status:', response.status, response.statusText);
+
+            const responseData = await response.json();
+            console.log('📥 Response data:', responseData);
+
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Error al crear la modalidad');
+                throw new Error(responseData.message || responseData.detail || 'Error al crear la modalidad');
             }
 
-            return await response.json();
+            return responseData;
         } catch (error) {
-            console.error('Error en createModality:', error);
+            console.error('❌ Error en createModality:', error);
             throw error;
         }
     }
 
-    // Actualizar modalidad
     async updateModality(id, modalityData) {
         try {
+            console.log('📤 PUT Request:', `${this.baseURL}/updateModalities/${id}`);
+            console.log('📦 Body:', JSON.stringify(modalityData));
+
             const response = await fetch(`${this.baseURL}/updateModalities/${id}`, {
                 method: 'PUT',
                 headers: {
@@ -82,21 +90,26 @@ class ModalitiesService {
                 body: JSON.stringify(modalityData)
             });
 
+            console.log('📥 Response status:', response.status, response.statusText);
+
+            const responseData = await response.json();
+            console.log('📥 Response data:', responseData);
+
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Error al actualizar la modalidad');
+                throw new Error(responseData.message || responseData.detail || 'Error al actualizar la modalidad');
             }
 
-            return await response.json();
+            return responseData;
         } catch (error) {
-            console.error('Error en updateModality:', error);
+            console.error('❌ Error en updateModality:', error);
             throw error;
         }
     }
 
-    // Eliminar modalidad
     async deleteModality(id) {
         try {
+            console.log('📤 DELETE Request:', `${this.baseURL}/deleteModality/${id}`);
+
             const response = await fetch(`${this.baseURL}/deleteModality/${id}`, {
                 method: 'DELETE',
                 headers: {
@@ -105,14 +118,25 @@ class ModalitiesService {
                 credentials: 'include'
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Error al eliminar la modalidad');
+            console.log('📥 Response status:', response.status, response.statusText);
+
+            // ✅ Intentar parsear JSON, pero manejar si falla
+            let responseData;
+            try {
+                responseData = await response.json();
+                console.log('📥 Response data:', responseData);
+            } catch (jsonError) {
+                console.warn('⚠️ La respuesta no es JSON válido');
+                responseData = { message: response.statusText };
             }
 
-            return await response.json();
+            if (!response.ok) {
+                throw new Error(responseData.message || responseData.detail || 'Error al eliminar la modalidad');
+            }
+
+            return responseData;
         } catch (error) {
-            console.error('Error en deleteModality:', error);
+            console.error('❌ Error en deleteModality:', error);
             throw error;
         }
     }

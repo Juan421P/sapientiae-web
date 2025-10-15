@@ -1,5 +1,5 @@
 // Controller para Modalities
-import ModalitiesService from '../../services/modalities.service';
+import ModalitiesService from '../../services/modalities.service.js';
 
 class ModalitiesController {
     constructor() {
@@ -24,7 +24,8 @@ class ModalitiesController {
     }
 
     setupEventListeners() {
-        const btnNew = document.getElementById('btn-new-modality');
+        // ✅ CORREGIDO: El ID correcto del botón
+        const btnNew = document.getElementById('btn-new-pensum');
         const searchInput = document.getElementById('search-input');
         const btnPrev = document.getElementById('btn-prev-page');
         const btnNext = document.getElementById('btn-next-page');
@@ -89,6 +90,7 @@ class ModalitiesController {
         this.filteredModalities.forEach(modality => {
             const row = document.createElement('tr');
             row.className = 'hover:bg-[rgb(var(--body-from))]/30 transition-colors duration-200';
+            // ✅ CORREGIDO: Usar id en lugar de modalityID
             row.innerHTML = `
                 <td class="px-6 py-4 text-[rgb(var(--text-from))]">${modality.modalityName || 'N/A'}</td>
                 <td class="px-6 py-4">
@@ -114,7 +116,6 @@ class ModalitiesController {
             tbody.appendChild(row);
         });
 
-        // editar
         document.querySelectorAll('.btn-edit').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const id = e.currentTarget.dataset.edit;
@@ -122,7 +123,6 @@ class ModalitiesController {
             });
         });
 
-        //eliminar
         document.querySelectorAll('.btn-delete').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const id = e.currentTarget.dataset.delete;
@@ -167,6 +167,7 @@ class ModalitiesController {
         const modalTitle = document.getElementById('modal-title');
 
         if (modality) {
+            // ✅ CORREGIDO: Usar id
             this.editingId = modality.id;
             modalTitle.textContent = 'Editar Modalidad';
             document.getElementById('modality-id').value = modality.id;
@@ -208,11 +209,17 @@ class ModalitiesController {
         }
 
         const user = JSON.parse(sessionStorage.getItem('user'));
+        
+        console.log('👤 Usuario desde sessionStorage:', user);
+        console.log('🏫 universityID del usuario:', user?.universityID);
 
+        // ✅ CORREGIDO: Solo enviar los campos que acepta el backend
         const modalityData = {
-            modalityName,
-            universityID: user?.userID || "3F464A1A464C6DF4E063DE54000A8EDM"
+            modalityName: modalityName,
+            universityID: user?.universityID || "3F464A1A4360DF4E063DE54000A8ED4"
         };
+
+        console.log('📤 Datos a enviar:', modalityData);
 
         try {
             if (this.editingId) {
@@ -226,30 +233,62 @@ class ModalitiesController {
             this.closeModal();
             this.loadModalities();
         } catch (error) {
-            console.error('Error al guardar modalidad:', error);
-            this.showError('Error al guardar la modalidad');
+            console.error('❌ Error al guardar modalidad:', error);
+            this.showError(error.message || 'Error al guardar la modalidad');
         }
     }
 
     async editModality(id) {
+        console.log('✏️ Intentando editar modalidad con ID:', id);
+        console.log('📋 Modalidades disponibles:', this.modalities);
+        
+        // ✅ CORREGIDO: Buscar por id
         const modality = this.modalities.find(m => m.id === id);
+        console.log('🔍 Modalidad encontrada:', modality);
+        
         if (modality) {
             this.openModal(modality);
+        } else {
+            this.showError('No se encontró la modalidad para editar');
         }
     }
 
     async deleteModality(id) {
-        if (!confirm('¿Está seguro de eliminar esta modalidad?')) {
+        console.log('🗑️ Intentando eliminar modalidad con ID:', id);
+        console.log('📋 Modalidades disponibles:', this.modalities);
+        
+        const modality = this.modalities.find(m => m.id === id);
+        console.log('🔍 Modalidad encontrada:', modality);
+        
+        if (!modality) {
+            this.showError('No se encontró la modalidad');
+            return;
+        }
+        
+        if (!confirm(`¿Está seguro de eliminar la modalidad "${modality.modalityName}"?`)) {
             return;
         }
 
         try {
+            console.log('🚀 Enviando petición DELETE con ID:', id);
             await this.service.deleteModality(id);
             this.showSuccess('Modalidad eliminada exitosamente');
             this.loadModalities();
         } catch (error) {
-            console.error('Error al eliminar modalidad:', error);
-            this.showError('Error al eliminar la modalidad');
+            console.error('❌ Error completo al eliminar:', error);
+            
+            // ✅ Verificar tanto en message como en detail
+            const errorText = (error.message || '') + ' ' + (error.detail || '');
+            
+            if (errorText.includes('integrity') || 
+                errorText.includes('constraint') || 
+                errorText.includes('child record') ||
+                errorText.includes('ORA-02292') ||
+                errorText.includes('FK_CAREERS_MODAL')) {
+                this.showError('No se puede eliminar esta modalidad porque tiene carreras asociadas.\n\nPrimero debe eliminar o reasignar las carreras que usan esta modalidad.');
+            } else {
+                this.showError('Error al eliminar la modalidad');
+            }
         }
     }
 
