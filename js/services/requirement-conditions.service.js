@@ -1,6 +1,6 @@
 import { Network } from '../lib/network';
 
-export class RequirementsService {
+export class RequirementConditionsService {
 
     static _ENDPOINT = '/RequirementConditions';
 
