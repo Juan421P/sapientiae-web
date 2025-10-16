@@ -1,53 +1,43 @@
+// Service para Modalities
 import { Network } from '../lib/network.js';
 
-export class PensumSubjectsService {
-    static _ENDPOINT = '/Pensum';
-    static _CAREERS_ENDPOINT = '/Careers';
+class ModalitiesService {
+    static _ENDPOINT = '/Modalities';
 
-    // Obtener todas las carreras para el select
-    static async getAllCareers() {
+    static async getModalitiesPagination(page = 0, size = 10) {
         return await Network.get({
-            path: `${this._CAREERS_ENDPOINT}/getCareers`
+            path: `${this._ENDPOINT}/getModalitiesPagination?page=${page}&size=${size}`
         });
     }
 
-    // Obtener todos los pensum
-    static async getAll() {
+    static async getAllModalities() {
         return await Network.get({
-            path: `${this._ENDPOINT}/getPensa`
+            path: `${this._ENDPOINT}/getModalities`
         });
     }
 
-    // Obtener pensum con paginación
-    static async getPensumPagination(page = 0, size = 10) {
-        return await Network.get({
-            path: `${this._ENDPOINT}/getPensumPagination?page=${page}&size=${size}`
-        });
-    }
-
-    // Crear nuevo pensum
-    static async createPensum(data) {
-        console.log('📤 POST /newPensum:', data);
+    static async createModality(modalityData) {
+        console.log('📤 POST /insertModality:', modalityData);
         return await Network.post({
-            path: `${this._ENDPOINT}/newPensum`,
-            body: data
+            path: `${this._ENDPOINT}/insertModality`,
+            body: modalityData
         });
     }
 
-    // Actualizar pensum
-    static async updatePensum(id, data) {
-        console.log(`📤 PUT /updatePensum/${id}:`, data);
+    static async updateModality(id, modalityData) {
+        console.log(`📤 PUT /updateModalities/${id}:`, modalityData);
         return await Network.put({
-            path: `${this._ENDPOINT}/updatePensum/${id}`,
-            body: data
+            path: `${this._ENDPOINT}/updateModalities/${id}`,
+            body: modalityData
         });
     }
 
-    // Eliminar pensum
-    static async deletePensum(id) {
-        console.log(`📤 DELETE /deletePensum/${id}`);
+    static async deleteModality(id) {
+        console.log(`📤 DELETE /deleteModality/${id}`);
         return await Network.delete({
-            path: `${this._ENDPOINT}/deletePensum/${id}`
+            path: `${this._ENDPOINT}/deleteModality/${id}`
         });
     }
 }
+
+export default ModalitiesService;

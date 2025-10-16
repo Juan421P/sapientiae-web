@@ -1,287 +1,482 @@
-// Controller para Localities
-import { LocalitiesService } from '../../services/localities.service.js';
+import { LocalitiesService } from './../../services/localities.service.js';
+import { UniversityService } from './../../services/universities.service.js';
 
-class LocalitiesController {
-    constructor() {
-        this.localities = [];
-        this.filteredLocalities = [];
-        this.currentPage = 0;
-        this.pageSize = 10;
-        this.totalPages = 0;
-        this.editingId = null;
-        this.tableBody = document.querySelector('#localities-table-body');
+const localityList = document.querySelector('#locality-list');
+const addLocalityBtn = document.querySelector('#add-locality');
+const searchInput = document.querySelector('#locality-search');
+const prevPageBtn = document.querySelector('#prev-page');
+const nextPageBtn = document.querySelector('#next-page');
+const pageInfo = document.querySelector('#page-info');
 
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => this.init());
-        } else {
-            this.init();
-        }
-    }
+let currentPage = 0;
+let totalPages = 0;
+let allLocalities = [];
+let filteredLocalities = [];
+const pageSize = 10;
 
-    async init() {
-        console.log('Inicializando Localities controller...');
-        this.setupEventListeners();
-        this.loadLocalities();
-    }
-
-    setupEventListeners() {
-        const btnNew = document.getElementById('btn-new-locality');
-        const searchInput = document.getElementById('search-input');
-        const btnPrev = document.getElementById('btn-prev-page');
-        const btnNext = document.getElementById('btn-next-page');
-
-        if (btnNew) {
-            btnNew.addEventListener('click', () => {
-                this.openModal();
-            });
-        }
-
-        if (searchInput) {
-            searchInput.addEventListener('input', (e) => {
-                this.handleSearch(e.target.value);
-            });
-        }
-
-        if (btnPrev) {
-            btnPrev.addEventListener('click', () => {
-                if (this.currentPage > 0) {
-                    this.currentPage--;
-                    this.loadLocalities();
-                }
-            });
-        }
-
-        if (btnNext) {
-            btnNext.addEventListener('click', () => {
-                this.currentPage++;
-                this.loadLocalities();
-            });
-        }
-    }
-
-    async loadLocalities() {
-        try {
-            const response = await LocalitiesService.getPagination(this.currentPage, this.pageSize);
-            this.localities = response.content;
-            this.filteredLocalities = this.localities;
-            this.totalPages = response.totalPages;
-            this.renderTable();
-            this.updatePaginationInfo(response);
-        } catch (error) {
-            console.error('Error al cargar localidades:', error);
-            this.showError('Error al cargar las localidades');
-        }
-    }
-
-    renderTable() {
-        this.tableBody.innerHTML = '';
-
-        if (this.filteredLocalities.length === 0) {
-            this.tableBody.innerHTML = `
-                <tr>
-                    <td colspan="4" class="px-6 py-8 text-center text-[rgb(var(--text-from))]">
-                        No se encontraron localidades
-                    </td>
-                </tr>
-            `;
-            return;
-        }
-
-        this.filteredLocalities.forEach(locality => {
-            const row = document.createElement('tr');
-            row.className = 'hover:bg-[rgb(var(--body-from))]/30 transition-colors duration-200';
-            row.innerHTML = `
-                <td class="px-6 py-4 text-[rgb(var(--text-from))]">${locality.address || 'N/A'}</td>
-                <td class="px-6 py-4 text-[rgb(var(--text-from))]">${locality.phoneNumber || 'N/A'}</td>
-                <td class="px-6 py-4 text-[rgb(var(--text-from))]">
-                    ${locality.isMainLocality ? 
-                        '<span class="px-3 py-1 rounded-full bg-green-500/20 text-green-600 text-xs font-semibold">Sí</span>' : 
-                        '<span class="px-3 py-1 rounded-full bg-gray-500/20 text-gray-600 text-xs font-semibold">No</span>'}
-                </td>
-                <td class="px-6 py-4">
-                    <div class="flex items-center justify-center gap-2">
-                        <button data-edit="${locality.localityID}" 
-                            class="btn-edit p-2 rounded-lg hover:bg-[rgb(var(--button-from))]/20 transition-all duration-300">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
-                                stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-[rgb(var(--button-from))]">
-                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                            </svg>
-                        </button>
-                        <button data-delete="${locality.localityID}" 
-                            class="btn-delete p-2 rounded-lg hover:bg-red-500/20 transition-all duration-300">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
-                                stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-red-500">
-                                <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                            </svg>
-                        </button>
-                    </div>
-                </td>
-            `;
-            this.tableBody.appendChild(row);
-        });
-
-        document.querySelectorAll('.btn-edit').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const id = e.currentTarget.dataset.edit;
-                this.editLocality(id);
-            });
-        });
-
-        document.querySelectorAll('.btn-delete').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const id = e.currentTarget.dataset.delete;
-                this.deleteLocality(id);
-            });
-        });
-    }
-
-    updatePaginationInfo(response) {
-        const start = response.number * response.size + 1;
-        const end = Math.min((response.number + 1) * response.size, response.totalElements);
+function applyPhoneMask(input) {
+    input.addEventListener('input', (e) => {
+        let value = e.target.value.replace(/\D/g, '');
         
-        document.getElementById('showing-start').textContent = start;
-        document.getElementById('showing-end').textContent = end;
-        document.getElementById('total-records').textContent = response.totalElements;
-
-        const btnPrev = document.getElementById('btn-prev-page');
-        const btnNext = document.getElementById('btn-next-page');
-
-        if (btnPrev) btnPrev.disabled = response.first;
-        if (btnNext) btnNext.disabled = response.last;
-    }
-
-    handleSearch(searchTerm) {
-        const term = searchTerm.toLowerCase().trim();
-        
-        if (!term) {
-            this.filteredLocalities = this.localities;
-        } else {
-            this.filteredLocalities = this.localities.filter(locality => {
-                const address = (locality.address || '').toLowerCase();
-                const phoneNumber = (locality.phoneNumber || '').toLowerCase();
-                
-                return address.includes(term) || phoneNumber.includes(term);
-            });
+        if (value.length > 4) {
+            value = value.slice(0, 4) + '-' + value.slice(4, 8);
         }
         
-        this.renderTable();
-    }
+        e.target.value = value;
+    });
+}
 
-    openModal(locality = null) {
-        const template = document.getElementById('locality-modal-template');
-        const modal = template.content.cloneNode(true);
-        document.body.appendChild(modal);
-
-        const modalElement = document.getElementById('locality-modal');
-        const form = document.getElementById('locality-form');
-        const modalTitle = document.getElementById('modal-title');
-
-        if (locality) {
-            this.editingId = locality.localityID;
-            modalTitle.textContent = 'Editar Localidad';
-            document.getElementById('locality-id').value = locality.localityID;
-            document.getElementById('address').value = locality.address;
-            document.getElementById('phone-number').value = locality.phoneNumber;
-            document.getElementById('is-main-locality').value = locality.isMainLocality.toString();
-        } else {
-            this.editingId = null;
-            modalTitle.textContent = 'Nueva Localidad';
-        }
-
-        document.getElementById('btn-cancel-modal').addEventListener('click', () => {
-            this.closeModal();
-        });
-
-        modalElement.addEventListener('click', (e) => {
-            if (e.target === modalElement) {
-                this.closeModal();
-            }
-        });
-
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.saveLocality();
-        });
-    }
-
-    closeModal() {
-        const modal = document.getElementById('locality-modal');
-        if (modal) {
-            modal.remove();
-        }
-    }
-
-    async saveLocality() {
-        const address = document.getElementById('address').value.trim();
-        const phoneNumber = document.getElementById('phone-number').value.trim();
-        const isMainLocalityValue = document.getElementById('is-main-locality').value;
-
-        if (!address || !phoneNumber || !isMainLocalityValue) {
-            this.showError('Todos los campos son obligatorios');
-            return;
-        }
-
-        const user = JSON.parse(sessionStorage.getItem('user'));
-        const isMainLocality = isMainLocalityValue === 'true';
-        
-        const localityData = {
-            address,
-            phoneNumber,
-            isMainLocality,
-            universityID: user?.universityID || "3F464A1A4360DF4E063DE54000A8ED4"
-        };
-
-        try {
-            if (this.editingId) {
-                await LocalitiesService.put(this.editingId, localityData);
-                this.showSuccess('Localidad actualizada exitosamente');
-            } else {
-                await LocalitiesService.post(localityData);
-                this.showSuccess('Localidad creada exitosamente');
-            }
-
-            this.closeModal();
-            this.loadLocalities();
-        } catch (error) {
-            console.error('Error al guardar localidad:', error);
-            this.showError(error.message || 'Error al guardar la localidad');
-        }
-    }
-
-    async editLocality(id) {
-        const locality = this.localities.find(l => l.localityID === id);
-        if (locality) {
-            this.openModal(locality);
-        }
-    }
-
-    async deleteLocality(id) {
-        const locality = this.localities.find(l => l.localityID === id);
-        if (!confirm(`¿Está seguro de eliminar la localidad "${locality.address}"?`)) {
-            return;
-        }
-
-        try {
-            await LocalitiesService.delete(id);
-            this.showSuccess('Localidad eliminada exitosamente');
-            this.loadLocalities();
-        } catch (error) {
-            console.error('Error al eliminar localidad:', error);
-            this.showError('Error al eliminar la localidad');
-        }
-    }
-
-    showSuccess(message) {
-        alert(message);
-    }
-
-    showError(message) {
-        alert(message);
+async function loadUniversities() {
+    try {
+        const universities = await UniversityService.get();
+        return universities;
+    } catch (error) {
+        Toast.show('Error al cargar universidades', 'error');
+        return [];
     }
 }
 
-const localitiesController = new LocalitiesController();
-window.localitiesController = localitiesController;
+function populateLocalities(localities) {
+    localityList.innerHTML = localities.length
+        ? localities.map(loc => `
+            <div class="locality-card p-6 bg-gradient-to-tr from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] rounded-xl shadow hover:shadow-lg hover:scale-[1.015] transition-transform duration-300 cursor-pointer flex flex-col min-w-[320px] max-w-[450px]" data-id="${loc.localityID}">
+                <div class="mb-6">
+                    <div class="flex items-start justify-between mb-3">
+                        <h2 class="font-bold bg-gradient-to-tr from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent text-lg">
+                            ${loc.universityName || 'Sin universidad'}
+                        </h2>
+                        ${loc.isMainLocality ? `
+                            <span class="px-3 py-1 text-xs rounded-full bg-gradient-to-r from-green-400 to-emerald-500 text-white font-bold shadow">
+                                PRINCIPAL
+                            </span>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <div class="flex items-start gap-2">
+                            <svg class="w-4 h-4 mt-1 text-[rgb(var(--placeholder-from))]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <span class="text-sm bg-gradient-to-tr from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent">
+                                ${loc.address || 'Sin dirección'}
+                            </span>
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-[rgb(var(--placeholder-from))]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                            </svg>
+                            <span class="text-sm bg-gradient-to-tr from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent font-medium">
+                                ${loc.phoneNumber || 'Sin teléfono'}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('')
+        : `
+            <div class="text-center w-full py-10">
+                <span class="bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] bg-clip-text text-transparent drop-shadow text-lg">
+                    No hay localidades registradas.
+                </span>
+            </div>
+        `;
 
-export default LocalitiesController;
+    attachCardEvents();
+}
+
+function attachCardEvents() {
+    localityList.querySelectorAll('.locality-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const id = card.dataset.id;
+            const locality = allLocalities.find(loc => loc.localityID === id);
+            
+            ContextMenu.show([
+                {
+                    label: 'Editar',
+                    icon: 'edit',
+                    onClick: () => showEditForm(locality)
+                },
+                {
+                    label: 'Eliminar',
+                    icon: 'delete',
+                    onClick: async () => {
+                        const confirmed = await Toast.confirm('¿Está seguro de eliminar esta localidad?');
+                        if (confirmed) {
+                            try {
+                                await LocalitiesService.delete(id);
+                                Toast.show('Localidad eliminada', 'success');
+                                await loadLocalities();
+                            } catch (error) {
+                                Toast.show(error.message || 'Error al eliminar', 'error');
+                            }
+                        }
+                    }
+                }
+            ]);
+        });
+    });
+}
+
+async function loadLocalities() {
+    try {
+        let response;
+        
+        console.log('Intentando cargar localidades...');
+        
+        // Intentar primero con el endpoint simple (más confiable)
+        try {
+            console.log('Llamando a /getDataLocality...');
+            response = await LocalitiesService.get();
+            console.log('Respuesta recibida:', response);
+            
+            // Manejar diferentes formatos de respuesta
+            if (Array.isArray(response)) {
+                allLocalities = response;
+            } else if (response && Array.isArray(response.data)) {
+                allLocalities = response.data;
+            } else if (response && Array.isArray(response.content)) {
+                allLocalities = response.content;
+            } else {
+                console.warn('Formato de respuesta inesperado, asumiendo array vacío');
+                allLocalities = [];
+            }
+            
+            totalPages = Math.ceil(allLocalities.length / pageSize) || 1;
+            
+        } catch (simpleError) {
+            console.error('Error en endpoint simple:', simpleError);
+            
+            // Intentar con endpoint paginado como último recurso
+            try {
+                console.log('📡 Intentando endpoint paginado como fallback...');
+                response = await LocalitiesService.getPaginated(currentPage, pageSize);
+                console.log('Respuesta paginada:', response);
+                
+                if (response && response.content) {
+                    allLocalities = response.content;
+                    totalPages = response.totalPages || 1;
+                } else {
+                    throw new Error('Formato de respuesta paginada inválido');
+                }
+            } catch (paginatedError) {
+                console.error('Error en endpoint paginado también:', paginatedError);
+                throw simpleError; // Lanzar el error original
+            }
+        }
+        
+        const startIndex = currentPage * pageSize;
+        const endIndex = startIndex + pageSize;
+        filteredLocalities = allLocalities.slice(startIndex, endIndex);
+        
+        console.log(`Cargadas ${allLocalities.length} localidades (mostrando ${filteredLocalities.length})`);
+        
+        populateLocalities(filteredLocalities);
+        updatePaginationControls();
+        
+    } catch (error) {
+        console.error('ERROR FATAL al cargar localidades');
+        console.error('Detalles completos del error:', {
+            name: error.name,
+            message: error.message,
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+            data: error.response?.data,
+            headers: error.response?.headers,
+            url: error.config?.url,
+            method: error.config?.method
+        });
+        
+        if (error.stack) {
+            console.error('📚 Stack trace:', error.stack);
+        }
+        
+        let errorMsg = 'Error al cargar localidades del servidor';
+        let errorDetails = '';
+        
+        if (error.response?.status === 500) {
+            errorMsg = 'Error interno del servidor (500)';
+            errorDetails = 'Posibles causas:\n' +
+                          '• La tabla LOCALITIES está vacía\n' +
+                          '• Hay datos corruptos en la base de datos\n' +
+                          '• Problema con las relaciones de Universidad\n' +
+                          '• Revisa los logs del servidor Spring Boot';
+        } else if (error.response?.status === 404) {
+            errorMsg = 'Endpoint no encontrado (404)';
+            errorDetails = 'Verifica que el servidor esté corriendo en el puerto correcto';
+        } else if (error.code === 'ERR_NETWORK') {
+            errorMsg = 'No se pudo conectar al servidor';
+            errorDetails = 'Verifica que el backend esté corriendo';
+        } else if (error.response?.data?.message) {
+            errorMsg = error.response.data.message;
+        }
+        
+        console.error('🔴 ' + errorMsg);
+        if (errorDetails) {
+            console.error('ℹ️ ' + errorDetails);
+        }
+        
+        Toast.show(errorMsg, 'error');
+        
+        allLocalities = [];
+        filteredLocalities = [];
+        totalPages = 1;
+        currentPage = 0;
+        populateLocalities([]);
+        updatePaginationControls();
+        
+        console.log('⚠️ Aplicación en modo degradado - puedes intentar agregar localidades');
+    }
+}
+
+function updatePaginationControls() {
+    pageInfo.textContent = `Página ${currentPage + 1} de ${totalPages}`;
+    prevPageBtn.disabled = currentPage === 0;
+    nextPageBtn.disabled = currentPage >= totalPages - 1;
+}
+
+searchInput.addEventListener('input', (e) => {
+    const searchTerm = e.target.value.toLowerCase().trim();
+    
+    if (!searchTerm) {
+        const startIndex = currentPage * pageSize;
+        const endIndex = startIndex + pageSize;
+        filteredLocalities = allLocalities.slice(startIndex, endIndex);
+    } else {
+        const filtered = allLocalities.filter(loc => 
+            loc.universityName?.toLowerCase().includes(searchTerm) ||
+            loc.address?.toLowerCase().includes(searchTerm) ||
+            loc.phoneNumber?.includes(searchTerm)
+        );
+        filteredLocalities = filtered;
+    }
+    
+    populateLocalities(filteredLocalities);
+});
+
+prevPageBtn.addEventListener('click', async () => {
+    if (currentPage > 0) {
+        currentPage--;
+        searchInput.value = '';
+        await loadLocalities();
+    }
+});
+
+nextPageBtn.addEventListener('click', async () => {
+    if (currentPage < totalPages - 1) {
+        currentPage++;
+        searchInput.value = ''; 
+        await loadLocalities();
+    }
+});
+
+addLocalityBtn.addEventListener('click', () => showAddForm());
+
+async function showAddForm() {
+    const template = document.querySelector('#tmpl-add-locality');
+    const form = template.content.cloneNode(true);
+    
+    const universities = await loadUniversities();
+    const select = form.querySelector('#university-select');
+    
+    universities.forEach(uni => {
+        const option = document.createElement('option');
+        option.value = uni.universityID;
+        option.textContent = uni.universityName;
+        select.appendChild(option);
+    });
+    
+    const phoneInput = form.querySelector('#locality-phone');
+    applyPhoneMask(phoneInput);
+    
+    const formElement = form.querySelector('#locality-form');
+    formElement.addEventListener('submit', handleAddSubmit);
+    
+    form.querySelector('#cancel-btn').addEventListener('click', () => Modal.hide());
+    
+    Modal.show(formElement);
+}
+
+async function showEditForm(locality) {
+    const template = document.querySelector('#tmpl-add-locality');
+    const form = template.content.cloneNode(true);
+    
+    form.querySelector('#form-title').textContent = 'Editar localidad';
+    
+    const universities = await loadUniversities();
+    const select = form.querySelector('#university-select');
+    
+    universities.forEach(uni => {
+        const option = document.createElement('option');
+        option.value = uni.universityID;
+        option.textContent = uni.universityName;
+        if (uni.universityID === locality.universityID) {
+            option.selected = true;
+        }
+        select.appendChild(option);
+    });
+    
+    form.querySelector('#locality-address').value = locality.address;
+    form.querySelector('#locality-phone').value = locality.phoneNumber;
+    form.querySelector('#is-main-locality').checked = locality.isMainLocality;
+    
+    const phoneInput = form.querySelector('#locality-phone');
+    applyPhoneMask(phoneInput);
+    
+    const formElement = form.querySelector('#locality-form');
+    formElement.dataset.editId = locality.localityID;
+    formElement.addEventListener('submit', handleEditSubmit);
+    
+    form.querySelector('#cancel-btn').addEventListener('click', () => Modal.hide());
+    
+    Modal.show(formElement);
+}
+
+async function handleAddSubmit(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const phoneValue = formData.get('phoneNumber')?.replace(/\D/g, '');
+    
+    const formattedPhone = phoneValue?.length === 8 
+        ? `${phoneValue.slice(0, 4)}-${phoneValue.slice(4)}` 
+        : formData.get('phoneNumber');
+    
+    const data = {
+        universityID: formData.get('universityID') || '',
+        address: formData.get('address')?.trim() || '',
+        phoneNumber: formattedPhone || '',
+        isMainLocality: e.target.querySelector('#is-main-locality').checked || false
+    };
+    
+    // Validaciones
+    if (!data.universityID) {
+        Toast.show('Debe seleccionar una universidad', 'warn');
+        return;
+    }
+    
+    if (!data.address || data.address.length === 0) {
+        Toast.show('La dirección es requerida', 'warn');
+        return;
+    }
+    
+    if (data.address.length > 500) {
+        Toast.show('La dirección no puede exceder 500 caracteres', 'warn');
+        return;
+    }
+    
+    if (!data.phoneNumber) {
+        Toast.show('El teléfono es requerido', 'warn');
+        return;
+    }
+    
+    if (!/^\d{4}-\d{4}$/.test(data.phoneNumber)) {
+        Toast.show('El teléfono debe tener el formato 1234-5678', 'warn');
+        return;
+    }
+    
+    console.log('Datos a enviar (POST):', data);
+    
+    try {
+        const response = await LocalitiesService.post(data);
+        console.log('Respuesta POST:', response);
+        Toast.show('Localidad creada exitosamente', 'success');
+        Modal.hide();
+        await loadLocalities();
+    } catch (error) {
+        console.error('Error al crear localidad:', error);
+        
+        // Manejo de errores mejorado
+        if (error.response?.data) {
+            const errorData = error.response.data;
+            if (errorData.errors) {
+                // Errores de validación
+                const errorMessages = Object.values(errorData.errors).join(', ');
+                Toast.show(errorMessages, 'error');
+            } else if (errorData.message) {
+                Toast.show(errorData.message, 'error');
+            } else {
+                Toast.show('Error al crear localidad', 'error');
+            }
+        } else {
+            Toast.show(error.message || 'Error al crear localidad', 'error');
+        }
+    }
+}
+
+async function handleEditSubmit(e) {
+    e.preventDefault();
+    
+    const id = e.target.dataset.editId;
+    const formData = new FormData(e.target);
+    const phoneValue = formData.get('phoneNumber')?.replace(/\D/g, '');
+    
+    // Formatear teléfono correctamente
+    const formattedPhone = phoneValue?.length === 8 
+        ? `${phoneValue.slice(0, 4)}-${phoneValue.slice(4)}` 
+        : formData.get('phoneNumber');
+    
+    const data = {
+        universityID: formData.get('universityID') || '',
+        address: formData.get('address')?.trim() || '',
+        phoneNumber: formattedPhone || '',
+        // CRÍTICO: Asegurar que siempre sea boolean, nunca null/undefined
+        isMainLocality: e.target.querySelector('#is-main-locality').checked || false
+    };
+    
+    // Validaciones
+    if (!data.universityID) {
+        Toast.show('Debe seleccionar una universidad', 'warn');
+        return;
+    }
+    
+    if (!data.address || data.address.length === 0) {
+        Toast.show('La dirección es requerida', 'warn');
+        return;
+    }
+    
+    if (data.address.length > 500) {
+        Toast.show('La dirección no puede exceder 500 caracteres', 'warn');
+        return;
+    }
+    
+    if (!data.phoneNumber) {
+        Toast.show('El teléfono es requerido', 'warn');
+        return;
+    }
+    
+    if (!/^\d{4}-\d{4}$/.test(data.phoneNumber)) {
+        Toast.show('El teléfono debe tener el formato 1234-5678', 'warn');
+        return;
+    }
+    
+    console.log('Datos a enviar (PUT):', data);
+    
+    try {
+        const response = await LocalitiesService.put(id, data);
+        console.log('Respuesta PUT:', response);
+        Toast.show('Localidad actualizada exitosamente', 'success');
+        Modal.hide();
+        await loadLocalities();
+    } catch (error) {
+        console.error('Error al actualizar localidad:', error);
+        
+        // Manejo de errores mejorado
+        if (error.response?.data) {
+            const errorData = error.response.data;
+            if (errorData.errors) {
+                const errorMessages = Object.values(errorData.errors).join(', ');
+                Toast.show(errorMessages, 'error');
+            } else if (errorData.message) {
+                Toast.show(errorData.message, 'error');
+            } else {
+                Toast.show('Error al actualizar localidad', 'error');
+            }
+        } else {
+            Toast.show(error.message || 'Error al actualizar localidad', 'error');
+        }
+    }
+}
+
+await loadLocalities();

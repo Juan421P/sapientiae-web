@@ -1,4 +1,4 @@
-import { Network } from '../lib/network';
+import { Network } from './../lib/network';
 
 export class SubjectDefinitionsService {
 
@@ -10,24 +10,38 @@ export class SubjectDefinitionsService {
         });
     }
 
+    static async getPagination(page = 0, size = 10) {
+        return await Network.get({
+            path: `${this._ENDPOINT}/getSubjectDefinitionPagination?page=${page}&size=${size}`
+        });
+    }
+
     static async post(data) {
-        return await Network.post({
+        console.log('POST Request:', data);
+        const response = await Network.post({
             path: `${this._ENDPOINT}/newSubjectDefinition`,
             body: data
         });
+        console.log('POST Response:', response);
+        return response;
     }
 
     static async put(id, data) {
-        return await Network.put({
+        console.log('PUT Request:', { id, data });
+        const response = await Network.put({
             path: `${this._ENDPOINT}/updateSubjectDefinition/${id}`,
             body: data
         });
+        console.log('PUT Response:', response);
+        return response;
     }
 
     static async delete(id) {
-        return await Network.delete({
+        console.log('DELETE Request:', id);
+        const response = await Network.delete({
             path: `${this._ENDPOINT}/deleteSubjectDefinition/${id}`
         });
+        console.log('DELETE Response:', response);
+        return response;
     }
-
 }

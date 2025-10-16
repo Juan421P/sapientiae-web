@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es" class="scrollbar-width-none">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="./../../css/style.css">
+    <link rel="icon" href="./../../img/logo.ico">
+    <title>Tipos de Título</title>
+</head>
+
+<body
+    class="relative flex justify-center min-h-screen mb-20 md:justify-start bg-gradient-to-tr from-[rgb(var(--body-from))] to-[rgb(var(--body-to))]">
+    <div class="fixed bottom-10 left-0 w-[600px] h-[600px] pointer-events-none animate-left-spin-pulse">
+        <div class="absolute inset-0 border-2 border-[rgb(var(--button-to))] opacity-20"></div>
+        <div class="absolute border-2 border-[rgb(var(--placeholder-to))] inset-1 opacity-5"></div>
+        <div class="absolute inset-0 rotate-45 border-2 border-[rgb(var(--button-from))] opacity-40"></div>
+        <div class="absolute rotate-45 border-2 border-[rgb(var(--placeholder-from))] inset-1 opacity-20"></div>
+    </div>
+    <div class="fixed top-0 right-0 w-[300px] h-[300px] z-[-20] pointer-events-none animate-right-spin-pulse">
+        <div class="absolute inset-0 border-2 border-[rgb(var(--button-to))] opacity-20"></div>
+        <div class="absolute border-2 border-[rgb(var(--placeholder-to))] inset-1 opacity-5"></div>
+        <div class="absolute inset-0 rotate-45 border-2 border-[rgb(var(--button-from))] opacity-40"></div>
+        <div class="absolute rotate-45 border-2 border-[rgb(var(--placeholder-from))] inset-1 opacity-20"></div>
+    </div>
+    
+    <div id="navbar" class="fixed top-0 left-0 w-full z-[51]"></div>
+    
+    <div id="main-view" class="z-50 flex-1 w-full">
+        <main class="flex flex-col min-h-screen p-10 space-y-8 md:ml-80 pb-80 md:pb-20">
+            <div class="flex items-center justify-between">
+                <h1
+                    class="text-2xl font-bold bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent drop-shadow select-none">
+                    Tipos de Título
+                </h1>
+                <div
+                    class="block transition-shadow duration-300 bg-transparent group rounded-xl hover:bg-white hover:shadow-lg">
+                    <button type="button" class="btn-component" id="add-degree-type">
+                        <div class="flex justify-center w-full gap-4">
+                            <svg id="button-icon" class="w-6 h-6 stroke-current fill-none drop-shadow-sm"
+                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10" />
+                                <path d="M8 12h8" />
+                                <path d="M12 8v8" />
+                            </svg>
+                            <span class="drop-shadow-sm">
+                                Agregar tipo de título
+                            </span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <div class="sm:max-w-xs">
+                <input id="degree-type-search" type="text" placeholder="Buscar tipo de título"
+                    class="w-full bg-gradient-to-r from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] px-4 py-3 rounded-lg focus:outline-none text-[rgb(var(--button-from))] placeholder:text-[rgb(var(--placeholder-from))] placeholder:italic text-shadow shadow-md border-none select-none focus:ring-0" />
+            </div>
+
+            <div class="flex flex-wrap w-full gap-10 p-5 pl-0 select-none" id="degree-type-list">
+            </div>
+
+            <!-- Paginación -->
+            <div class="flex items-center justify-center gap-4 mt-8">
+                <button id="prev-page" disabled
+                    class="p-3 bg-gradient-to-tr from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] text-[rgb(var(--text-from))] rounded-lg font-medium shadow-md hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
+                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                
+                <span id="page-info" class="text-[rgb(var(--text-from))] font-medium select-none">
+                    Página 1 de 1
+                </span>
+                
+                <button id="next-page" disabled
+                    class="p-3 bg-gradient-to-tr from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] text-[rgb(var(--text-from))] rounded-lg font-medium shadow-md hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
+                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <footer id="footer"
+        class="fixed bottom-0 left-0 w-full bg-gradient-to-tr from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] z-[999] opacity-0 pointer-events-none translate-y-full transition-all duration-700 ease-in-out grid grid-cols-1 md:grid-cols-12 rounded-t-2xl md:rounded-t-none cursor-pointer">
+    </footer>
+
+    <!-- Template para agregar/editar -->
+    <template id="tmpl-add-degree-type">
+        <form id="degree-type-form" novalidate class="flex flex-col max-w-md px-6 mx-auto gap-14 py-14">
+            <div class="flex flex-col items-center">
+                <span
+                    class="text-3xl font-bold text-center mb-2 drop-shadow bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent select-none"
+                    id="form-title">
+                    Nuevo tipo de título
+                </span>
+                <span
+                    class="text-xl font-semibold text-center drop-shadow bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent select-none">
+                    Llena los campos requeridos
+                </span>
+            </div>
+
+            <div class="flex flex-col gap-6">
+                <select id="university-select" name="universityID" required
+                    class="w-full bg-gradient-to-r from-[rgb(var(--body-from))] to-[rgb(var(--body-to))] px-6 py-4 rounded-lg focus:outline-none text-indigo-500 placeholder:text-indigo-300 text-xl text-shadow shadow-md border-none">
+                    <option value="">Selecciona una universidad</option>
+                </select>
+
+                <input id="degree-type-name" name="degreeTypeName" type="text" placeholder="Nombre del tipo de título"
+                    class="w-full bg-gradient-to-r from-[rgb(var(--body-from))] to-[rgb(var(--body-to))] px-6 py-4 rounded-lg focus:outline-none text-indigo-500 placeholder:text-indigo-300 text-xl placeholder:italic text-shadow shadow-md border-none"
+                    required>
+            </div>
+
+            <div class="flex justify-end gap-3">
+                <button type="button" id="cancel-btn"
+                    class="p-4 bg-gradient-to-tr from-indigo-100 to-blue-100 text-indigo-400 hover:scale-[1.015] hover:from-indigo-200 hover:to-blue-200 rounded-xl font-medium shadow-md transition-all">
+                    Cancelar
+                </button>
+                <button type="submit" id="save-btn"
+                    class="p-4 bg-gradient-to-tr from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] text-white drop-shadow rounded-xl font-medium shadow-md hover:from-[rgb(var(--body-from))] hover:to-[rgb(var(--body-to))] hover:scale-[1.015] transition-all">
+                    Guardar
+                </button>
+            </div>
+        </form>
+    </template>
+</body>
+
+<script type="module" src="./../../js/controllers/auth/auth.controller.js"></script>
+<script type="module" src="./../../js/controllers/themes/themes.controller.js"></script>
+<script type="module" src="./../../js/controllers/planification/titles.js"></script>
+<script type="module" src="./../../js/controllers/elements/footer.controller.js"></script>
+<script type="module" src="./../../js/controllers/elements/navbar.controller.js"></script>
+
+</html>

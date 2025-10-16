@@ -38,7 +38,7 @@
                 </h1>
                 <div
                     class="block transition-shadow duration-300 bg-transparent group rounded-xl hover:bg-white hover:shadow-lg">
-                    <button type="button" class="btn-component" id="btn-new-social-service">
+                    <button type="button" class="btn-component" id="add-project-btn">
                         <div class="flex justify-center w-full gap-4">
                             <svg id="button-icon" class="w-6 h-6 stroke-current fill-none drop-shadow-sm"
                                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2"
@@ -47,7 +47,7 @@
                                 <path d="M8 12h8" />
                                 <path d="M12 8v8" />
                             </svg>
-                            <span id="button-text" class="drop-shadow-sm">
+                            <span class="drop-shadow-sm">
                                 Agregar proyecto
                             </span>
                         </div>
@@ -55,59 +55,114 @@
                 </div>
             </div>
             <div class="sm:max-w-xs">
-                <input id="search-input" type="text" placeholder="Buscar"
+                <input id="project-search" type="text" placeholder="Buscar"
                     class="w-full bg-gradient-to-r from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] px-4 py-3 rounded-lg focus:outline-none text-[rgb(var(--button-from))] placeholder:text-[rgb(var(--placeholder-from))] placeholder:italic text-shadow shadow-md border-none select-none focus:ring-0" />
             </div>
-            <div class="flex flex-wrap w-full gap-10 p-5 pl-0 select-none" id="social-service-list">
+            <div class="flex flex-wrap w-full gap-10 p-5 pl-0 select-none" id="project-list">
             </div>
         </main>
     </div>
     <footer id="footer"
         class="fixed bottom-0 left-0 w-full bg-gradient-to-tr from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] z-[999] opacity-0 pointer-events-none translate-y-full transition-all duration-700 ease-in-out grid grid-cols-1 md:grid-cols-12 rounded-t-2xl md:rounded-t-none cursor-pointer">
     </footer>
+    <template id="tmpl-add-project">
+        <form id="project-form" novalidate class="flex flex-col max-w-md px-6 mx-auto gap-14 py-14">
+            <div class="flex flex-col items-center">
+                <span
+                    class="text-3xl font-bold text-center mb-2 drop-shadow bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent select-none">
+                    Nuevo proyecto de servicio social
+                </span>
+                <span
+                    class="text-xl font-semibold text-center drop-shadow bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent select-none">
+                    Llena los campos requeridos
+                </span>
+            </div>
 
-    <!-- Modal Template -->
-    <template id="social-service-modal-template">
-        <div id="social-service-modal" class="fixed inset-0 backdrop-blur-sm bg-black/20 flex items-center justify-center z-[9999] p-4">
-            <div class="bg-gradient-to-br from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] rounded-2xl shadow-2xl w-full max-w-md p-6 transform transition-all">
-                <h2 id="modal-title" class="text-2xl font-bold mb-6 bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent">
-                    Nuevo Proyecto
-                </h2>
-                
-                <form id="social-service-form" class="space-y-4">
-                    <input type="hidden" id="social-service-id">
-                    
+            <div class="flex flex-col gap-6">
+                <input id="project-name" name="socialServiceProjectName" type="text" placeholder="Nombre del proyecto"
+                    class="w-full bg-gradient-to-r from-[rgb(var(--body-from))] to-[rgb(var(--body-to))] px-6 py-4 rounded-lg focus:outline-none text-indigo-500 placeholder:text-indigo-300 text-xl placeholder:italic text-shadow shadow-md border-none"
+                    required>
+
+                <textarea id="project-description" name="description" placeholder="Descripción"
+                    class="w-full bg-gradient-to-r from-[rgb(var(--body-from))] to-[rgb(var(--body-to))] px-6 py-4 rounded-lg focus:outline-none text-indigo-500 placeholder:text-indigo-300 text-xl placeholder:italic text-shadow shadow-md border-none min-h-[120px]"
+                    required></textarea>
+
+                <div class="flex flex-col flex-1" data-select>
                     <div>
-                        <label class="block text-sm font-medium mb-2 text-[rgb(var(--text-from))]">Nombre del Proyecto</label>
-                        <input type="text" id="project-name" required
-                            class="w-full bg-white/10 px-4 py-3 rounded-lg focus:outline-none text-[rgb(var(--button-from))] placeholder:text-[rgb(var(--placeholder-from))] placeholder:italic shadow-md border-none backdrop-blur-sm">
+                        <label
+                            class="mb-1 ml-2 text-xs font-semibold bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent select-none"
+                            data-label>Universidad</label>
                     </div>
-
-                    <div>
-                        <label class="block text-sm font-medium mb-2 text-[rgb(var(--text-from))]">Descripción</label>
-                        <textarea id="project-description" required rows="4"
-                            class="w-full bg-white/10 px-4 py-3 rounded-lg focus:outline-none text-[rgb(var(--button-from))] placeholder:text-[rgb(var(--placeholder-from))] placeholder:italic shadow-md border-none backdrop-blur-sm resize-none"></textarea>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium mb-2 text-[rgb(var(--text-from))]">Universidad</label>
-                        <select id="university-select" required
-                            class="w-full bg-white/10 px-4 py-3 rounded-lg focus:outline-none text-[rgb(var(--button-from))] shadow-md border-none backdrop-blur-sm">
-                            <option value="">Seleccione una universidad</option>
-                        </select>
-                    </div>
-
-                    <div class="flex gap-3 mt-6">
-                        <button type="button" id="btn-cancel-modal"
-                            class="flex-1 px-4 py-3 rounded-lg bg-gray-500 hover:bg-gray-600 text-white font-medium transition-colors">
-                            Cancelar
+                    <div class="relative w-full group">
+                        <button type="button" data-btn
+                            class="flex items-center justify-between w-full px-4 py-3 transition-all shadow-md bg-gradient-to-r from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] rounded-lg focus:outline-none group-hover:cursor-pointer">
+                            <span data-text class="italic text-[rgb(var(--placeholder-from))]">Seleccione una universidad</span>
+                            <svg viewBox="0 0 24 24"
+                                class="w-4 h-4 text-[rgb(var(--text-from))] transition-transform duration-300"
+                                data-chevron fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M6 9l6 6 6-6" />
+                            </svg>
                         </button>
-                        <button type="submit"
-                            class="flex-1 px-4 py-3 rounded-lg bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] text-white font-medium hover:shadow-lg transition-all">
-                            Guardar
-                        </button>
+                        <ul data-menu
+                            class="absolute left-0 z-20 hidden w-full mt-1 bg-gradient-to-r from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] drop-shadow rounded-lg max-h-48 overflow-y-auto">
+                        </ul>
+                        <input type="text" data-input name="universityID"
+                            class="absolute top-0 left-0 z-0 w-1 h-1 opacity-0 pointer-events-none">
                     </div>
-                </form>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3">
+                <button type="button" id="cancel-btn"
+                    class="p-4 bg-gradient-to-tr from-indigo-100 to-blue-100 text-indigo-400 hover:scale-[1.015] hover:from-indigo-200 hover:to-blue-200 rounded-xl font-medium shadow-md transition-all">
+                    Cancelar
+                </button>
+                <button type="submit" id="save-btn"
+                    class="p-4 bg-gradient-to-tr from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] text-white drop-shadow rounded-xl font-medium shadow-md hover:from-[rgb(var(--body-from))]0 hover:to-[rgb(var(--body-to))]0 hover:scale-[1.015] transition-all">
+                    Guardar
+                </button>
+            </div>
+        </form>
+    </template>
+
+    <template id="tmpl-view-project">
+        <div class="flex flex-col max-w-lg px-8 mx-auto gap-8 py-10">
+            <div class="flex flex-col items-center">
+                <span
+                    class="text-3xl font-bold text-center mb-2 drop-shadow bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent select-none"
+                    id="view-title">
+                </span>
+            </div>
+
+            <div class="flex flex-col gap-4">
+                <div class="flex flex-col gap-2">
+                    <span
+                        class="text-sm font-semibold bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent">
+                        Universidad
+                    </span>
+                    <span
+                        class="text-lg bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] bg-clip-text text-transparent"
+                        id="view-university">
+                    </span>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <span
+                        class="text-sm font-semibold bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent">
+                        Descripción
+                    </span>
+                    <p class="text-base bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] bg-clip-text text-transparent"
+                        id="view-description">
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex justify-end">
+                <button type="button" id="close-view-btn"
+                    class="p-4 bg-gradient-to-tr from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] text-white drop-shadow rounded-xl font-medium shadow-md hover:scale-[1.015] transition-all">
+                    Cerrar
+                </button>
             </div>
         </div>
     </template>
