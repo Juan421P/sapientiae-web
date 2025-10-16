@@ -5,15 +5,6 @@ export class DegreeTypesService {
     static _ENDPOINT = '/DegreeTypes';
 
     /**
-     * Obtener todos los tipos de título (sin paginación)
-     */
-    static async get() {
-        return await Network.get({
-            path: `${this._ENDPOINT}/getAllDegreeTypes`
-        });
-    }
-
-    /**
      * Obtener tipos de título con paginación
      * @param {number} page
      * @param {number} size 

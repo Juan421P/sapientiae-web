@@ -1,307 +1,288 @@
-// Controller para Modalities
-import ModalitiesService from '../../services/modalities.service.js';
+import { ModalitiesService } from './../../services/modalities.service';
+import { UniversityService } from './../../services/universities.service';
 
-class ModalitiesController {
-    constructor() {
-        this.service = new ModalitiesService();
-        this.currentPage = 0;
-        this.pageSize = 10;
-        this.modalities = [];
-        this.filteredModalities = [];
-        this.editingId = null;
+const modalityList = document.querySelector('#modality-list');
+const searchInput = document.querySelector('#modality-search');
+const addModalityBtn = document.querySelector('#add-modality-btn');
 
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => this.init());
-        } else {
-            this.init();
-        }
-    }
+let allModalities = [];
+let allUniversities = [];
 
-    init() {
-        console.log('Inicializando Modalities controller...');
-        this.setupEventListeners();
-        this.loadModalities();
-    }
+function populateModalities(modalities) {
+    modalityList.innerHTML = modalities.length
+        ? modalities.map(m => `
+            <div class="modality-card p-6 bg-gradient-to-tr from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] rounded-xl shadow hover:shadow-lg hover:scale-[1.015] transition-transform duration-300 cursor-pointer flex flex-col min-w-[300px] max-w-[500px]" data-id="${m.id}">
+                <div class="mb-6">
+                    <h2 class="font-bold bg-gradient-to-tr from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent text-lg mb-3">
+                        ${m.modalityName || 'Sin nombre'}
+                    </h2>
+                    <span class="inline-block mt-2 px-3 py-1 text-xs rounded bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] text-white font-semibold select-none drop-shadow">
+                        ${m.universityName || 'Sin universidad'}
+                    </span>
+                </div>
+            </div>
+        `).join('')
+        : `
+            <div class="text-center w-full py-10">
+                <span class="bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] bg-clip-text text-transparent drop-shadow">
+                    No hay modalidades registradas.
+                </span>
+            </div>
+        `;
 
-    setupEventListeners() {
-        // ✅ CORREGIDO: El ID correcto del botón
-        const btnNew = document.getElementById('btn-new-pensum');
-        const searchInput = document.getElementById('search-input');
-        const btnPrev = document.getElementById('btn-prev-page');
-        const btnNext = document.getElementById('btn-next-page');
-
-        if (btnNew) {
-            btnNew.addEventListener('click', () => {
-                this.openModal();
-            });
-        }
-
-        if (searchInput) {
-            searchInput.addEventListener('input', (e) => {
-                this.handleSearch(e.target.value);
-            });
-        }
-
-        if (btnPrev) {
-            btnPrev.addEventListener('click', () => {
-                if (this.currentPage > 0) {
-                    this.currentPage--;
-                    this.loadModalities();
+    modalityList.querySelectorAll('.modality-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const id = card.dataset.id;
+            const modality = allModalities.find(m => m.id === id);
+            
+            ContextMenu.show([
+                {
+                    label: 'Ver detalles',
+                    icon: 'view',
+                    onClick: () => showViewModal(modality)
+                },
+                {
+                    label: 'Editar',
+                    icon: 'edit',
+                    onClick: () => showEditModal(modality)
+                },
+                {
+                    label: 'Eliminar',
+                    icon: 'delete',
+                    onClick: async () => {
+                        const confirmed = await Toast.confirm('¿Estás seguro de eliminar esta modalidad?');
+                        if (confirmed) {
+                            try {
+                                await ModalitiesService.delete(id);
+                                Toast.show('Modalidad eliminada correctamente', 'success');
+                                await loadModalities();
+                            } catch (error) {
+                                Toast.show('Error al eliminar la modalidad', 'error');
+                                console.error(error);
+                            }
+                        }
+                    }
                 }
-            });
-        }
-
-        if (btnNext) {
-            btnNext.addEventListener('click', () => {
-                this.currentPage++;
-                this.loadModalities();
-            });
-        }
-    }
-
-    async loadModalities() {
-        try {
-            const response = await this.service.getModalitiesPagination(this.currentPage, this.pageSize);
-            this.modalities = response.content;
-            this.filteredModalities = this.modalities;
-            this.renderTable();
-            this.updatePaginationInfo(response);
-        } catch (error) {
-            console.error('Error al cargar modalidades:', error);
-            this.showError('Error al cargar las modalidades');
-        }
-    }
-
-    renderTable() {
-        const tbody = document.getElementById('modalities-table-body');
-        tbody.innerHTML = '';
-
-        if (this.filteredModalities.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="2" class="px-6 py-8 text-center text-[rgb(var(--text-from))]">
-                        No se encontraron modalidades
-                    </td>
-                </tr>
-            `;
-            return;
-        }
-
-        this.filteredModalities.forEach(modality => {
-            const row = document.createElement('tr');
-            row.className = 'hover:bg-[rgb(var(--body-from))]/30 transition-colors duration-200';
-            // ✅ CORREGIDO: Usar id en lugar de modalityID
-            row.innerHTML = `
-                <td class="px-6 py-4 text-[rgb(var(--text-from))]">${modality.modalityName || 'N/A'}</td>
-                <td class="px-6 py-4">
-                    <div class="flex items-center justify-center gap-2">
-                        <button data-edit="${modality.id}" 
-                            class="btn-edit p-2 rounded-lg hover:bg-[rgb(var(--button-from))]/20 transition-all duration-300">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
-                                stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-[rgb(var(--button-from))]">
-                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                            </svg>
-                        </button>
-                        <button data-delete="${modality.id}" 
-                            class="btn-delete p-2 rounded-lg hover:bg-red-500/20 transition-all duration-300">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
-                                stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-red-500">
-                                <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                            </svg>
-                        </button>
-                    </div>
-                </td>
-            `;
-            tbody.appendChild(row);
+            ]);
         });
+    });
+}
 
-        document.querySelectorAll('.btn-edit').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const id = e.currentTarget.dataset.edit;
-                this.editModality(id);
-            });
-        });
-
-        document.querySelectorAll('.btn-delete').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const id = e.currentTarget.dataset.delete;
-                this.deleteModality(id);
-            });
-        });
-    }
-
-    updatePaginationInfo(response) {
-        const start = response.number * response.size + 1;
-        const end = Math.min((response.number + 1) * response.size, response.totalElements);
-
-        document.getElementById('showing-start').textContent = start;
-        document.getElementById('showing-end').textContent = end;
-        document.getElementById('total-records').textContent = response.totalElements;
-
-        document.getElementById('btn-prev-page').disabled = response.first;
-        document.getElementById('btn-next-page').disabled = response.last;
-    }
-
-    handleSearch(searchTerm) {
-        const term = searchTerm.toLowerCase().trim();
-
-        if (!term) {
-            this.filteredModalities = this.modalities;
-        } else {
-            this.filteredModalities = this.modalities.filter(modality =>
-                modality.modalityName?.toLowerCase().includes(term)
-            );
-        }
-
-        this.renderTable();
-    }
-
-    openModal(modality = null) {
-        const template = document.getElementById('modality-modal-template');
-        const modal = template.content.cloneNode(true);
-        document.body.appendChild(modal);
-
-        const modalElement = document.getElementById('modality-modal');
-        const form = document.getElementById('modality-form');
-        const modalTitle = document.getElementById('modal-title');
-
-        if (modality) {
-            // ✅ CORREGIDO: Usar id
-            this.editingId = modality.id;
-            modalTitle.textContent = 'Editar Modalidad';
-            document.getElementById('modality-id').value = modality.id;
-            document.getElementById('modality-name').value = modality.modalityName;
-        } else {
-            this.editingId = null;
-            modalTitle.textContent = 'Nueva Modalidad';
-        }
-
-        document.getElementById('btn-cancel-modal').addEventListener('click', () => {
-            this.closeModal();
-        });
-
-        modalElement.addEventListener('click', (e) => {
-            if (e.target === modalElement) {
-                this.closeModal();
-            }
-        });
-
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.saveModality();
-        });
-    }
-
-    closeModal() {
-        const modal = document.getElementById('modality-modal');
-        if (modal) {
-            modal.remove();
-        }
-    }
-
-    async saveModality() {
-        const modalityName = document.getElementById('modality-name').value.trim();
-
-        if (!modalityName) {
-            this.showError('El nombre de la modalidad es obligatorio');
-            return;
-        }
-
-        const user = JSON.parse(sessionStorage.getItem('user'));
-        
-        console.log('👤 Usuario desde sessionStorage:', user);
-        console.log('🏫 universityID del usuario:', user?.universityID);
-
-        // ✅ CORREGIDO: Solo enviar los campos que acepta el backend
-        const modalityData = {
-            modalityName: modalityName,
-            universityID: user?.universityID || "3F464A1A4360DF4E063DE54000A8ED4"
-        };
-
-        console.log('📤 Datos a enviar:', modalityData);
-
-        try {
-            if (this.editingId) {
-                await this.service.updateModality(this.editingId, modalityData);
-                this.showSuccess('Modalidad actualizada exitosamente');
-            } else {
-                await this.service.createModality(modalityData);
-                this.showSuccess('Modalidad creada exitosamente');
-            }
-
-            this.closeModal();
-            this.loadModalities();
-        } catch (error) {
-            console.error('❌ Error al guardar modalidad:', error);
-            this.showError(error.message || 'Error al guardar la modalidad');
-        }
-    }
-
-    async editModality(id) {
-        console.log('✏️ Intentando editar modalidad con ID:', id);
-        console.log('📋 Modalidades disponibles:', this.modalities);
-        
-        // ✅ CORREGIDO: Buscar por id
-        const modality = this.modalities.find(m => m.id === id);
-        console.log('🔍 Modalidad encontrada:', modality);
-        
-        if (modality) {
-            this.openModal(modality);
-        } else {
-            this.showError('No se encontró la modalidad para editar');
-        }
-    }
-
-    async deleteModality(id) {
-        console.log('🗑️ Intentando eliminar modalidad con ID:', id);
-        console.log('📋 Modalidades disponibles:', this.modalities);
-        
-        const modality = this.modalities.find(m => m.id === id);
-        console.log('🔍 Modalidad encontrada:', modality);
-        
-        if (!modality) {
-            this.showError('No se encontró la modalidad');
-            return;
-        }
-        
-        if (!confirm(`¿Está seguro de eliminar la modalidad "${modality.modalityName}"?`)) {
-            return;
-        }
-
-        try {
-            console.log('🚀 Enviando petición DELETE con ID:', id);
-            await this.service.deleteModality(id);
-            this.showSuccess('Modalidad eliminada exitosamente');
-            this.loadModalities();
-        } catch (error) {
-            console.error('❌ Error completo al eliminar:', error);
-            
-            // ✅ Verificar tanto en message como en detail
-            const errorText = (error.message || '') + ' ' + (error.detail || '');
-            
-            if (errorText.includes('integrity') || 
-                errorText.includes('constraint') || 
-                errorText.includes('child record') ||
-                errorText.includes('ORA-02292') ||
-                errorText.includes('FK_CAREERS_MODAL')) {
-                this.showError('No se puede eliminar esta modalidad porque tiene carreras asociadas.\n\nPrimero debe eliminar o reasignar las carreras que usan esta modalidad.');
-            } else {
-                this.showError('Error al eliminar la modalidad');
-            }
-        }
-    }
-
-    showSuccess(message) {
-        alert(message);
-    }
-
-    showError(message) {
-        alert(message);
+async function loadModalities() {
+    try {
+        allModalities = await ModalitiesService.get();
+        populateModalities(allModalities);
+    } catch (error) {
+        Toast.show('Error al cargar las modalidades', 'error');
+        console.error(error);
+        populateModalities([]);
     }
 }
 
-const modalitiesController = new ModalitiesController();
-window.modalitiesController = modalitiesController;
+async function loadUniversities() {
+    try {
+        allUniversities = await UniversityService.get();
+    } catch (error) {
+        Toast.show('Error al cargar las universidades', 'error');
+        console.error(error);
+        allUniversities = [];
+    }
+}
 
-export default ModalitiesController;
+searchInput.addEventListener('input', (e) => {
+    const searchTerm = e.target.value.toLowerCase().trim();
+    
+    if (!searchTerm) {
+        populateModalities(allModalities);
+        return;
+    }
+
+    const filtered = allModalities.filter(m => 
+        (m.modalityName || '').toLowerCase().includes(searchTerm) ||
+        (m.universityName || '').toLowerCase().includes(searchTerm)
+    );
+
+    populateModalities(filtered);
+});
+
+function populateSelect(selectRoot, options = [], selectedValue = null) {
+    if (!selectRoot) return;
+
+    const menu = selectRoot.querySelector('[data-menu]');
+    const text = selectRoot.querySelector('[data-text]');
+    const input = selectRoot.querySelector('[data-input]');
+    const chevron = selectRoot.querySelector('[data-chevron]');
+    const btn = selectRoot.querySelector('[data-btn]');
+
+    menu.innerHTML = options.map(opt => `
+        <li class="px-4 py-2 cursor-pointer transition select-none 
+                   bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] 
+                   bg-clip-text text-transparent font-medium
+                   hover:from-[rgb(var(--button-from))]/70 hover:to-[rgb(var(--button-to))]/70"
+            data-value="${opt.value || opt}">
+            ${opt.label || opt}
+        </li>
+    `).join('');
+
+    btn.addEventListener('click', () => {
+        const isOpen = !menu.classList.contains('hidden');
+        menu.classList.toggle('hidden', isOpen);
+        chevron.classList.toggle('rotate-180', !isOpen);
+    });
+
+    document.addEventListener('click', e => {
+        if (!selectRoot.contains(e.target)) {
+            menu.classList.add('hidden');
+            chevron.classList.remove('rotate-180');
+        }
+    });
+
+    menu.querySelectorAll('li').forEach(li => {
+        li.addEventListener('click', () => {
+            const val = li.dataset.value;
+            const label = li.textContent.trim();
+
+            text.textContent = label;
+            text.classList.remove('italic', 'text-[rgb(var(--placeholder-from))]');
+            text.classList.add('bg-gradient-to-r', 'from-[rgb(var(--button-from))]', 'to-[rgb(var(--button-to))]', 'bg-clip-text', 'text-transparent');
+
+            input.value = val;
+
+            menu.classList.add('hidden');
+            chevron.classList.remove('rotate-180');
+        });
+    });
+
+    btn.addEventListener('contextmenu', e => {
+        e.preventDefault();
+        text.textContent = 'Seleccione una universidad';
+        text.classList.add('italic', 'text-[rgb(var(--placeholder-from))]');
+        text.classList.remove('bg-gradient-to-r', 'from-[rgb(var(--button-from))]', 'to-[rgb(var(--button-to))]', 'bg-clip-text', 'text-transparent');
+        input.value = '';
+    });
+
+    if (selectedValue !== null) {
+        const found = options.find(opt => (opt.value || opt) === selectedValue);
+        if (found) {
+            text.textContent = found.label || found;
+            text.classList.remove('italic', 'text-[rgb(var(--placeholder-from))]');
+            text.classList.add('bg-gradient-to-r', 'from-[rgb(var(--button-from))]', 'to-[rgb(var(--button-to))]', 'bg-clip-text', 'text-transparent');
+            input.value = selectedValue;
+        }
+    }
+}
+
+function showAddModal() {
+    const template = document.querySelector('#tmpl-add-modality');
+    if (!template) return;
+
+    const formElement = template.content.querySelector('#modality-form').cloneNode(true);
+    Modal.show(formElement);
+
+    const selectRoot = formElement.querySelector('[data-select]');
+    const universityOptions = allUniversities.map(u => ({
+        value: u.universityID,
+        label: u.universityName
+    }));
+    populateSelect(selectRoot, universityOptions);
+
+    formElement.querySelector('#cancel-btn').addEventListener('click', () => {
+        Modal.hide();
+    });
+
+    formElement.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(formElement);
+        const data = {
+            modalityName: formData.get('modalityName'),
+            universityID: formData.get('universityID')
+        };
+
+        if (!data.modalityName || !data.universityID) {
+            Toast.show('Todos los campos son requeridos', 'warn');
+            return;
+        }
+
+        try {
+            await ModalitiesService.post(data);
+            Toast.show('Modalidad creada correctamente', 'success');
+            Modal.hide();
+            await loadModalities();
+        } catch (error) {
+            Toast.show('Error al crear la modalidad', 'error');
+            console.error(error);
+        }
+    });
+}
+
+function showEditModal(modality) {
+    const template = document.querySelector('#tmpl-add-modality');
+    if (!template) return;
+
+    const formElement = template.content.querySelector('#modality-form').cloneNode(true);
+    
+    formElement.querySelector('.text-3xl').textContent = 'Editar modalidad';
+    formElement.querySelector('.text-xl').textContent = 'Modifica los campos necesarios';
+    
+    Modal.show(formElement);
+
+    formElement.querySelector('#modality-name').value = modality.modalityName || '';
+
+    const selectRoot = formElement.querySelector('[data-select]');
+    const universityOptions = allUniversities.map(u => ({
+        value: u.universityID,
+        label: u.universityName
+    }));
+    populateSelect(selectRoot, universityOptions, modality.universityID);
+
+    formElement.querySelector('#cancel-btn').addEventListener('click', () => {
+        Modal.hide();
+    });
+
+    formElement.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(formElement);
+        const data = {
+            modalityName: formData.get('modalityName'),
+            universityID: formData.get('universityID')
+        };
+
+        if (!data.modalityName || !data.universityID) {
+            Toast.show('Todos los campos son requeridos', 'warn');
+            return;
+        }
+
+        try {
+            await ModalitiesService.put(modality.id, data);
+            Toast.show('Modalidad actualizada correctamente', 'success');
+            Modal.hide();
+            await loadModalities();
+        } catch (error) {
+            Toast.show('Error al actualizar la modalidad', 'error');
+            console.error(error);
+        }
+    });
+}
+
+function showViewModal(modality) {
+    const template = document.querySelector('#tmpl-view-modality');
+    if (!template) return;
+
+    const viewElement = template.content.cloneNode(true).querySelector('div');
+    
+    viewElement.querySelector('#view-title').textContent = modality.modalityName || 'Sin nombre';
+    viewElement.querySelector('#view-university').textContent = modality.universityName || 'Sin universidad';
+
+    Modal.show(viewElement);
+
+    viewElement.querySelector('#close-view-btn').addEventListener('click', () => {
+        Modal.hide();
+    });
+}
+
+addModalityBtn.addEventListener('click', showAddModal);
+
+await loadUniversities();
+await loadModalities();

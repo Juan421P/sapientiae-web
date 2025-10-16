@@ -5,6 +5,15 @@ export class LocalitiesService {
     static _ENDPOINT = '/Locality';
 
     /**
+     * Obtener TODAS las localidades (sin paginación)
+     */
+    static async get() {
+        return await Network.get({
+            path: `${this._ENDPOINT}/getDataLocality`
+        });
+    }
+
+    /**
      * Obtener localidades con paginación
      * @param {number} page 
      * @param {number} size 
@@ -18,10 +27,6 @@ export class LocalitiesService {
     /**
      * Crear una nueva localidad
      * @param {Object} data 
-     * @param {string} data.universityID 
-     * @param {boolean} data.isMainLocality 
-     * @param {string} data.address 
-     * @param {string} data.phoneNumber 
      */
     static async post(data) {
         return await Network.post({

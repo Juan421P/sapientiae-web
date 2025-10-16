@@ -102,12 +102,15 @@ function attachCardEvents() {
                     label: 'Eliminar',
                     icon: 'delete',
                     onClick: async () => {
-                        try {
-                            await LocalitiesService.delete(id);
-                            Toast.show('Localidad eliminada', 'success');
-                            await loadLocalities();
-                        } catch {
-                            Toast.show('Error al eliminar', 'error');
+                        const confirmed = await Toast.confirm('¿Está seguro de eliminar esta localidad?');
+                        if (confirmed) {
+                            try {
+                                await LocalitiesService.delete(id);
+                                Toast.show('Localidad eliminada', 'success');
+                                await loadLocalities();
+                            } catch (error) {
+                                Toast.show(error.message || 'Error al eliminar', 'error');
+                            }
                         }
                     }
                 }
@@ -118,17 +121,112 @@ function attachCardEvents() {
 
 async function loadLocalities() {
     try {
-        const response = await LocalitiesService.getPaginated(currentPage, pageSize);
+        let response;
         
-        allLocalities = response.content || [];
-        filteredLocalities = [...allLocalities];
-        totalPages = response.totalPages || 1;
+        console.log('Intentando cargar localidades...');
+        
+        // Intentar primero con el endpoint simple (más confiable)
+        try {
+            console.log('Llamando a /getDataLocality...');
+            response = await LocalitiesService.get();
+            console.log('Respuesta recibida:', response);
+            
+            // Manejar diferentes formatos de respuesta
+            if (Array.isArray(response)) {
+                allLocalities = response;
+            } else if (response && Array.isArray(response.data)) {
+                allLocalities = response.data;
+            } else if (response && Array.isArray(response.content)) {
+                allLocalities = response.content;
+            } else {
+                console.warn('Formato de respuesta inesperado, asumiendo array vacío');
+                allLocalities = [];
+            }
+            
+            totalPages = Math.ceil(allLocalities.length / pageSize) || 1;
+            
+        } catch (simpleError) {
+            console.error('Error en endpoint simple:', simpleError);
+            
+            // Intentar con endpoint paginado como último recurso
+            try {
+                console.log('📡 Intentando endpoint paginado como fallback...');
+                response = await LocalitiesService.getPaginated(currentPage, pageSize);
+                console.log('Respuesta paginada:', response);
+                
+                if (response && response.content) {
+                    allLocalities = response.content;
+                    totalPages = response.totalPages || 1;
+                } else {
+                    throw new Error('Formato de respuesta paginada inválido');
+                }
+            } catch (paginatedError) {
+                console.error('Error en endpoint paginado también:', paginatedError);
+                throw simpleError; // Lanzar el error original
+            }
+        }
+        
+        const startIndex = currentPage * pageSize;
+        const endIndex = startIndex + pageSize;
+        filteredLocalities = allLocalities.slice(startIndex, endIndex);
+        
+        console.log(`Cargadas ${allLocalities.length} localidades (mostrando ${filteredLocalities.length})`);
         
         populateLocalities(filteredLocalities);
         updatePaginationControls();
+        
     } catch (error) {
-        Toast.show('Error al cargar localidades', 'error');
-        console.error(error);
+        console.error('ERROR FATAL al cargar localidades');
+        console.error('Detalles completos del error:', {
+            name: error.name,
+            message: error.message,
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+            data: error.response?.data,
+            headers: error.response?.headers,
+            url: error.config?.url,
+            method: error.config?.method
+        });
+        
+        if (error.stack) {
+            console.error('📚 Stack trace:', error.stack);
+        }
+        
+        let errorMsg = 'Error al cargar localidades del servidor';
+        let errorDetails = '';
+        
+        if (error.response?.status === 500) {
+            errorMsg = 'Error interno del servidor (500)';
+            errorDetails = 'Posibles causas:\n' +
+                          '• La tabla LOCALITIES está vacía\n' +
+                          '• Hay datos corruptos en la base de datos\n' +
+                          '• Problema con las relaciones de Universidad\n' +
+                          '• Revisa los logs del servidor Spring Boot';
+        } else if (error.response?.status === 404) {
+            errorMsg = 'Endpoint no encontrado (404)';
+            errorDetails = 'Verifica que el servidor esté corriendo en el puerto correcto';
+        } else if (error.code === 'ERR_NETWORK') {
+            errorMsg = 'No se pudo conectar al servidor';
+            errorDetails = 'Verifica que el backend esté corriendo';
+        } else if (error.response?.data?.message) {
+            errorMsg = error.response.data.message;
+        }
+        
+        console.error('🔴 ' + errorMsg);
+        if (errorDetails) {
+            console.error('ℹ️ ' + errorDetails);
+        }
+        
+        Toast.show(errorMsg, 'error');
+        
+        allLocalities = [];
+        filteredLocalities = [];
+        totalPages = 1;
+        currentPage = 0;
+        populateLocalities([]);
+        updatePaginationControls();
+        
+        console.log('⚠️ Aplicación en modo degradado - puedes intentar agregar localidades');
     }
 }
 
@@ -142,13 +240,16 @@ searchInput.addEventListener('input', (e) => {
     const searchTerm = e.target.value.toLowerCase().trim();
     
     if (!searchTerm) {
-        filteredLocalities = [...allLocalities];
+        const startIndex = currentPage * pageSize;
+        const endIndex = startIndex + pageSize;
+        filteredLocalities = allLocalities.slice(startIndex, endIndex);
     } else {
-        filteredLocalities = allLocalities.filter(loc => 
+        const filtered = allLocalities.filter(loc => 
             loc.universityName?.toLowerCase().includes(searchTerm) ||
             loc.address?.toLowerCase().includes(searchTerm) ||
             loc.phoneNumber?.includes(searchTerm)
         );
+        filteredLocalities = filtered;
     }
     
     populateLocalities(filteredLocalities);
@@ -157,6 +258,7 @@ searchInput.addEventListener('input', (e) => {
 prevPageBtn.addEventListener('click', async () => {
     if (currentPage > 0) {
         currentPage--;
+        searchInput.value = '';
         await loadLocalities();
     }
 });
@@ -164,6 +266,7 @@ prevPageBtn.addEventListener('click', async () => {
 nextPageBtn.addEventListener('click', async () => {
     if (currentPage < totalPages - 1) {
         currentPage++;
+        searchInput.value = ''; 
         await loadLocalities();
     }
 });
@@ -234,31 +337,71 @@ async function handleAddSubmit(e) {
     e.preventDefault();
     
     const formData = new FormData(e.target);
+    const phoneValue = formData.get('phoneNumber')?.replace(/\D/g, '');
+    
+    const formattedPhone = phoneValue?.length === 8 
+        ? `${phoneValue.slice(0, 4)}-${phoneValue.slice(4)}` 
+        : formData.get('phoneNumber');
+    
     const data = {
-        universityID: formData.get('universityID'),
-        address: formData.get('address'),
-        phoneNumber: formData.get('phoneNumber').replace('-', ''),
-        isMainLocality: e.target.querySelector('#is-main-locality').checked
+        universityID: formData.get('universityID') || '',
+        address: formData.get('address')?.trim() || '',
+        phoneNumber: formattedPhone || '',
+        isMainLocality: e.target.querySelector('#is-main-locality').checked || false
     };
     
-    if (!data.universityID || !data.address || !data.phoneNumber) {
-        Toast.show('Todos los campos son requeridos', 'warn');
+    // Validaciones
+    if (!data.universityID) {
+        Toast.show('Debe seleccionar una universidad', 'warn');
         return;
     }
     
-    if (data.phoneNumber.length !== 8) {
-        Toast.show('El teléfono debe tener 8 dígitos', 'warn');
+    if (!data.address || data.address.length === 0) {
+        Toast.show('La dirección es requerida', 'warn');
         return;
     }
+    
+    if (data.address.length > 500) {
+        Toast.show('La dirección no puede exceder 500 caracteres', 'warn');
+        return;
+    }
+    
+    if (!data.phoneNumber) {
+        Toast.show('El teléfono es requerido', 'warn');
+        return;
+    }
+    
+    if (!/^\d{4}-\d{4}$/.test(data.phoneNumber)) {
+        Toast.show('El teléfono debe tener el formato 1234-5678', 'warn');
+        return;
+    }
+    
+    console.log('Datos a enviar (POST):', data);
     
     try {
-        await LocalitiesService.post(data);
+        const response = await LocalitiesService.post(data);
+        console.log('Respuesta POST:', response);
         Toast.show('Localidad creada exitosamente', 'success');
         Modal.hide();
         await loadLocalities();
     } catch (error) {
-        Toast.show('Error al crear localidad', 'error');
-        console.error(error);
+        console.error('Error al crear localidad:', error);
+        
+        // Manejo de errores mejorado
+        if (error.response?.data) {
+            const errorData = error.response.data;
+            if (errorData.errors) {
+                // Errores de validación
+                const errorMessages = Object.values(errorData.errors).join(', ');
+                Toast.show(errorMessages, 'error');
+            } else if (errorData.message) {
+                Toast.show(errorData.message, 'error');
+            } else {
+                Toast.show('Error al crear localidad', 'error');
+            }
+        } else {
+            Toast.show(error.message || 'Error al crear localidad', 'error');
+        }
     }
 }
 
@@ -267,31 +410,72 @@ async function handleEditSubmit(e) {
     
     const id = e.target.dataset.editId;
     const formData = new FormData(e.target);
+    const phoneValue = formData.get('phoneNumber')?.replace(/\D/g, '');
+    
+    // Formatear teléfono correctamente
+    const formattedPhone = phoneValue?.length === 8 
+        ? `${phoneValue.slice(0, 4)}-${phoneValue.slice(4)}` 
+        : formData.get('phoneNumber');
+    
     const data = {
-        universityID: formData.get('universityID'),
-        address: formData.get('address'),
-        phoneNumber: formData.get('phoneNumber').replace('-', ''),
-        isMainLocality: e.target.querySelector('#is-main-locality').checked
+        universityID: formData.get('universityID') || '',
+        address: formData.get('address')?.trim() || '',
+        phoneNumber: formattedPhone || '',
+        // CRÍTICO: Asegurar que siempre sea boolean, nunca null/undefined
+        isMainLocality: e.target.querySelector('#is-main-locality').checked || false
     };
     
-    if (!data.universityID || !data.address || !data.phoneNumber) {
-        Toast.show('Todos los campos son requeridos', 'warn');
+    // Validaciones
+    if (!data.universityID) {
+        Toast.show('Debe seleccionar una universidad', 'warn');
         return;
     }
     
-    if (data.phoneNumber.length !== 8) {
-        Toast.show('El teléfono debe tener 8 dígitos', 'warn');
+    if (!data.address || data.address.length === 0) {
+        Toast.show('La dirección es requerida', 'warn');
         return;
     }
+    
+    if (data.address.length > 500) {
+        Toast.show('La dirección no puede exceder 500 caracteres', 'warn');
+        return;
+    }
+    
+    if (!data.phoneNumber) {
+        Toast.show('El teléfono es requerido', 'warn');
+        return;
+    }
+    
+    if (!/^\d{4}-\d{4}$/.test(data.phoneNumber)) {
+        Toast.show('El teléfono debe tener el formato 1234-5678', 'warn');
+        return;
+    }
+    
+    console.log('Datos a enviar (PUT):', data);
     
     try {
-        await LocalitiesService.put(id, data);
+        const response = await LocalitiesService.put(id, data);
+        console.log('Respuesta PUT:', response);
         Toast.show('Localidad actualizada exitosamente', 'success');
         Modal.hide();
         await loadLocalities();
     } catch (error) {
-        Toast.show('Error al actualizar localidad', 'error');
-        console.error(error);
+        console.error('Error al actualizar localidad:', error);
+        
+        // Manejo de errores mejorado
+        if (error.response?.data) {
+            const errorData = error.response.data;
+            if (errorData.errors) {
+                const errorMessages = Object.values(errorData.errors).join(', ');
+                Toast.show(errorMessages, 'error');
+            } else if (errorData.message) {
+                Toast.show(errorData.message, 'error');
+            } else {
+                Toast.show('Error al actualizar localidad', 'error');
+            }
+        } else {
+            Toast.show(error.message || 'Error al actualizar localidad', 'error');
+        }
     }
 }
 
