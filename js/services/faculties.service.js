@@ -26,7 +26,7 @@ export class FacultiesService {
 
 	static async delete(id){
 		return await Network.delete({
-			path: `${this._ENDPOINT}/deleteFaculty/${id}`
+			path: `${this._ENDPOINT}/deleteFaculty/${id}`,
 		});
 	}
 
