@@ -1,33 +1,32 @@
 // js/controllers/teacher-portal/courses.controller.js
-import { CourseOfferingTeachersService } from "../../services/course-offering-teachers.service.js";
-import { CourseOfferingsService }        from "../../services/course-offerings.service.js";
-import { SubjectDefinitionsService }     from "../../services/subject-definitions.service.js";
-import { YearCyclesService }             from "../../services/year-cycles.service.js";
-import { CycleTypesService }             from "../../services/cycle-types.service.js";
-import { CourseEnrollmentsService }      from "../../services/course-enrollments.service.js";
-import { StudentsService }               from "../../services/students.service.js";
-import { PeopleService }                 from "../../services/people.service.js";
-import { Toast } from "../../../components/toast.js";
-import { Modal } from "../../../components/modal.js";
+import { CourseOfferingsTeachersService } from "../../services/course-offering-teachers.service.js";
+import { CourseOfferingService }         from "../../services/course-offerings.service.js"; // usa get() o getAll()
+import { SubjectDefinitionsService }      from "../../services/subject-definitions.service.js";
+import { YearCyclesService }              from "../../services/year-cycles.service.js";
+import { CycleTypesService }              from "../../services/cycle-types.service.js";
+import { CourseEnrollmentsService }       from "../../services/course-enrollments.service.js";
+import { StudentsService }                from "../../services/students.service.js";
+import { PeopleService }                  from "../../services/people.service.js";
+import { Toast }                          from "../../../components/toast.js";
+import { Modal }                          from "../../../components/modal.js";
 
-
-
-// ===============================
-// Tabla base (tu mismo estilo)
-// ===============================
-const thead = document.querySelector('#thead');
-const tbody = document.querySelector('#tbody');
+/* ------------------------------- Referencias ---------------------------- */
+const thead   = document.querySelector('#thead');   // se rellena en boot()
+const tbody   = document.querySelector('#tbody');
 const HEADERS = ['Materia', 'Grupo', 'Ciclo académico', 'Estudiantes'];
 
-thead.innerHTML = `
-  <tr class="bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] drop-shadow-sm">
-    ${HEADERS.map(h => `<th class="px-5 py-4 text-left select-none text-white drop-shadow-sm">${h}</th>`).join("")}
-  </tr>
-`;
+/* -------------------------------- Helpers ------------------------------- */
+const $ = (sel, root = document) => root.querySelector(sel);
 
-// ===============================
-// Helpers de mapeo/formatos
-// ===============================
+const byId = (arr, key1, key2) => {
+  const m = new Map();
+  for (const x of arr || []) {
+    const id = x?.[key1] ?? x?.[key2] ?? x?.id;
+    if (id) m.set(id, x);
+  }
+  return m;
+};
+
 function buildCycleLabel(yc, ct) {
   if (!yc) return '—';
   const year = yc.year ?? yc.academicYear ?? yc.yearName ?? '';
@@ -61,85 +60,97 @@ function mapStudentRow(s, i) {
   `;
 }
 
-// ===============================
-// Carga y composición usando SOLO services importados
-// ===============================
+/* -------------------- Carga SOLO con getAll()/get() --------------------- */
 async function loadCoursesForTeacher(teacherId) {
-  // 1) relaciones docente-oferta
-  const links = await CourseOfferingTeachersService.getByTeacher(teacherId);
-  const offeringIds = [...new Set(links.map(x => x.courseOfferingID ?? x.courseOfferingId ?? x.offeringId))].filter(Boolean);
-  if (!offeringIds.length) return [];
+  // 1) descargo TODO (defensivo: get() o getAll())
+  const [
+    linksAll,            // relaciones oferta-docente
+    offeringsAll,        // ofertas
+    subjectsAll,         // materias
+    yearCyclesAll,       // ciclos
+    cycleTypesAll,       // tipos de ciclo
+    enrollmentsAll       // inscripciones a ofertas
+  ] = await Promise.all([
+    (CourseOfferingsTeachersService.get?.() ?? CourseOfferingsTeachersService.getAll?.() ?? Promise.resolve([])),
+    (CourseOfferingService.get?.()         ?? CourseOfferingService.getAll?.()         ?? Promise.resolve([])),
+    (SubjectDefinitionsService.get?.()     ?? SubjectDefinitionsService.getAll?.()      ?? Promise.resolve([])),
+    (YearCyclesService.get?.()             ?? YearCyclesService.getAll?.()              ?? Promise.resolve([])),
+    (CycleTypesService.get?.()             ?? CycleTypesService.getAll?.()              ?? Promise.resolve([])),
+    (CourseEnrollmentsService.get?.()      ?? CourseEnrollmentsService.getAll?.()       ?? Promise.resolve([]))
+  ]);
 
-  // 2) ofertas
-  const offerings = await CourseOfferingsService.getByIds(offeringIds);
+  // 2) filtro relaciones por empleado logueado
+  const myLinks = (linksAll || []).filter(l =>
+    (l.employeeID ?? l.employeeId ?? l.employee) === teacherId
+  );
+  if (!myLinks.length) return [];
 
-  // 3) materias
-  const subjectIds = [...new Set(offerings.map(o => o.subjectDefinitionID ?? o.subjectDefinitionId))].filter(Boolean);
-  const subjects   = await SubjectDefinitionsService.getByIds(subjectIds);
+  // 3) índices por id
+  const offeringsById = byId(offeringsAll, 'courseOfferingID', 'courseOfferingId');
+  const subjectsById  = byId(subjectsAll,  'subjectDefinitionID', 'subjectDefinitionId');
+  const ycsById       = byId(yearCyclesAll,'yearCycleID', 'yearCycleId');
+  const ctsById       = byId(cycleTypesAll,'cycleTypeID', 'cycleTypeId');
 
-  // 4) ciclos + tipo de ciclo
-  const ycIds = [...new Set(offerings.map(o => o.yearCycleID ?? o.yearCycleId))].filter(Boolean);
-  const ycs   = await YearCyclesService.getByIds(ycIds);
-  const ctIds = [...new Set(ycs.map(y => y.cycleTypeID ?? y.cycleTypeId))].filter(Boolean);
-  const cts   = await CycleTypesService.getByIds(ctIds);
+  // 4) conteo de inscripciones por oferta
+  const enrollCount = new Map();
+  for (const e of enrollmentsAll || []) {
+    const offId = e.courseOfferingID ?? e.courseOfferingId ?? e.offeringId;
+    if (!offId) continue;
+    enrollCount.set(offId, (enrollCount.get(offId) || 0) + 1);
+  }
 
-  // 5) horarios (por oferta)
-  const schedulesByOffering = {};
-  await Promise.all(offeringIds.map(async id => {
-    schedulesByOffering[id] = await CourseOfferingsService.getSchedules(id);
-  }));
+  // 5) compongo filas para la UI
+  const rows = [];
+  for (const link of myLinks) {
+    const offId = link.courseOfferingID ?? link.courseOfferingId ?? link.offeringId;
+    const off   = offeringsById.get(offId);
+    if (!off) continue;
 
-  // 6) conteo de inscripciones (por oferta)
-  const enrollCountByOffering = {};
-  await Promise.all(offeringIds.map(async id => {
-    const enrolls = await CourseEnrollmentsService.getByOffering(id);
-    enrollCountByOffering[id] = enrolls.length;
-  }));
+    const subj = subjectsById.get(off.subjectDefinitionID ?? off.subjectDefinitionId);
+    const yc   = ycsById.get(off.yearCycleID ?? off.yearCycleId);
+    const ct   = yc ? ctsById.get(yc.cycleTypeID ?? yc.cycleTypeId) : null;
 
-  // 7) armar DTO para la UI
-  return offerings.map(o => {
-    const offId = o.id ?? o.courseOfferingID ?? o.courseOfferingId ?? o.offeringId;
-    const subj  = subjects.find(s => (s.id ?? s.subjectDefinitionID) === (o.subjectDefinitionID ?? o.subjectDefinitionId));
-    const yc    = ycs.find(y => (y.id ?? y.yearCycleID) === (o.yearCycleID ?? o.yearCycleId));
-    const ct    = cts.find(c => (c.id ?? c.cycleTypeID) === (yc?.cycleTypeID ?? yc?.cycleTypeId));
-
-    const sch   = schedulesByOffering[offId] ?? [];
-    const scheduleText = sch.length
-      ? sch.map(s => `${s.dayName ?? s.day ?? ''} ${s.startTime ?? ''}-${s.endTime ?? ''}`.trim()).join(' · ')
-      : (o.scheduleDescription ?? '—');
-
-    return {
+    rows.push({
       id: offId,
-      subjectName: subj?.name ?? subj?.subjectDefinitionName ?? '—',
-      group: o.group ?? o.groupCode ?? o.section ?? '—',
+      subjectName: subj?.name ?? subj?.subjectDefinitionName ?? off.subject ?? '—',
+      group: off.group ?? off.groupCode ?? off.section ?? '—',
       cycle: buildCycleLabel(yc, ct),
-      classroom: o.classroom ?? '—',
-      schedule: scheduleText,
-      studentCount: enrollCountByOffering[offId] ?? 0
-    };
-  });
+      classroom: off.classroom ?? '—',
+      schedule:  off.scheduleDescription ?? '—',  // si no manejas horarios separados
+      studentCount: enrollCount.get(offId) || 0
+    });
+  }
+
+  return rows;
 }
 
 async function loadStudentsForOffering(offeringId) {
-  const enrolls = await CourseEnrollmentsService.getByOffering(offeringId);
-  const studentIds = [...new Set(enrolls.map(e => e.studentID ?? e.studentId))].filter(Boolean);
-  if (!studentIds.length) return [];
+  // bajo TODO y filtro
+  const [enrollmentsAll, studentsAll, peopleAll] = await Promise.all([
+    (CourseEnrollmentsService.get?.() ?? CourseEnrollmentsService.getAll?.() ?? Promise.resolve([])),
+    (StudentsService.get?.()          ?? StudentsService.getAll?.()          ?? Promise.resolve([])),
+    (PeopleService.get?.()            ?? PeopleService.getAll?.()            ?? Promise.resolve([]))
+  ]);
 
-  const students = await StudentsService.getByIds(studentIds);
-  const personIds = [...new Set(students.map(s => s.personID ?? s.personId))].filter(Boolean);
-  const people    = await PeopleService.getByIds(personIds);
-  const peopleMap = new Map(people.map(p => [ (p.id ?? p.personID), p ]));
+  const myEnrolls = (enrollmentsAll || []).filter(e =>
+    (e.courseOfferingID ?? e.courseOfferingId ?? e.offeringId) === offeringId
+  );
+
+  const studentIds = new Set(myEnrolls.map(e => e.studentID ?? e.studentId));
+  const students   = (studentsAll || []).filter(s => studentIds.has(s.id ?? s.studentID ?? s.studentId));
+
+  const peopleById = byId(peopleAll, 'personID', 'personId');
 
   return students.map(s => {
-    const p = peopleMap.get(s.personID ?? s.personId);
-    const fullName = p ? `${p.firstName ?? ''} ${p.lastName ?? ''}`.trim() : (s.fullName ?? s.name ?? '—');
+    const personId = s.personID ?? s.personId;
+    const p = peopleById.get(personId);
+    const fullName = p ? `${p.firstName ?? ''} ${p.lastName ?? ''}`.trim()
+                       : (s.fullName ?? s.name ?? '—');
     return { studentID: s.id ?? s.studentID ?? s.studentId, fullName };
   });
 }
 
-// ===============================
-// Render tabla + modal
-// ===============================
+/* ------------------------------ Render UI ------------------------------- */
 function renderRows(courses) {
   if (!courses.length) {
     tbody.innerHTML = `
@@ -189,35 +200,83 @@ function renderRows(courses) {
 }
 
 async function openCourseDetail(info) {
-  const students = await loadStudentsForOffering(info.id);
+  try {
+    const students = await loadStudentsForOffering(info.id);
 
-  const tpl = document.querySelector('#tmpl-course-detail').content.cloneNode(true);
-  tpl.querySelector('#cd-classroom').textContent = info.classroom;
-  tpl.querySelector('#cd-schedule').textContent  = info.schedule;
-  tpl.querySelector('#cd-group').textContent     = info.group;
-  tpl.querySelector('#cd-cycle').textContent     = info.cycle;
+    const tpl = document.querySelector('#tmpl-course-detail').content.cloneNode(true);
+    tpl.querySelector('#cd-classroom').textContent = info.classroom;
+    tpl.querySelector('#cd-schedule').textContent  = info.schedule;
+    tpl.querySelector('#cd-group').textContent     = info.group;
+    tpl.querySelector('#cd-cycle').textContent     = info.cycle;
 
-  const list = tpl.querySelector('#cd-students');
-  list.innerHTML = students.length
-    ? students.map((s, i) => mapStudentRow(s, i)).join('')
-    : `<tr><td class="px-5 py-4 text-[rgb(var(--text-from))]" colspan="2">Sin estudiantes</td></tr>`;
+    const list = tpl.querySelector('#cd-students');
+    list.innerHTML = students.length
+      ? students.map((s, i) => mapStudentRow(s, i)).join('')
+      : `<tr><td class="px-5 py-4 text-[rgb(var(--text-from))]" colspan="2">Sin estudiantes</td></tr>`;
 
-  const wrapper = document.createElement('div');
-  wrapper.className = 'w-[92vw] max-w-2xl';
-  wrapper.appendChild(tpl);
-  Modal.show(wrapper);
+    const wrapper = document.createElement('div');
+    wrapper.className = 'w-[92vw] max-w-2xl';
+    wrapper.appendChild(tpl);
+    Modal.show(wrapper);
 
-  const onEsc = (ev) => { if (ev.key === 'Escape') { Modal.hide(); window.removeEventListener('keydown', onEsc); } };
-  window.addEventListener('keydown', onEsc, { once: true });
+    const onEsc = (ev) => { if (ev.key === 'Escape') { Modal.hide(); window.removeEventListener('keydown', onEsc); } };
+    window.addEventListener('keydown', onEsc, { once: true });
+  } catch (err) {
+    console.error('[Course detail] error:', err);
+    Toast.show('No se pudo cargar el detalle del curso.', 'error');
+  }
 }
 
-// ===============================
-// Boot
-// ===============================
+/* --------------------------------- Boot -------------------------------- */
 async function loadCourses() {
-  const user = JSON.parse(sessionStorage.getItem('user') || '{}');
-  const teacherId = user?.userID || user?.employeeID || user?.personID || user?.id;
-  const data = await loadCoursesForTeacher(teacherId);
-  renderRows(data);
+  try {
+    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+    console.log('[courses.controller] user en sesión:', user);
+
+    const teacherId =
+      user?.employeeID ?? user?.EmployeeID ?? user?.userID ?? user?.personID ?? user?.id;
+
+    console.log('[courses.controller] teacherId:', teacherId);
+
+    if (!teacherId) {
+      Toast.show('No se encontró el ID del docente en la sesión.', 'warn');
+      renderRows([]);
+      return;
+    }
+
+    const data = await loadCoursesForTeacher(teacherId);
+    console.log('[courses.controller] cursos:', data);
+    renderRows(data);
+  } catch (e) {
+    console.error('[Courses] load error:', e);
+    Toast.show('No se pudieron cargar tus cursos.', 'error');
+    renderRows([]);
+  }
 }
-await loadCourses();
+
+async function boot() {
+  try {
+    // Pintar encabezado cuando el DOM ya existe
+    if (thead) {
+      thead.innerHTML = `
+        <tr class="bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] drop-shadow-sm">
+          ${HEADERS.map(h => `<th class="px-5 py-4 text-left select-none text-white drop-shadow-sm">${h}</th>`).join("")}
+        </tr>
+      `;
+    } else {
+      console.warn('[courses.controller] #thead no existe en el DOM');
+    }
+
+    await loadCourses();
+  } catch (e) {
+    console.error('[Boot] error:', e);
+    Toast.show('No se pudo iniciar la vista.', 'error');
+  }
+}
+
+// auto-init (siempre después de que el DOM esté listo)
+if (document.readyState !== 'loading') {
+  boot().catch(console.error);
+} else {
+  document.addEventListener('DOMContentLoaded', () => boot().catch(console.error));
+}
