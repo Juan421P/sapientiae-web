@@ -3,11 +3,9 @@ import { FacultiesService } from "../../services/faculties.service";
 const careerList = document.querySelector('#career-list');
 const user = JSON.parse(sessionStorage.getItem('user'));
 
-// --- Renderizado dinámico de facultades ---
 function populateCareers(faculties) {
     const filtered = faculties.filter(c => c.universityID === user.universityID);
 
-    // Renderizar el contenido dinámicamente
     careerList.innerHTML = faculties.length
         ? faculties.map(c => `
             <div class="career-card min-w-[300px] max-w-[500px] p-6 bg-gradient-to-tr from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] 
@@ -60,7 +58,6 @@ function populateCareers(faculties) {
             </div>
         `;
 
-    // --- Eventos por tarjeta ---
     careerList.querySelectorAll('.career-card').forEach(card => {
         card.addEventListener('click', () => {
             const id = card.dataset.id;
@@ -94,11 +91,9 @@ function populateCareers(faculties) {
     });
 }
 
-// --- Cargar los datos desde el servicio ---
 async function loadCareers() {
     const data = await FacultiesService.get();
     populateCareers(data);
 }
 
-// --- Inicialización ---
 await loadCareers();
