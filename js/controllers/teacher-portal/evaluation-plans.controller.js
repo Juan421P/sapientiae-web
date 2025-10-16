@@ -1,4 +1,3 @@
-// controllers/teacher-portal/evaluation-plans.controller.js
 import { EvaluationPlansService } from '../../services/evaluation-plans.service.js';
 import { EvaluationPlanComponentsService } from '../../services/evaluation-plan-components.service.js';
 import { CourseOfferingService } from '../../services/course-offerings.service.js';
@@ -7,27 +6,20 @@ import { Toast } from './../../../components/toast.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 
-/* ============================ */
-/*  Course Offerings (en caché) */
-/* ============================ */
 let OFFERINGS_BY_ID = new Map();
 
 function labelFromOffering(off) {
   if (!off) return '';
-  // Tu DTO expone: subject (materia) y yearcycleName (texto de fechas)
+ 
   const subject = off.subject || off.subjectName || 'Curso';
   const cycle   = off.yearcycleName || off.yearCycleName || '';
-  // Si en el futuro el backend te manda ciclo/año explícitos, puedes armar:
-  // const ciclo = off.yearCycle?.cycleType?.cycleLabel || cycle;
-  // const anio  = off.yearCycle?.academicYear?.year || '';
-  // const chunk = [ciclo, anio].filter(Boolean).join(' ');
-  // return [subject, chunk].filter(Boolean).join(' — ');
+  
   return [subject, cycle].filter(Boolean).join(' — ');
 }
 
 async function warmOfferingsCache() {
   try {
-    const list = await CourseOfferingService.get();      // <- tu service sin cambios
+    const list = await CourseOfferingService.get();      
     OFFERINGS_BY_ID = new Map((list || []).map(o => [
       (o.courseOfferingID || o.id),
       o
@@ -38,9 +30,6 @@ async function warmOfferingsCache() {
   }
 }
 
-/* ============================ */
-/*     Mapeo del DTO del plan   */
-/* ============================ */
 function mapPlan(dto) {
   const id    = dto.evaluationPlanID || dto.evaluationPlanId || dto.id;
   const title = dto.planName || dto.nombre || 'Plan de Evaluación';
@@ -50,25 +39,19 @@ function mapPlan(dto) {
     dto.courseOfferingID || dto.courseOfferingId ||
     dto.courseOffering?.courseOfferingID || null;
 
-  // Si no viene embebido, lo resuelvo desde el caché
   const offering = dto.courseOffering || OFFERINGS_BY_ID.get(courseOfferingID) || null;
 
   const period = offering ? labelFromOffering(offering) : (dto.period || '—');
 
-  // úsalo en update para evitar ORA-01407 (createdAt NOT NULL)
   const createdAt = dto.createdAt || dto.createDate || null;
 
   return { id, title, period, description, offering, courseOfferingID, createdAt };
 }
 
-/* ============================ */
-/*             INIT             */
-/* ============================ */
 export async function init() {
   try {
     $('#create-plan-btn')?.addEventListener('click', openCreateModal);
 
-    // Cerrar menús contextuales al hacer click fuera
     document.addEventListener('click', () => {
       document.querySelectorAll('.context-menu').forEach(m => m.classList.add('hidden'));
     });
@@ -80,23 +63,18 @@ export async function init() {
   }
 }
 
-// Auto-init
 if (document.readyState !== 'loading') {
   init().catch(console.error);
 } else {
   document.addEventListener('DOMContentLoaded', () => init().catch(console.error));
 }
 
-/* ============================ */
-/*        Cargar / Render       */
-/* ============================ */
 async function loadAndRender() {
   const container = $('#plans-container');
   container.innerHTML = `
     <div id="timeline-line" class="absolute left-4 w-1 bg-gradient-to-r from-[rgb(var(--off-from))] to-[rgb(var(--off-to))] rounded-full"></div>
   `;
 
-  // Cargar ofertas para usarlas en cards y en el modal
   await warmOfferingsCache();
 
   let plans = [];
@@ -127,7 +105,6 @@ async function loadAndRender() {
     return;
   }
 
-  // Agrupar nombres de componentes por plan
   const getCompPlanId = c =>
     c.evaluationPlanID || c.evaluationPlanId || c.planId || c.planID || c.idPlan || null;
 
@@ -142,7 +119,6 @@ async function loadAndRender() {
     compsByPlan.get(pid).push(getCompName(c));
   });
 
-  // Render
   plans.forEach(dto => {
     const plan = mapPlan(dto);
     plan.evaluations = (compsByPlan.get(plan.id) || []).slice();
@@ -155,11 +131,10 @@ async function loadAndRender() {
     $('#plan-evaluations', tpl).innerHTML =
       (plan.evaluations || []).map(e => `<li>${escapeHTML(e)}</li>`).join('');
 
-    // acciones
+    
     $('.view-plan-btn', tpl).addEventListener('click', () => openPlanDetail(plan));
     $('.edit-plan-btn', tpl).addEventListener('click', () => openEditModal(plan));
 
-    // mini context menu
     const btn = $('.context-menu-btn', tpl);
     const menu = $('.context-menu', tpl);
     btn.addEventListener('click', ev => {
@@ -182,9 +157,6 @@ async function loadAndRender() {
   updateTimelineHeight();
 }
 
-/* ============================ */
-/*         Ver Detalle          */
-/* ============================ */
 async function openPlanDetail(plan) {
   const tpl = document.importNode($('#tmpl-plan-detail').content, true);
   $('#detail-title', tpl).textContent = plan.title;
@@ -196,9 +168,6 @@ async function openPlanDetail(plan) {
   Modal.show(tpl.firstElementChild || tpl);
 }
 
-/* ============================ */
-/*        Crear / Editar        */
-/* ============================ */
 async function openCreateModal() {
   const tpl = document.importNode($('#tmpl-create-plan').content, true);
   Modal.show(tpl.firstElementChild || tpl);
@@ -207,7 +176,6 @@ async function openCreateModal() {
   const form = document.querySelector('#plan-form');
   const sel  = document.querySelector('#form-courseOffering');
 
-  // llenar select de cursos
   if (sel) {
     sel.innerHTML = '<option value="">Selecciona un curso…</option>';
     if (OFFERINGS_BY_ID.size) {
@@ -247,7 +215,6 @@ async function openCreateModal() {
 }
 
 function normalizeDateForAPI(v) {
-  // Regresa 'YYYY-MM-DD'. Si v es inválido o viene vacío, usa la fecha de hoy.
   try {
     const d = v ? new Date(v) : new Date();
     if (isNaN(d.getTime())) return new Date().toISOString().slice(0, 10);
@@ -263,11 +230,9 @@ async function openEditModal(plan) {
   Modal.show(tpl.firstElementChild || tpl);
   await new Promise(r => requestAnimationFrame(r));
 
-  // precarga
   document.querySelector('#form-title').value       = plan.title || '';
   document.querySelector('#form-description').value = plan.description || '';
 
-  // mostramos el curso actual bloqueado
   const sel = document.querySelector('#form-courseOffering');
   if (sel) {
     sel.innerHTML = `<option>${plan.period || '—'}</option>`;
@@ -279,7 +244,7 @@ async function openEditModal(plan) {
   document.querySelector('#plan-form')?.addEventListener('submit', async e => {
     e.preventDefault();
 
-    // Siempre mandar FK y createdAt
+
     const payload = {
       planName:        document.querySelector('#form-title')?.value.trim() || '',
       description:     document.querySelector('#form-description')?.value.trim() || '',
@@ -287,7 +252,6 @@ async function openEditModal(plan) {
       createdAt:       normalizeDateForAPI(plan.createdAt)
     };
 
-    // Si por lo que sea no tenemos el ID del curso, lo quitamos (por si el backend lo permite)
     if (!payload.courseOfferingID) delete payload.courseOfferingID;
 
     try {
@@ -303,9 +267,7 @@ async function openEditModal(plan) {
 }
 
 
-/* ============================ */
-/*            Utils             */
-/* ============================ */
+
 function updateTimelineHeight() {
   const container = $('#plans-container');
   const cards = container.querySelectorAll('#plan-card');
