@@ -17,7 +17,7 @@ export class SubjectDefinitionsService {
         });
     }
 
-    static async put(id) {
+    static async put(id, data) {
         return await Network.put({
             path: `${this._ENDPOINT}/updateSubjectDefinition/${id}`,
             body: data

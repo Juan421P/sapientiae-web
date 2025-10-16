@@ -1,17 +1,57 @@
 import { EvaluationPlansService } from '../../services/evaluation-plans.service.js';
 import { EvaluationPlanComponentsService } from '../../services/evaluation-plan-components.service.js';
+import { CourseOfferingService } from '../../services/course-offerings.service.js';
 import { Modal } from './../../../components/modal.js';
 import { Toast } from './../../../components/toast.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 
+let OFFERINGS_BY_ID = new Map();
+
+function labelFromOffering(off) {
+  if (!off) return '';
+ 
+  const subject = off.subject || off.subjectName || 'Curso';
+  const cycle   = off.yearcycleName || off.yearCycleName || '';
+  
+  return [subject, cycle].filter(Boolean).join(' — ');
+}
+
+async function warmOfferingsCache() {
+  try {
+    const list = await CourseOfferingService.get();      
+    OFFERINGS_BY_ID = new Map((list || []).map(o => [
+      (o.courseOfferingID || o.id),
+      o
+    ]));
+  } catch (e) {
+    OFFERINGS_BY_ID = new Map();
+    console.error('[Offerings] no se pudieron cargar:', e);
+  }
+}
+
+function mapPlan(dto) {
+  const id    = dto.evaluationPlanID || dto.evaluationPlanId || dto.id;
+  const title = dto.planName || dto.nombre || 'Plan de Evaluación';
+  const description = dto.description || '';
+
+  const courseOfferingID =
+    dto.courseOfferingID || dto.courseOfferingId ||
+    dto.courseOffering?.courseOfferingID || null;
+
+  const offering = dto.courseOffering || OFFERINGS_BY_ID.get(courseOfferingID) || null;
+
+  const period = offering ? labelFromOffering(offering) : (dto.period || '—');
+
+  const createdAt = dto.createdAt || dto.createDate || null;
+
+  return { id, title, period, description, offering, courseOfferingID, createdAt };
+}
 
 export async function init() {
   try {
-    // Eventos UI
     $('#create-plan-btn')?.addEventListener('click', openCreateModal);
 
-    // Cerrar menús contextuales simples al hacer click fuera
     document.addEventListener('click', () => {
       document.querySelectorAll('.context-menu').forEach(m => m.classList.add('hidden'));
     });
@@ -23,13 +63,11 @@ export async function init() {
   }
 }
 
-// Auto-init
 if (document.readyState !== 'loading') {
   init().catch(console.error);
 } else {
   document.addEventListener('DOMContentLoaded', () => init().catch(console.error));
 }
-
 
 async function loadAndRender() {
   const container = $('#plans-container');
@@ -37,13 +75,14 @@ async function loadAndRender() {
     <div id="timeline-line" class="absolute left-4 w-1 bg-gradient-to-r from-[rgb(var(--off-from))] to-[rgb(var(--off-to))] rounded-full"></div>
   `;
 
+  await warmOfferingsCache();
+
   let plans = [];
   let comps = [];
   try {
-    // Credenciales: el Network ya manda credentials: 'include'
     const [plansRes, compsRes] = await Promise.all([
-      EvaluationPlansService.getAll(),                // /api/EvaluationPlans/getEvaluationPlan
-      EvaluationPlanComponentsService.getAll()        // /api/EvaluationPlanComponents/getEvaluationPlanComponents
+      EvaluationPlansService.getAll(),
+      EvaluationPlanComponentsService.getAll()
     ]);
     plans = Array.isArray(plansRes) ? plansRes : [];
     comps  = Array.isArray(compsRes)  ? compsRes  : [];
@@ -66,7 +105,6 @@ async function loadAndRender() {
     return;
   }
 
-  // --- Agrupar componentes por planId ---
   const getCompPlanId = c =>
     c.evaluationPlanID || c.evaluationPlanId || c.planId || c.planID || c.idPlan || null;
 
@@ -81,25 +119,22 @@ async function loadAndRender() {
     compsByPlan.get(pid).push(getCompName(c));
   });
 
-  // --- Render cards ---
   plans.forEach(dto => {
     const plan = mapPlan(dto);
     plan.evaluations = (compsByPlan.get(plan.id) || []).slice();
 
     const tpl = document.importNode($('#tmpl-plan-card').content, true);
 
-    // Rellenar
     $('#plan-title', tpl).textContent = plan.title;
     $('#plan-period', tpl).textContent = plan.period;
     $('#plan-description', tpl).textContent = plan.description || '—';
     $('#plan-evaluations', tpl).innerHTML =
       (plan.evaluations || []).map(e => `<li>${escapeHTML(e)}</li>`).join('');
 
-    // Acciones
+    
     $('.view-plan-btn', tpl).addEventListener('click', () => openPlanDetail(plan));
     $('.edit-plan-btn', tpl).addEventListener('click', () => openEditModal(plan));
 
-    // mini context-menu local
     const btn = $('.context-menu-btn', tpl);
     const menu = $('.context-menu', tpl);
     btn.addEventListener('click', ev => {
@@ -116,34 +151,10 @@ async function loadAndRender() {
       Toast.show('Función "Agregar evaluación" (UI)', 'info');
     });
 
-    // Añadir al DOM
     container.appendChild(tpl);
   });
 
   updateTimelineHeight();
-}
-
-
-function mapPlan(dto) {
-  const id =
-    dto.evaluationPlanID || dto.evaluationPlanId || dto.id || dto.uuid || dto.codigo || dto.code;
-
-  const title =
-    dto.planName || dto.nombre || dto.name || dto.titulo || dto.title || 'Plan de Evaluación';
-
-  const year =
-    dto.year || dto.anio || dto.academicYear || dto.yearLabel;
-
-  const cycle =
-    dto.cycle || dto.ciclo || dto.cycleLabel || dto.cycleType;
-
-  const period = [cycle, year].filter(Boolean).join(' - ')
-               || dto.period || dto.periodo || '—';
-
-  const description =
-    dto.description || dto.descripcion || dto.detalle || '';
-
-  return { id, title, period, description, evaluations: [] };
 }
 
 async function openPlanDetail(plan) {
@@ -154,58 +165,108 @@ async function openPlanDetail(plan) {
   $('#detail-evaluations', tpl).innerHTML =
     (plan.evaluations || []).map(e => `<li>${escapeHTML(e)}</li>`).join('');
 
-  // Mostrar modal
-  Modal.show(tpl.firstElementChild ? tpl.firstElementChild : tpl);
+  Modal.show(tpl.firstElementChild || tpl);
 }
 
 async function openCreateModal() {
   const tpl = document.importNode($('#tmpl-create-plan').content, true);
-  const form = tpl.querySelector('#plan-form');
+  Modal.show(tpl.firstElementChild || tpl);
+  await new Promise(r => requestAnimationFrame(r)); // esperar a que esté en el DOM
 
-  // Botón cancelar
-  tpl.querySelector('#cancel-plan-btn')?.addEventListener('click', () => Modal.hide());
+  const form = document.querySelector('#plan-form');
+  const sel  = document.querySelector('#form-courseOffering');
 
-  // Guardar (WIP: ajusta payload al DTO de tu backend si ya lo tienes)
+  if (sel) {
+    sel.innerHTML = '<option value="">Selecciona un curso…</option>';
+    if (OFFERINGS_BY_ID.size) {
+      for (const off of OFFERINGS_BY_ID.values()) {
+        const opt = document.createElement('option');
+        opt.value = off.courseOfferingID || off.id;
+        opt.textContent = labelFromOffering(off);
+        sel.appendChild(opt);
+      }
+    } else {
+      sel.innerHTML = '<option value="">— No hay cursos disponibles —</option>';
+    }
+  }
+
+  document.querySelector('#cancel-plan-btn')?.addEventListener('click', () => Modal.hide());
+
   form?.addEventListener('submit', async e => {
     e.preventDefault();
-    Toast.show('Define los campos del DTO para guardar (create).', 'warn');
 
-    // Ejemplo (ajústalo luego a tu DTO real):
-    // const payload = {
-    //   planName: tpl.querySelector('#form-title').value,
-    //   description: tpl.querySelector('#form-description').value,
-    //   period: tpl.querySelector('#form-period').value
-    // };
-    // await EvaluationPlansService.create(payload);
-    // await loadAndRender();
+    const planName    = document.querySelector('#form-title')?.value.trim() || '';
+    const description = document.querySelector('#form-description')?.value.trim() || '';
+    const courseOfferingID = document.querySelector('#form-courseOffering')?.value || '';
 
-    Modal.hide();
+    if (!courseOfferingID) { Toast.show('Selecciona un curso.', 'warn'); return; }
+    if (!planName)         { Toast.show('Escribe el título del plan.', 'warn'); return; }
+
+    try {
+      await EvaluationPlansService.create({ courseOfferingID, planName, description });
+      Toast.show('Plan creado con éxito.', 'success');
+      Modal.hide();
+      await loadAndRender();
+    } catch (err) {
+      console.error('[Create] fallo:', err);
+      Toast.show('No se pudo crear el plan.', 'error');
+    }
   });
-
-  // Mostrar modal
-  Modal.show(tpl.firstElementChild ? tpl.firstElementChild : tpl);
 }
+
+function normalizeDateForAPI(v) {
+  try {
+    const d = v ? new Date(v) : new Date();
+    if (isNaN(d.getTime())) return new Date().toISOString().slice(0, 10);
+    return d.toISOString().slice(0, 10);
+  } catch {
+    return new Date().toISOString().slice(0, 10);
+  }
+}
+
 
 async function openEditModal(plan) {
   const tpl = document.importNode($('#tmpl-create-plan').content, true);
+  Modal.show(tpl.firstElementChild || tpl);
+  await new Promise(r => requestAnimationFrame(r));
 
-  // Precarga
-  tpl.querySelector('#form-title').value = plan.title || '';
-  tpl.querySelector('#form-period').value = plan.period || '';
-  tpl.querySelector('#form-description').value = plan.description || '';
+  document.querySelector('#form-title').value       = plan.title || '';
+  document.querySelector('#form-description').value = plan.description || '';
 
-  tpl.querySelector('#cancel-plan-btn')?.addEventListener('click', () => Modal.hide());
-  tpl.querySelector('#plan-form')?.addEventListener('submit', async e => {
+  const sel = document.querySelector('#form-courseOffering');
+  if (sel) {
+    sel.innerHTML = `<option>${plan.period || '—'}</option>`;
+    sel.disabled = true;
+  }
+
+  document.querySelector('#cancel-plan-btn')?.addEventListener('click', () => Modal.hide());
+
+  document.querySelector('#plan-form')?.addEventListener('submit', async e => {
     e.preventDefault();
-    Toast.show('Define el DTO para actualizar (update).', 'warn');
 
 
+    const payload = {
+      planName:        document.querySelector('#form-title')?.value.trim() || '',
+      description:     document.querySelector('#form-description')?.value.trim() || '',
+      courseOfferingID: plan.courseOfferingID || plan.offering?.courseOfferingID || null,
+      createdAt:       normalizeDateForAPI(plan.createdAt)
+    };
 
-    Modal.hide();
+    if (!payload.courseOfferingID) delete payload.courseOfferingID;
+
+    try {
+      await EvaluationPlansService.update(plan.id, payload);
+      Toast.show('Plan actualizado.', 'success');
+      Modal.hide();
+      await loadAndRender();
+    } catch (err) {
+      console.error('[Update] fallo:', err);
+      Toast.show('No se pudo actualizar el plan.', 'error');
+    }
   });
-
-  Modal.show(tpl.firstElementChild ? tpl.firstElementChild : tpl);
 }
+
+
 
 function updateTimelineHeight() {
   const container = $('#plans-container');

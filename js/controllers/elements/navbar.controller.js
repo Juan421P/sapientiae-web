@@ -150,7 +150,7 @@ const html = `
                                         class="block px-3 py-1 text-[rgb(var(--button-from))] rounded hover:text-[rgb(var(--text-from))]">Pensums</a>
                                 </li>
                                 <li>
-                                    <a href="/html/planification/subjects.html"
+                                    <a href="/html/planification/subjects.definitions.html"
                                         class="block px-3 py-1 text-[rgb(var(--button-from))] rounded hover:text-[rgb(var(--text-from))]">Materias</a>
                                 </li>
                                 <li>

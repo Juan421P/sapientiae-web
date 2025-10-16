@@ -1,0 +1,22 @@
+<div class="flex flex-col flex-1 mb-4 lg:mb-0" data-select>
+    <div>
+        <label
+            class="mb-1 ml-2 text-xs font-semibold bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent select-none"
+            data-label>Seleccione</label>
+    </div>
+    <div class="relative w-full group">
+        <button type="button" data-btn
+            class="flex items-center justify-between w-full px-4 py-3 transition-all shadow-md bg-gradient-to-r from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] rounded-lg focus:outline-none group-hover:cursor-pointer">
+            <span data-text class="italic text-[rgb(var(--placeholder-from))]">Seleccione</span>
+            <svg viewBox="0 0 24 24" class="w-4 h-4 text-[rgb(var(--text-from))] transition-transform duration-300"
+                data-chevron fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M6 9l6 6 6-6" />
+            </svg>
+        </button>
+        <ul data-menu
+            class="absolute left-0 z-20 hidden w-full mt-1 bg-gradient-to-r from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] drop-shadow rounded-lg">
+        </ul>
+        <input type="text" data-input class="absolute top-0 left-0 z-0 w-1 h-1 opacity-0 pointer-events-none">
+    </div>
+</div>
