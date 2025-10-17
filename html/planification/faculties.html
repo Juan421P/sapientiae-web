@@ -63,11 +63,65 @@
             <section id="career-list" class="flex flex-wrap gap-6">
             </section>
 
+            <section id="faculties-list" class="flex flex-wrap gap-6">
+            </section>
+
         </main>
     </div>
     <footer id="footer" class="fixed bottom-0 left-0 w-full bg-gradient-to-tr from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] z-[999] opacity-0 pointer-events-none translate-y-full transition-all duration-700 ease-in-out grid grid-cols-1 md:grid-cols-12 rounded-t-2xl md:rounded-t-none cursor-pointer">
     </footer>
 </body>
+
+<!-- Template para ver facultad -->
+<template id="tmpl-view-faculty">
+    <div class="flex flex-col max-w-lg px-8 mx-auto gap-8 py-10">
+        <!-- Título -->
+        <div class="flex flex-col items-center">
+            <span
+                class="text-3xl font-bold text-center mb-2 drop-shadow bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent select-none"
+                id="view-faculty-name">
+            </span>
+        </div>
+
+        <!-- Campos -->
+        <div class="flex flex-col gap-4">
+            <div class="flex flex-col gap-2">
+                <span class="text-sm font-semibold bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent">
+                    ID de Facultad
+                </span>
+                <span class="text-lg bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] bg-clip-text text-transparent"
+                      id="view-faculty-id">
+                </span>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <span class="text-sm font-semibold bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent">
+                    Teléfono de contacto
+                </span>
+                <span class="text-lg bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] bg-clip-text text-transparent"
+                      id="view-faculty-phone">
+                </span>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <span class="text-sm font-semibold bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent">
+                    Código correlativo
+                </span>
+                <span class="text-lg bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] bg-clip-text text-transparent"
+                      id="view-faculty-code">
+                </span>
+            </div>
+        </div>
+
+        <!-- Botón cerrar -->
+        <div class="flex justify-end">
+            <button type="button" id="close-faculty-view-btn"
+                    class="p-4 bg-gradient-to-tr from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] text-white drop-shadow rounded-xl font-medium shadow-md hover:scale-[1.015] transition-all">
+                Cerrar
+            </button>
+        </div>
+    </div>
+</template>
 <script type="module" src="./../../js/controllers/auth/auth.controller.js"></script>
 <script type="module" src="./../../js/controllers/themes/themes.controller.js"></script>
 <script type="module" src="./../../js/controllers/planification/faculties.controller.js"></script>

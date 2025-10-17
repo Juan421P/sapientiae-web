@@ -36,22 +36,20 @@ function populateGrades(grades) {
             </div>
         `;
 
-    // Listeners de las tarjetas
     gradeList.querySelectorAll('.grade-card').forEach(card => {
         card.addEventListener('click', () => {
             const id = card.dataset.id;
-            const grades = allDegrees.find(m => m.id === id);
-
+            const grade = allDegrees.find(m => String(m.id).trim().toUpperCase() === String(id).trim().toUpperCase());
             ContextMenu.show([
                 {
                     label: 'Ver detalles',
                     icon: 'view',
-                    onClick: () => Toast.show(grades)
+                    onClick: () => showViewDegree(grade)
                 },
                 {
                     label: 'Editar',
                     icon: 'edit',
-                    onClick: () => Toast.show(grades)
+                    onClick: () => showEditDegree(grade)
                 },
                 {
                     label: 'Eliminar',
@@ -156,7 +154,6 @@ function showAddDegree() {
     const formElement = template.content.querySelector('#grade-form').cloneNode(true);
     Modal.show(formElement);
 
-    // Llenar el select de universidades
     const selectRoot = formElement.querySelector('[data-select]');
     const universityOptions = allUniversities.map(u => ({
         value: u.universityID,
@@ -164,36 +161,34 @@ function showAddDegree() {
     }));
     populateSelect(selectRoot, universityOptions);
 
-    // Cancelar
     formElement.querySelector('#cancel-btn').addEventListener('click', () => {
         Modal.hide();
     });
 
-    // Guardar
-    formElement.addEventListener('submit', async (e) => {
-        e.preventDefault();
+formElement.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-        const formData = new FormData(formElement);
-        const data = {
-            degreeTypeName: formData.get('degreeTypeName'),
-            universityID: formData.get('universityID')
-        };
+    const formData = new FormData(formElement);
+    const data = {
+        degreeTypeName: formData.get('degreeTypeName'),
+        universityID: formData.get('universityID')
+    };
 
-        if (!data.degreeTypeName || !data.universityID) {
-            Toast.show('Todos los campos son requeridos', 'warn');
-            return;
-        }
+    if (!data.degreeTypeName || !data.universityID) {
+        Toast.show('Todos los campos son requeridos', 'warn');
+        return;
+    }
 
-        try {
-            await DegreeTypesService.post(data);
-            Toast.show('Grado creado correctamente', 'success');
-            Modal.hide();
-            await loadGrades();
-        } catch (error) {
-            Toast.show('Error al crear el grado', 'error');
-            console.error(error);
-        }
-    });
+    try {
+        await DegreeTypesService.put(grade.id, data);
+        Toast.show('Grado actualizado correctamente', 'success');
+        Modal.hide();
+        await loadGrades();
+    } catch (error) {
+        Toast.show('Error al actualizar el grado', 'error');
+        console.error(error);
+    }
+});
 }
 
 function showEditDegree(grade) {
@@ -255,7 +250,7 @@ function showViewDegree(grade) {
 
     viewElement.querySelector('#view-degree-name').textContent = grade.degreeTypeName || 'Sin nombre';
     viewElement.querySelector('#view-university').textContent = grade.universityName || 'Sin universidad';
-    viewElement.querySelector('#view-universityID').textContent = grade.universityID || 'Sin universidad';
+    viewElement.querySelector('#view-universityID').textContent = grade.universityID || 'Sin ID';
 
     Modal.show(viewElement);
 
@@ -268,7 +263,8 @@ addDegreeBtn.addEventListener('click', showAddDegree);
 
 async function loadGrades() {
     const data = await DegreeTypesService.get();
-    populateGrades(data);
+    allDegrees = data;
+    populateGrades(allDegrees);
 }
 
 await loadUniversities();
