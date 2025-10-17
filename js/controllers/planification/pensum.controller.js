@@ -35,7 +35,6 @@ function populatePensum(pensums) {
             </div>
         `;
 
-    // Agregar eventos a las tarjetas
     pensumList.querySelectorAll('.pensum-card').forEach(card => {
         card.addEventListener('click', () => {
             const id = card.dataset.id;
@@ -76,7 +75,6 @@ function populatePensum(pensums) {
     });
 }
 
-// Cargar pensums desde el backend
 async function loadPensum() {
     try {
         console.log('Cargando pensums...');
@@ -84,7 +82,6 @@ async function loadPensum() {
         
         console.log('Respuesta cruda del servidor:', response);
         
-        // Manejar diferentes formatos de respuesta
         if (Array.isArray(response)) {
             allPensum = response;
         } else if (response && response.data && Array.isArray(response.data)) {
@@ -105,7 +102,6 @@ async function loadPensum() {
     }
 }
 
-// Cargar carreras desde el backend
 async function loadCareers() {
     try {
         console.log('Cargando carreras...');
@@ -113,7 +109,6 @@ async function loadCareers() {
         
         console.log('Respuesta cruda de carreras:', response);
         
-        // Manejar diferentes formatos de respuesta
         if (Array.isArray(response)) {
             allCareers = response;
         } else if (response && response.data && Array.isArray(response.data)) {
@@ -127,7 +122,6 @@ async function loadCareers() {
         
         console.log('Carreras procesadas:', allCareers);
         
-        // 🔍 Verificar estructura de las carreras
         if (allCareers.length > 0) {
             console.log('Estructura de una carrera:', allCareers[0]);
             console.log('Campos disponibles:', Object.keys(allCareers[0]));
@@ -139,7 +133,6 @@ async function loadCareers() {
     }
 }
 
-// Buscador en tiempo real
 searchInput.addEventListener('input', (e) => {
     const searchTerm = e.target.value.toLowerCase().trim();
     
@@ -161,7 +154,6 @@ searchInput.addEventListener('input', (e) => {
     populatePensum(filtered);
 });
 
-// Función para poblar el select personalizado
 function populateSelect(selectRoot, options = [], selectedValue = null) {
     if (!selectRoot) return;
 
@@ -171,7 +163,6 @@ function populateSelect(selectRoot, options = [], selectedValue = null) {
     const chevron = selectRoot.querySelector('[data-chevron]');
     const btn = selectRoot.querySelector('[data-btn]');
 
-    // Renderizar opciones
     menu.innerHTML = options.map(opt => `
         <li class="px-4 py-2 cursor-pointer transition select-none 
                    bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] 
@@ -182,14 +173,12 @@ function populateSelect(selectRoot, options = [], selectedValue = null) {
         </li>
     `).join('');
 
-    // Toggle del menú
     btn.addEventListener('click', () => {
         const isOpen = !menu.classList.contains('hidden');
         menu.classList.toggle('hidden', isOpen);
         chevron.classList.toggle('rotate-180', !isOpen);
     });
 
-    // Cerrar al hacer clic afuera
     document.addEventListener('click', e => {
         if (!selectRoot.contains(e.target)) {
             menu.classList.add('hidden');
@@ -197,7 +186,6 @@ function populateSelect(selectRoot, options = [], selectedValue = null) {
         }
     });
 
-    // Seleccionar opción
     menu.querySelectorAll('li').forEach(li => {
         li.addEventListener('click', () => {
             const val = li.dataset.value;
@@ -232,7 +220,6 @@ function populateSelect(selectRoot, options = [], selectedValue = null) {
     }
 }
 
-// Modal para agregar pensum
 function showAddModal() {
     const template = document.querySelector('#tmpl-add-pensum');
     if (!template) return;
@@ -241,32 +228,45 @@ function showAddModal() {
     Modal.show(formElement);
 
     const selectRoot = formElement.querySelector('[data-select]');
+    
+    // ✅ Intentar múltiples campos para el ID de carrera
     const careerOptions = allCareers.map(c => ({
-        value: c.id,
-        label: c.nameCareer || c.name 
+        value: c.id || c.careerID || c.CareerID || c.ID,
+        label: c.nameCareer || c.name || c.Name || 'Sin nombre'
     }));
     
-    console.log('🎓 Opciones de carreras:', careerOptions);
+    console.log('🎓 Opciones de carreras para agregar:', careerOptions);
     populateSelect(selectRoot, careerOptions);
 
-    // Botón cancelar
     formElement.querySelector('#cancel-btn').addEventListener('click', () => {
         Modal.hide();
     });
 
-    // Submit del formulario
     formElement.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const formData = new FormData(formElement);
         
+        // ✅ Convertir a número ANTES de validar y asegurar que no sea NaN
+        const yearValue = formData.get('EffectiveYear')?.trim();
+        let yearNumber = null;
+        
+        if (yearValue && yearValue.length > 0) {
+            yearNumber = parseInt(yearValue, 10);
+            if (isNaN(yearNumber)) {
+                yearNumber = null;
+            }
+        }
+        
         const data = {
-            Version: formData.get('Version')?.trim(),
-            EffectiveYear: parseInt(formData.get('EffectiveYear')),
-            CareerID: formData.get('CareerID')?.trim()
+            Version: formData.get('Version')?.trim() || null,
+            EffectiveYear: yearNumber,
+            CareerID: formData.get('CareerID')?.trim() || null
         };
 
-        // Validaciones
+        console.log('📦 Datos capturados (POST):', data);
+
+        // ✅ Validaciones corregidas
         if (!data.Version || data.Version.length === 0) {
             Toast.show('La versión es requerida', 'warn');
             return;
@@ -277,8 +277,8 @@ function showAddModal() {
             return;
         }
 
-        if (!data.EffectiveYear || isNaN(data.EffectiveYear)) {
-            Toast.show('El año efectivo es requerido', 'warn');
+        if (data.EffectiveYear === null || isNaN(data.EffectiveYear)) {
+            Toast.show('El año efectivo es requerido y debe ser un número válido', 'warn');
             return;
         }
 
@@ -292,66 +292,75 @@ function showAddModal() {
             return;
         }
 
-        console.log('Datos a enviar (POST):', data);
+        console.log('✅ Datos validados (POST):', data);
 
         try {
             const response = await PensumService.post(data);
-            console.log('Respuesta POST:', response);
+            console.log('✅ Respuesta POST exitosa:', response);
             Toast.show('Pensum creado correctamente', 'success');
             Modal.hide();
             await loadPensum();
         } catch (error) {
-            console.error('Error al crear pensum:', error);
+            console.error('❌ Error al crear pensum:', error);
             Toast.show(error.message || 'Error al crear el pensum', 'error');
         }
     });
 }
 
-// Modal para editar pensum
 function showEditModal(pensum) {
     const template = document.querySelector('#tmpl-add-pensum');
     if (!template) return;
 
     const formElement = template.content.querySelector('#pensum-form').cloneNode(true);
     
-    // Cambiar título
     formElement.querySelector('#form-title').textContent = 'Editar pensum';
     formElement.querySelector('.text-xl').textContent = 'Modifica los campos necesarios';
     
     Modal.show(formElement);
 
-    const version = pensum.Version || '';
-    const year = pensum.EffectiveYear || '';
-    const careerId = pensum.CareerID || '';
+    // ✅ Usar los campos correctos del pensum
+    const version = pensum.version || pensum.Version || '';
+    const year = pensum.effectiveYear || pensum.EffectiveYear || '';
+    const careerId = pensum.careerID || pensum.CareerID || '';
+    
+    console.log('📝 Datos del pensum a editar:', { version, year, careerId });
     
     formElement.querySelector('#pensum-version').value = version;
     formElement.querySelector('#pensum-year').value = year;
 
     const selectRoot = formElement.querySelector('[data-select]');
+    
+    // ✅ Usar múltiples campos posibles
     const careerOptions = allCareers.map(c => ({
-        value: c.id,
-        label: c.nameCareer || c.name
+        value: c.id || c.careerID || c.CareerID || c.ID,
+        label: c.nameCareer || c.name || c.Name || 'Sin nombre'
     }));
+    
+    console.log('🎓 Opciones de carreras para editar:', careerOptions);
     populateSelect(selectRoot, careerOptions, careerId);
 
-    // Botón cancelar
     formElement.querySelector('#cancel-btn').addEventListener('click', () => {
         Modal.hide();
     });
 
-    // Submit del formulario
     formElement.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const formData = new FormData(formElement);
         
+        // ✅ Convertir a número ANTES de validar
+        const yearValue = formData.get('EffectiveYear')?.trim();
+        const yearNumber = yearValue ? parseInt(yearValue, 10) : null;
+        
         const data = {
             Version: formData.get('Version')?.trim(),
-            EffectiveYear: parseInt(formData.get('EffectiveYear')),
+            EffectiveYear: yearNumber,
             CareerID: formData.get('CareerID')?.trim()
         };
 
-        // Validaciones
+        console.log('📦 Datos capturados (PUT):', data);
+
+        // ✅ Validaciones usando los nombres CORRECTOS (PascalCase)
         if (!data.Version || data.Version.length === 0) {
             Toast.show('La versión es requerida', 'warn');
             return;
@@ -362,45 +371,45 @@ function showEditModal(pensum) {
             return;
         }
 
-        if (!data.effectiveYear || isNaN(data.EffectiveYear)) {
-            Toast.show('El año efectivo es requerido', 'warn');
+        if (data.EffectiveYear === null || isNaN(data.EffectiveYear)) {
+            Toast.show('El año efectivo es requerido y debe ser un número válido', 'warn');
             return;
         }
 
-        if (data.effectiveYear < 1900 || data.EffectiveYear > 2100) {
+        if (data.EffectiveYear < 1900 || data.EffectiveYear > 2100) {
             Toast.show('El año debe estar entre 1900 y 2100', 'warn');
             return;
         }
 
-        if (!data.careerID || data.CareerID.length === 0) {
+        if (!data.CareerID || data.CareerID.length === 0) {
             Toast.show('Debe seleccionar una carrera', 'warn');
             return;
         }
 
-        console.log('Datos a enviar (PUT):', data);
+        console.log('✅ Datos validados (PUT):', data);
 
         try {
             const pensumId = pensum.pensumID || pensum.PensumID;
+            console.log('🆔 ID del pensum a actualizar:', pensumId);
+            
             const response = await PensumService.put(pensumId, data);
-            console.log('Respuesta PUT:', response);
+            console.log('✅ Respuesta PUT exitosa:', response);
             Toast.show('Pensum actualizado correctamente', 'success');
             Modal.hide();
             await loadPensum();
         } catch (error) {
-            console.error('Error al actualizar pensum:', error);
+            console.error('❌ Error al actualizar pensum:', error);
             Toast.show(error.message || 'Error al actualizar el pensum', 'error');
         }
     });
 }
 
-// Modal para ver detalles
 function showViewModal(pensum) {
     const template = document.querySelector('#tmpl-view-pensum');
     if (!template) return;
 
     const viewElement = template.content.cloneNode(true).querySelector('div');
     
-    // Rellenar datos (manejar ambos formatos)
     const version = pensum.version || pensum.Version || 'Sin versión';
     const year = pensum.effectiveYear || pensum.EffectiveYear || 'N/A';
     const career = pensum.career || 'Sin carrera asignada';
@@ -411,15 +420,12 @@ function showViewModal(pensum) {
 
     Modal.show(viewElement);
 
-    // Botón cerrar
     viewElement.querySelector('#close-view-btn').addEventListener('click', () => {
         Modal.hide();
     });
 }
 
-// Event listener del botón agregar
 addPensumBtn.addEventListener('click', showAddModal);
 
-// Inicialización
 await loadCareers();
 await loadPensum();
