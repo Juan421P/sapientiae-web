@@ -1,14 +1,14 @@
 import { FacultiesService } from "../../services/faculties.service";
 
-const careerList = document.querySelector('#career-list');
+const facultyList = document.querySelector('#faculties-list');
 const user = JSON.parse(sessionStorage.getItem('user'));
 
-function populateCareers(faculties) {
-    const filtered = faculties.filter(c => c.universityID === user.universityID);
+let allFaculties = [];
 
-    careerList.innerHTML = faculties.length
+function populateCareers(faculties) {
+    facultyList.innerHTML = faculties.length
         ? faculties.map(c => `
-            <div class="career-card min-w-[300px] max-w-[500px] p-6 bg-gradient-to-tr from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] 
+            <div class="faculty-card min-w-[300px] max-w-[500px] p-6 bg-gradient-to-tr from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] 
                        rounded-xl shadow hover:shadow-lg hover:scale-[1.015] transition-transform duration-300 
                        cursor-pointer flex flex-col justify-between" 
                 data-id="${c.facultyID}">
@@ -58,15 +58,15 @@ function populateCareers(faculties) {
             </div>
         `;
 
-    careerList.querySelectorAll('.career-card').forEach(card => {
+    facultyList.querySelectorAll('.faculty-card').forEach(card => {
         card.addEventListener('click', () => {
             const id = card.dataset.id;
-
+            const faculty = allFaculties.find(m => String(m.id).trim().toUpperCase() === String(id).trim().toUpperCase());
             ContextMenu.show([
                 {
                     label: 'Ver detalles',
                     icon: 'view',
-                    onClick: () => Toast.show(`Mostrando detalles de la facultad #${id}`, 'info')
+                    onClick: () => showViewFaculty(faculty)
                 },
                 {
                     label: 'Editar',
@@ -90,6 +90,33 @@ function populateCareers(faculties) {
         });
     });
 }
+
+function showViewFaculty(faculty) {
+    const template = document.querySelector('#tmpl-view-faculty');
+    if (!template) return;
+
+    const viewElement = template.content.cloneNode(true).querySelector('div');
+
+    viewElement.querySelector('#view-faculty-name').textContent = faculty.facultyName || 'Sin nombre';
+    viewElement.querySelector('#view-faculty-id').textContent = faculty.facultyID || '—';
+    viewElement.querySelector('#view-faculty-phone').textContent = faculty.contactPhone || 'Sin teléfono';
+    viewElement.querySelector('#view-faculty-code').textContent = faculty.correlativeCode ?? 'N/A';
+
+    Modal.show(viewElement);
+
+    viewElement.querySelector('#close-faculty-view-btn').addEventListener('click', () => {
+        Modal.hide();
+    });
+}
+
+// Ejemplo de uso
+document.querySelectorAll('.career-card').forEach(card => {
+    card.addEventListener('click', () => {
+        const id = card.dataset.id;
+        const faculty = allFaculties.find(f => f.facultyID === id);
+        if(faculty) showViewFaculty(faculty);
+    });
+});
 
 async function loadCareers() {
     const data = await FacultiesService.get();

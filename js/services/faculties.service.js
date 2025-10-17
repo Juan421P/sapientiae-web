@@ -17,7 +17,7 @@ export class FacultiesService {
 		});
 	}
 
-	static async put(id){
+	static async put(id, data){
 		return await Network.put({
 			path: `${this._ENDPOINT}/updateFaculty/${id}`,
 			body: data
