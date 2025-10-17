@@ -1,25 +1,37 @@
-import { Service } from './../lib/service.js';
-import { NotificationsContract } from './../contracts/notifications.contract.js';
+import { Network } from './../lib/network';
 
-export class NotificationsService extends Service {
-    
-    static baseEndpoint = '/Notifications';
-    static contract = new NotificationsContract();
+export class NotificationService {
+    static _ENDPOINT = '/Notifications';
 
-    static async list() {
-        return await this.get('getNotifications', null, 'table');
+    static async get() {
+        return await Network.get({ 
+            path: `${this._ENDPOINT}/getNotifications` 
+        });
     }
 
-    static async create(notificationData) {
-        return await this.post('newNotification', notificationData, 'create');
+    static async getPagination(page = 0, size = 10) {
+        return await Network.get({ 
+            path: `${this._ENDPOINT}/getNotificationPagination?page=${page}&size=${size}` 
+        });
     }
 
-    // Si más adelante necesitas update, lo puedes habilitar aquí
-    // static async update(notificationData) {
-    //     return await this.put('updateNotification', notificationData, 'update');
-    // }
+    static async post(data) {
+        return await Network.post({ 
+            path: `${this._ENDPOINT}/newNotification`, 
+            body: data 
+        });
+    }
+
+    static async put(id, data) {
+        return await Network.put({ 
+            path: `${this._ENDPOINT}/updateNotification/${id}`, 
+            body: data 
+        });
+    }
 
     static async delete(id) {
-        return await this.delete('deleteNotification', id);
+        return await Network.delete({ 
+            path: `${this._ENDPOINT}/deleteNotification/${id}` 
+        });
     }
 }
