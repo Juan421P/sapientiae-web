@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es" class="scrollbar-width-none">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./../../css/style.css">
+    <link rel="icon" href="./../../img/logo.ico">
+    <title>Notificaciones</title>
+</head>
+<body class="relative flex justify-center min-h-screen mb-20 md:justify-start bg-gradient-to-tr from-[rgb(var(--body-from))] to-[rgb(var(--body-to))]">
+    
+    <div class="fixed bottom-10 left-0 w-[600px] h-[600px] pointer-events-none animate-left-spin-pulse">
+        <div class="absolute inset-0 border-2 border-[rgb(var(--button-to))] opacity-20"></div>
+        <div class="absolute border-2 border-[rgb(var(--placeholder-to))] inset-1 opacity-5"></div>
+        <div class="absolute inset-0 rotate-45 border-2 border-[rgb(var(--button-from))] opacity-40"></div>
+        <div class="absolute rotate-45 border-2 border-[rgb(var(--placeholder-from))] inset-1 opacity-20"></div>
+    </div>
+
+    <div class="fixed top-0 right-0 w-[300px] h-[300px] z-[-20] pointer-events-none animate-right-spin-pulse">
+        <div class="absolute inset-0 border-2 border-[rgb(var(--button-to))] opacity-20"></div>
+        <div class="absolute border-2 border-[rgb(var(--placeholder-to))] inset-1 opacity-5"></div>
+        <div class="absolute inset-0 rotate-45 border-2 border-[rgb(var(--button-from))] opacity-40"></div>
+        <div class="absolute rotate-45 border-2 border-[rgb(var(--placeholder-from))] inset-1 opacity-20"></div>
+    </div>
+
+    <div id="navbar" class="fixed top-0 left-0 w-full z-[51]">
+    </div>
+
+    <div id="main-view" class="z-50 flex-1 w-full">
+        <main class="flex flex-col min-h-screen p-10 space-y-8 md:ml-80 pb-80 md:pb-20">
+            
+            <div class="flex items-center justify-between">
+                <h1 class="text-2xl font-bold bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent drop-shadow select-none">
+                    Notificaciones
+                </h1>
+                <div class="block transition-shadow duration-300 bg-transparent group rounded-xl hover:bg-white hover:shadow-lg">
+                    <button type="button" class="btn-component" id="add-notification-btn">
+                        <div class="flex justify-center w-full gap-4">
+                            <svg id="button-icon" class="w-6 h-6 stroke-current fill-none drop-shadow-sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10" />
+                                <path d="M8 12h8" />
+                                <path d="M12 8v8" />
+                            </svg>
+                            <span class="drop-shadow-sm">
+                                Agregar notificación
+                            </span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <div class="sm:max-w-xs">
+                <input id="notification-search" type="text" placeholder="Buscar" class="w-full bg-gradient-to-r from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] px-4 py-3 rounded-lg focus:outline-none text-[rgb(var(--button-from))] placeholder:text-[rgb(var(--placeholder-from))] placeholder:italic text-shadow shadow-md border-none select-none focus:ring-0" />
+            </div>
+
+            <div class="flex flex-col w-full gap-6 p-5 pl-0 select-none" id="notification-list">
+            </div>
+
+        </main>
+    </div>
+
+    <footer id="footer" class="fixed bottom-0 left-0 w-full bg-gradient-to-tr from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] z-[999] opacity-0 pointer-events-none translate-y-full transition-all duration-700 ease-in-out grid grid-cols-1 md:grid-cols-12 rounded-t-2xl md:rounded-t-none cursor-pointer">
+    </footer>
+
+    <template id="tmpl-add-notification">
+        <form id="notification-form" novalidate class="flex flex-col max-w-md px-6 mx-auto gap-14 py-14">
+            <div class="flex flex-col items-center">
+                <span class="text-3xl font-bold text-center mb-2 drop-shadow bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent select-none">
+                    Nueva notificación
+                </span>
+                <span class="text-xl font-semibold text-center drop-shadow bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent select-none">
+                    Llena los campos requeridos
+                </span>
+            </div>
+
+            <div class="flex flex-col gap-6">
+                <input id="notification-title" name="title" type="text" placeholder="Título de la notificación" class="w-full bg-gradient-to-r from-[rgb(var(--body-from))] to-[rgb(var(--body-to))] px-6 py-4 rounded-lg focus:outline-none text-indigo-500 placeholder:text-indigo-300 text-xl placeholder:italic text-shadow shadow-md border-none" required>
+                
+                <textarea id="notification-body" name="body" placeholder="Cuerpo del mensaje (máx. 300 caracteres)" maxlength="300" class="w-full bg-gradient-to-r from-[rgb(var(--body-from))] to-[rgb(var(--body-to))] px-6 py-4 rounded-lg focus:outline-none text-indigo-500 placeholder:text-indigo-300 text-xl placeholder:italic text-shadow shadow-md border-none min-h-[120px]" required></textarea>
+                
+                <div class="flex flex-col flex-1" data-select>
+                    <div>
+                        <label class="mb-1 ml-2 text-xs font-semibold bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent select-none" data-label>Usuario</label>
+                    </div>
+                    <div class="relative w-full group">
+                        <button type="button" data-btn class="flex items-center justify-between w-full px-4 py-3 transition-all shadow-md bg-gradient-to-r from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] rounded-lg focus:outline-none group-hover:cursor-pointer">
+                            <span data-text class="italic text-[rgb(var(--placeholder-from))]">Seleccione un usuario</span>
+                            <svg viewBox="0 0 24 24" class="w-4 h-4 text-[rgb(var(--text-from))] transition-transform duration-300" data-chevron fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 9l6 6 6-6" />
+                            </svg>
+                        </button>
+                        <ul data-menu class="absolute left-0 z-20 hidden w-full mt-1 bg-gradient-to-r from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] drop-shadow rounded-lg max-h-48 overflow-y-auto">
+                        </ul>
+                        <input type="text" data-input name="userID" class="absolute top-0 left-0 z-0 w-1 h-1 opacity-0 pointer-events-none">
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label class="ml-2 text-xs font-semibold bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent select-none">Fecha de envío</label>
+                    <input type="date" name="sentAt" id="notification-date" class="w-full bg-gradient-to-r from-[rgb(var(--body-from))] to-[rgb(var(--body-to))] px-4 py-3 rounded-lg focus:outline-none text-indigo-500 shadow-md border-none">
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3">
+                <button type="button" id="cancel-btn" class="p-4 bg-gradient-to-tr from-indigo-100 to-blue-100 text-indigo-400 hover:scale-[1.015] hover:from-indigo-200 hover:to-blue-200 rounded-xl font-medium shadow-md transition-all">
+                    Cancelar
+                </button>
+                <button type="submit" id="save-btn" class="p-4 bg-gradient-to-tr from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] text-white drop-shadow rounded-xl font-medium shadow-md hover:from-[rgb(var(--body-from))]0 hover:to-[rgb(var(--body-to))]0 hover:scale-[1.015] transition-all">
+                    Guardar
+                </button>
+            </div>
+        </form>
+    </template>
+
+    <template id="tmpl-view-notification">
+        <div class="flex flex-col max-w-lg px-8 mx-auto gap-8 py-10">
+            <div class="flex flex-col items-center">
+                <span class="text-3xl font-bold text-center mb-2 drop-shadow bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent select-none" id="view-title">
+                </span>
+            </div>
+
+            <div class="flex flex-col gap-4">
+                <div class="flex flex-col gap-2">
+                    <span class="text-sm font-semibold bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent">
+                        Usuario
+                    </span>
+                    <span class="text-lg bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] bg-clip-text text-transparent" id="view-user">
+                    </span>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <span class="text-sm font-semibold bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent">
+                        Cuerpo del mensaje
+                    </span>
+                    <p class="text-base bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] bg-clip-text text-transparent" id="view-body">
+                    </p>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <span class="text-sm font-semibold bg-gradient-to-r from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent">
+                        Fecha de envío
+                    </span>
+                    <span class="text-base bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))] bg-clip-text text-transparent" id="view-date">
+                    </span>
+                </div>
+            </div>
+
+            <div class="flex justify-end">
+                <button type="button" id="close-view-btn" class="p-4 bg-gradient-to-tr from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] text-white drop-shadow rounded-xl font-medium shadow-md hover:scale-[1.015] transition-all">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </template>
+
+</body>
+<script type="module" src="./../../js/controllers/auth/auth.controller.js"></script>
+<script type="module" src="./../../js/controllers/themes/themes.controller.js"></script>
+<script type="module" src="./../../js/controllers/general/news.controller.js"></script>
+<script type="module" src="./../../js/controllers/elements/footer.controller.js"></script>
+<script type="module" src="./../../js/controllers/elements/navbar.controller.js"></script>
+</html>
