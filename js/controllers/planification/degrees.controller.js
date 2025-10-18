@@ -19,9 +19,6 @@ function populateGrades(grades) {
                     <p class="text-sm bg-gradient-to-tr from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent italic mb-2 mt-3">
                         Universidad: ${g.universityName || 'Sin descripción'}
                     </p>
-                    <p class="text-xs bg-gradient-to-tr from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent">
-                        ID Universidad: ${g.universityID || 'No especificado'}
-                    </p>
                 </div>
                 <div>
                     <span class="inline-block mt-1 px-2 py-0.5 text-xs rounded bg-indigo-400 text-white font-semibold select-none">
@@ -180,7 +177,7 @@ formElement.addEventListener('submit', async (e) => {
     }
 
     try {
-        await DegreeTypesService.put(grade.id, data);
+        await DegreeTypesService.post(data);
         Toast.show('Grado actualizado correctamente', 'success');
         Modal.hide();
         await loadGrades();
