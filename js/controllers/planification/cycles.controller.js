@@ -9,29 +9,16 @@ function populateCycles(cycles) {
     cyclesList.innerHTML = filtered.length
         ? filtered.map(c => `
             <div class="cycle-card p-6 bg-gradient-to-tr from-[rgb(var(--card-from))] to-[rgb(var(--card-to))] rounded-xl shadow hover:shadow-lg hover:scale-[1.015] transition-transform duration-300 cursor-pointer flex flex-col min-w-[300px] max-w-[500px]" data-id="${c.id}">
-                <div class="mb-10">
-                    <p class="text-md font-bold text-xs bg-gradient-to-tr from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent italic mb-2">
-                        ${c.id || ''}
-                    </p>
+                <div class="mb-5">
                     <h2 class="font-bold text-xl">
                         <span class="bg-gradient-to-tr from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent">
                             ${c.cycleLabel || ''}
                         </span>
                     </h2>
                 </div>
-                <!--
-                <div>
-                    <span class="inline-block mt-1 px-2 py-0.5 text-xs rounded bg-[rgb(var(--card-from))] text-[rgb(var(--card-from))] font-semibold select-none">
-                        ${c.departmentName || 'Departamento'}
-                    </span>
-                    <span class="inline-block mt-1 px-2 py-0.5 text-xs rounded bg-[rgb(var(--button-from))] text-[rgb(var(--card-from))] font-semibold select-none">
-                        ${c.facultyName || 'Facultad'}
-                    </span>
-                    <span class="inline-block mt-1 px-2 py-0.5 text-xs rounded bg-[rgb(var(--button-from))] text-[rgb(var(--card-from))] font-semibold select-none">
-                        ${c.location || 'Localidad'}
-                    </span>
-                </div>
-                -->
+                <h2 class="text-md font-bold text-xs bg-gradient-to-tr from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent italic mb-2">
+                    ${c.universityName || ''}
+                </h2>
             </div>
         `).join('')
         : `

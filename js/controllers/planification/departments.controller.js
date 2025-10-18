@@ -15,10 +15,6 @@ function populateDepartments(departments) {
                         bg-clip-text text-transparent text-lg">
                         ${d.departmentName}
                     </h2>
-                    <p id="departmentCode" class="text-md font-bold text-sm bg-gradient-to-tr from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] 
-                        bg-clip-text text-transparent italic mb-2">
-                        ID: ${d.departmentID}
-                    </p>
                     <p class="text-sm bg-gradient-to-tr from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] bg-clip-text text-transparent">
                         Facultad: ${d.faculty}
                     </p>

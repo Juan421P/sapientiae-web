@@ -17,12 +17,8 @@ function populateCareers(faculties) {
                                bg-clip-text text-transparent text-lg">
                         ${c.facultyName}
                     </h2>
-                    <p class="text-md font-bold text-sm bg-gradient-to-tr from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] 
-                        bg-clip-text text-transparent italic mb-2 mt-5">
-                        ID: ${c.facultyID || '—'}
-                    </p>
                     <p class="text-sm bg-gradient-to-tr from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] 
-                              bg-clip-text text-transparent mb-2">
+                              bg-clip-text text-transparent mt-4">
                         Telefono de contacto: ${c.contactPhone || 'Sin descripción'}
                     </p>
                     <p class="text-sm bg-gradient-to-tr from-[rgb(var(--text-from))] to-[rgb(var(--text-to))] 
