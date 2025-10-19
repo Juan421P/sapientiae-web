@@ -36,6 +36,8 @@ function renderThemeSwatches() {
     };
 
     THEMES.palettes.forEach(p => {
+        if (p.name === 'christmas') return;
+
         const label = document.createElement('label');
         label.className = 'inline-flex items-center justify-center mx-1 cursor-pointer swatch-item';
         label.setAttribute('title', p.name);
@@ -130,3 +132,77 @@ setInitialThemeMode();
 renderThemeSwatches();
 setupThemeButton();
 renderUserInfo();
+
+let typed = '';
+
+window.addEventListener('keydown', (e) => {
+    if (e.key.length === 1) {
+        typed += e.key.toLowerCase();
+        if (typed.endsWith('navidad')) {
+            activateChristmasMode();
+            typed = '';
+        }
+        if (typed.length > 10) typed = typed.slice(-10);
+    }
+});
+
+async function activateChristmasMode() {
+    console.log('🎄 Navidad mode activated!');
+    THEMES.setTheme('christmas', 'light', true);
+
+    const audio = new Audio('/assets/sounds/jb.mp3');
+    audio.volume = 0.7;
+
+    audio.addEventListener('canplaythrough', () => {
+        audio.play().catch(err => console.warn('Audio playback failed:', err));
+    });
+
+    audio.addEventListener('error', (err) => {
+        console.error('❌ Failed to load jingle:', err);
+    });
+
+    startSnowflakes();
+}
+
+function startSnowflakes() {
+    const container = document.createElement('div');
+    container.id = 'snowflakes';
+    container.style.position = 'fixed';
+    container.style.top = 0;
+    container.style.left = 0;
+    container.style.width = '100%';
+    container.style.height = '100%';
+    container.style.pointerEvents = 'none';
+    container.style.zIndex = 9999;
+    document.body.appendChild(container);
+
+    for (let i = 0; i < 40; i++) {
+        const flake = document.createElement('div');
+        flake.textContent = '❄';
+        flake.style.position = 'absolute';
+        flake.style.left = `${Math.random() * 100}%`;
+        flake.style.fontSize = `${Math.random() * 1.2 + 0.8}rem`;
+        flake.style.opacity = Math.random();
+        flake.style.animation = `fall-${i} ${5 + Math.random() * 10}s linear infinite`;
+
+        //flake.style.color = 'white';
+        //flake.style.textShadow = '0 0 6px rgba(255,255,255,0.8)';
+
+        flake.style.background = 'linear-gradient(to bottom, #9ca, #9cf)';
+        flake.style.webkitBackgroundClip = 'text';
+        flake.style.color = 'transparent';
+
+        container.appendChild(flake);
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fall-${i} {
+                0% { transform: translateY(-10%) rotate(0deg); }
+                100% { transform: translateY(110vh) rotate(${Math.random() * 360}deg); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    setTimeout(() => container.remove(), 30000);
+}

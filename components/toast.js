@@ -82,13 +82,17 @@ export class Toast {
         return new Promise(resolve => {
             const container = this._ensureContainer();
 
+            // Create the toast
             const toast = document.createElement('div');
             toast.className = `
             relative flex flex-col gap-3 pointer-events-auto px-5 py-4 rounded shadow-lg text-md
             overflow-hidden max-w-sm min-w-[220px] text-[rgb(var(--card-from))]
             bg-gradient-to-r from-[rgb(var(--button-from))] to-[rgb(var(--button-to))]
-            fade-in select-none
+            animate-toast-slide-in select-none
         `;
+            toast.style.animationDuration = '400ms';
+            toast.style.animationFillMode = 'forwards';
+            toast.style.userSelect = 'none';
 
             toast.innerHTML = `
             <div class="flex items-center gap-3 flex-1 min-w-[300px]">
@@ -109,9 +113,7 @@ export class Toast {
                         <circle cx="12" cy="12" r="10"/>
                         <path d="m15 9-6 6"/><path d="m9 9 6 6"/>
                     </svg>
-                    <span class="drop-shadow">
-                        No
-                    </span>
+                    <span class="drop-shadow">No</span>
                 </button>
                 <button class="flex items-center gap-1.5 px-3 py-1.5 rounded bg-lime-600 hover:bg-lime-700 transition select-none cursor-pointer duration-300">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -120,23 +122,23 @@ export class Toast {
                         <circle cx="12" cy="12" r="10"/>
                         <path d="m9 12 2 2 4-4"/>
                     </svg>
-                    <span class="drop-shadow">
-                        Sí
-                    </span>
+                    <span class="drop-shadow">Sí</span>
                 </button>
             </div>
         `;
 
             const [noBtn, yesBtn] = toast.querySelectorAll('button');
 
-            const close = (val) => {
-                toast.classList.add('opacity-0', 'transition', 'duration-300');
-                setTimeout(() => toast.remove(), 300);
+            const fadeOutAndResolve = (val) => {
+                toast.classList.remove('animate-toast-slide-in');
+                toast.classList.add('animate-toast-fade-out');
+                toast.style.animationDuration = '400ms';
+                toast.addEventListener('animationend', () => toast.remove(), { once: true });
                 resolve(val);
             };
 
-            noBtn.addEventListener('click', () => close(false));
-            yesBtn.addEventListener('click', () => close(true));
+            noBtn.addEventListener('click', () => fadeOutAndResolve(false));
+            yesBtn.addEventListener('click', () => fadeOutAndResolve(true));
 
             container.appendChild(toast);
         });

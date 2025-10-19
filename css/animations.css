@@ -61,3 +61,44 @@
     animation-timing-function: ease-in-out;
     animation-fill-mode: forwards;
 }
+
+@keyframes toast-slide-in {
+
+    0% {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+}
+
+.animate-toast-slide-in {
+    animation-name: toast-slide-in;
+    animation-duration: 300ms;
+    animation-timing-function: ease-out;
+    animation-fill-mode: forwards;
+}
+
+@keyframes toast-fade-out {
+
+    0% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    
+}
+
+.animate-toast-fade-out {
+    animation-name: toast-fade-out;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards;
+}

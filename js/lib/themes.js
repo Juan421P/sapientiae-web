@@ -205,6 +205,41 @@ export const THEMES = (() => {
                 offTo: '251, 207, 232'
             }
         },
+
+        {
+            name: 'christmas',
+            light: {
+                bodyFrom: '255, 247, 237',       // warm ivory tone
+                bodyTo: '254, 242, 242',         // pale red
+                cardFrom: '255, 255, 255',
+                cardTo: '255, 247, 247',
+                textFrom: '220, 38, 38',         // red-600
+                textTo: '22, 163, 74',           // green-600
+                buttonFrom: '220, 38, 38',
+                buttonTo: '22, 163, 74',
+                buttonText: '255, 255, 255',
+                placeholderFrom: '252, 165, 165',// red-300
+                placeholderTo: '134, 239, 172',  // green-300
+                offFrom: '254, 226, 226',        // red-100
+                offTo: '220, 252, 231'           // green-100
+            },
+            dark: {
+                bodyFrom: '33, 33, 33',
+                bodyTo: '50, 50, 50',
+                cardFrom: '22, 22, 22',
+                cardTo: '30, 30, 30',
+                textFrom: '255, 255, 255',
+                textTo: '209, 213, 219',
+                buttonFrom: '220, 38, 38',       // red-600
+                buttonTo: '22, 163, 74',         // green-600
+                buttonText: '255, 255, 255',
+                placeholderFrom: '252, 165, 165',// red-300
+                placeholderTo: '134, 239, 172',  // green-300
+                offFrom: '220, 38, 38',
+                offTo: '22, 163, 74'
+            }
+        },
+
     ];
 
     const STORAGE_KEY = 'app_theme_v1';
